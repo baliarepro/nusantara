@@ -12,7 +12,7 @@ const D={
 // nav & umum
 "Beranda":"Home","Listing":"Listings","Berita":"News","Panduan":"Guide","Tentang kami":"About us","FAQ":"FAQ","Masuk":"Sign in","Daftar agen":"Agent sign-up","Dasbor":"Dashboard","Menu":"Menu","Menu utama":"Main menu","Bahasa":"Language",
 "Properti Indonesia,":"Indonesian property,","langsung dari agennya.":"straight from the agent.",
-"Tanah, rumah, villa dan properti komersial di seluruh Indonesia dari agen-agen terpercaya. Hubungi agennya langsung lewat WhatsApp.":"Land, houses, villas and commercial property across Indonesia from trusted agents. Contact the agent directly on WhatsApp.",
+"Jual beli tanah, rumah, villa, dan properti komersial di Bali dan seluruh Indonesia, langsung dari agen properti terverifikasi. Hubungi agennya lewat WhatsApp.":"Land, houses, villas and commercial property for sale or rent in Bali and across Indonesia, straight from verified property agents. Contact the agent on WhatsApp.",
 "Cari":"Search","Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…":"Search a city or area, e.g. South Jakarta, Sleman, Canggu…","Cari listing":"Search listings","Cari dan saring":"Search and filter",
 "listing":"listings","agen":"agents","provinsi":"provinces","kota/kabupaten":"cities/regencies",
 "Baru tayang":"Just listed","Listing terbaru":"Latest listings","Lihat semua listing":"View all listings","Memuat listing…":"Loading listings…","Belum ada listing yang tayang.":"No listings yet.",

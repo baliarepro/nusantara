@@ -202,7 +202,7 @@ function newsCard(n){
 function head(label,title,lead){return `<header class="page-head" data-noi18n><div class="label">${label}</div><h1>${title}</h1>${lead?`<p>${lead}</p>`:""}</header>`}
 
 return {
- NEWS,newsCard,
+ NEWS,newsCard,DATA:{NEWS_ID,NEWS_EN,GUIDE_ID,GUIDE_EN,FAQ_ID,FAQ_EN},
  news(){const e=EN();return `<div class="wrap page" data-noi18n>${head(e?"News":"Berita",e?"Indonesian property news":"Kabar properti Indonesia",e?"Summaries of market, interest-rate, lending and policy news that affects property deals. Each item links to its original source.":"Ringkasan kabar pasar, suku bunga, kredit, dan kebijakan yang berpengaruh pada jual beli properti. Setiap berita menautkan ke sumber aslinya.")}
    <div class="news-list">${NEWS.map(newsCard).join("")}</div></div>`},
  guide(){const e=EN(),G=e?GUIDE_EN:GUIDE_ID;return `<div class="wrap page" data-noi18n>${head(e?"Guide":"Panduan",e?"Guide to buying property in Indonesia":"Panduan membeli properti di Indonesia",e?"What to check before you pay, from title types to the title transfer. This is general guidance, not legal advice. Always use a PPAT or notary for the transaction.":"Hal-hal yang perlu diperiksa sebelum membayar, dari jenis sertifikat sampai balik nama. Ini panduan umum, bukan nasihat hukum. Untuk transaksi, selalu gunakan PPAT atau notaris.")}

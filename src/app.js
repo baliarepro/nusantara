@@ -3,7 +3,7 @@
 const SB_URL="https://mpyspcofrekhnbkxzucr.supabase.co";
 const SB_KEY="sb_publishable_cFs5F-kTzR39URtsdFKhGg_mXN7cObN";
 const SITE={name:"Nusantara Property",adminPhone:"0812868080",
-  tagline:"Tanah, rumah, villa dan properti komersial di seluruh Indonesia dari agen-agen terpercaya. Hubungi agennya langsung lewat WhatsApp."};
+  tagline:"Jual beli tanah, rumah, villa, dan properti komersial di Bali dan seluruh Indonesia, langsung dari agen properti terverifikasi. Hubungi agennya lewat WhatsApp."};
 const TYPES=["Tanah","Rumah","Villa","Apartemen","Ruko","Gudang","Komersial"];
 const STATUS=["Dijual","Disewakan"];
 const PROVS=["Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau","Jambi","Sumatera Selatan","Kepulauan Bangka Belitung","Bengkulu","Lampung","DKI Jakarta","Jawa Barat","Banten","Jawa Tengah","DI Yogyakarta","Jawa Timur","Bali","Nusa Tenggara Barat","Nusa Tenggara Timur","Kalimantan Barat","Kalimantan Tengah","Kalimantan Selatan","Kalimantan Timur","Kalimantan Utara","Sulawesi Utara","Gorontalo","Sulawesi Tengah","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tenggara","Maluku","Maluku Utara","Papua","Papua Barat","Papua Barat Daya","Papua Tengah","Papua Pegunungan","Papua Selatan"];
@@ -490,9 +490,21 @@ function render(){
     else main=home();
   }
   app.innerHTML=bar()+`<main>${main}</main>`+footer();
+  setTitle(r);
   I.translate(app);
   if(I.upgrade)I.upgrade(app);
   hints();
+}
+function setTitle(r){
+  const e=EN(),l=S.listings.find(x=>x.id===r),ag=r.startsWith("agen-")&&agentOf(r.slice(5));
+  const base=e?"Nusantara Property – Land, Houses & Villas in Bali and Across Indonesia":"Nusantara Property – Jual Beli Tanah, Rumah & Villa di Bali dan Seluruh Indonesia";
+  const map={listing:e?"All property listings":"Semua listing properti",berita:e?"Indonesian property news":"Berita properti Indonesia",panduan:e?"Guide to buying property in Indonesia":"Panduan membeli properti di Indonesia",
+    tentang:e?"About us":"Tentang kami",faq:"FAQ",daftar:e?"Join as an agent":"Daftar sebagai agen",masuk:e?"Agent sign in":"Masuk agen",dasbor:e?"Agent dashboard":"Dasbor agen",agen:e?"Our agents":"Agen kami"};
+  let t=base;
+  if(l)t=`${TT(l.title)} – ${[l.kab,l.prov].filter(Boolean).join(", ")} | Nusantara Property`;
+  else if(ag)t=`${ag.name} – ${e?"Property agent":"Agen properti"} | Nusantara Property`;
+  else if(map[r])t=`${map[r]} | Nusantara Property`;
+  document.title=t;
 }
 function hints(){
   [["l-size","h-size",v=>`= ${num(v/100)} are`],["l-price","h-price",rupiah]].forEach(([i,h,f])=>{
