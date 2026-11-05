@@ -82,9 +82,11 @@ function priceHtml(l,cls){
   const extra=l.unit==="total"&&l.size&&l.type==="Tanah"?` <small>· ${rupiah(l.price/(l.size/100))}/are</small>`:"";
   return `<div class="${cls||"price"}">${rupiah(l.price)} <small>${UNITS[l.unit]||""}</small>${extra}</div>`;
 }
+const WM_OV=`<span class="wm-ov" aria-hidden="true"><img src="/assets/np-mark-light.png" alt="">Nusantara Property</span>`;
+const wmOv=u=>u&&!/\/lw-/.test(u)?WM_OV:"";
 function mediaHtml(l){
   const p=l.photos||[];
-  if(p.length)return `<img src="${esc(p[0])}" alt="${esc(l.title)}" loading="lazy">`;
+  if(p.length)return `<img src="${esc(p[0])}" alt="${esc(l.title)}" loading="lazy">${wmOv(p[0])}`;
   const w=Math.max(34,Math.min(78,22+Math.sqrt(l.size||100)*.6));
   return `<div class="plot" aria-hidden="true"><div class="shape" style="width:${w}%;aspect-ratio:${l.size>2000?'1.5':'1.15'}"><div><div class="big">${l.size?num(Math.round(l.size)/100)+" are":esc(l.type)}</div><div class="small">${l.size?num(l.size)+" m²":""}</div></div></div></div>`;
 }
@@ -337,7 +339,7 @@ function detail(l){
       :daysLeft(l)<=0?`<div class="note err renew-note" style="margin-bottom:14px"><span>Listing ini sudah diturunkan karena tidak diperbarui selama ${EXPIRE_DAYS} hari. Pembeli tidak bisa melihatnya.</span>${mine?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>`:""}</div>`
       :mine&&needsRenew(l)?`<div class="note renew-note" style="margin-bottom:14px"><span>Listing ini akan diturunkan dalam ${daysLeft(l)} hari.</span><button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button></div>`:""}
     <div class="detail"><div>
-        <div class="gallery"><div class="main" id="g-main">${pics.length?`<img src="${esc(pics[0])}" alt="${esc(l.title)}">`:mediaHtml(l)}</div>
+        <div class="gallery"><div class="main" id="g-main">${pics.length?`<img src="${esc(pics[0])}" alt="${esc(l.title)}">${wmOv(pics[0])}`:mediaHtml(l)}</div>
           ${pics.length>1?`<div class="thumbs">${pics.map((p,i)=>`<button data-thumb="${i}" aria-current="${i===0}" aria-label="Foto ${i+1}"><img src="${esc(p)}" alt=""></button>`).join("")}</div>`:""}</div>
         <div class="label" style="margin-top:22px">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(" · ")}</div>
         <h1 class="d-title"${mt(l.title)}>${esc(TT(l.title))}</h1>
@@ -632,13 +634,33 @@ function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o
   ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description","maps_url","building_size","bedrooms","bathrooms","facing"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
   DS.form.data.published=!!o.published;DS.form.own=!!o.own;}}
 
-function shrink(file,max,q){
-  return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("Foto tidak bisa dibaca"))};
-    img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("Foto gagal diproses")),'image/jpeg',q||.74)};img.src=url});
+/* watermark logo di tengah foto listing (tertanam di file foto) */
+let WM_LOGO=null;
+function wmLogo(){
+  if(!WM_LOGO)WM_LOGO=new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src="/assets/np-mark-light.png"});
+  return WM_LOGO;
 }
-async function uploadPhoto(file,prefix,max){
-  const blob=await shrink(file,max);
+async function drawWatermark(x,w,h){
+  const logo=await wmLogo();
+  try{await document.fonts.load('700 40px "Plus Jakarta Sans"')}catch(e){}
+  const s=Math.min(w,h),fs=Math.max(14,Math.round(s*.062)),lh=Math.round(fs*1.9),gap=Math.round(fs*.3),text=SITE.name;
+  x.save();x.font=`700 ${fs}px "Plus Jakarta Sans",system-ui,sans-serif`;x.textBaseline="middle";
+  const lw=logo?logo.width*lh/logo.height:0,tw=x.measureText(text).width,total=lw+(logo?gap:0)+tw;
+  const x0=(w-total)/2,cy=h/2;
+  x.globalAlpha=.6;x.shadowColor="rgba(0,0,0,.45)";x.shadowBlur=Math.max(2,s*.012);
+  if(logo)x.drawImage(logo,x0,cy-lh/2,lw,lh);
+  x.fillStyle="#fff";x.fillText(text,x0+lw+(logo?gap:0),cy+fs*.05);
+  x.restore();
+}
+function shrink(file,max,q,wm){
+  return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("Foto tidak bisa dibaca"))};
+    img.onload=async()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      const x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
+      if(wm){try{await drawWatermark(x,c.width,c.height)}catch(e){}}
+      c.toBlob(b=>b?res(b):rej(new Error("Foto gagal diproses")),'image/jpeg',q||.74)};img.src=url});
+}
+async function uploadPhoto(file,prefix,max,wm){
+  const blob=await shrink(file,max,0,wm);
   const path=`${session.user.id}/${prefix}${Date.now()}-${Math.random().toString(36).slice(2,7)}.jpg`;
   const {error}=await sb.storage.from('listing-photos').upload(path,blob,{contentType:'image/jpeg',upsert:false});
   if(error)throw error;
@@ -658,7 +680,7 @@ app.addEventListener('click',async e=>{
   if(t.dataset.goto){e.preventDefault();const el=document.getElementById("g-"+t.dataset.goto);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.classList.contains('chip')){F.type=t.dataset.type;render();return}
   if(t.dataset.thumb!==undefined){const l=getL(route());const i=Number(t.dataset.thumb);
-    document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">`;
+    document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">${wmOv(l.photos[i])}`;
     document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
   if(t.dataset.pdf){const l=getL(t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent=T("Menyiapkan PDF…");
     try{await NP_SHARE.pdf(EN()?{...l,title:TT(l.title)}:l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent=T("PDF terunduh")}catch(err){t.textContent=T("Gagal membuat PDF, coba lagi")}
@@ -716,7 +738,7 @@ app.addEventListener('change',async e=>{
     if(picked.length>files.length)DS.msg={text:`Maksimal ${MAX_PHOTOS} foto per listing. ${picked.length-files.length} foto tidak diunggah.`,err:true};
     if(!files.length){render();return}
     DS.form.uploading=true;render();
-    for(const f of files){try{DS.form.data.photos.push(await uploadPhoto(f,"l-",1280))}catch(err){DS.msg={text:"Satu foto gagal diunggah: "+errMsg(err),err:true}}}
+    for(const f of files){try{DS.form.data.photos.push(await uploadPhoto(f,"lw-",1280,true))}catch(err){DS.msg={text:"Satu foto gagal diunggah: "+errMsg(err),err:true}}}
     DS.form.uploading=false;render();return}
   if(id==="p-photo"){
     const f=e.target.files[0];if(!f)return;const pf=document.getElementById('pf');DS.profile=Object.assign({},me||{},readForm(pf));

@@ -120,6 +120,8 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 @media (max-width:860px){.detail{grid-template-columns:minmax(0,1fr)}}
 .gallery{display:grid;gap:8px}
 .gallery .main{aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;background:var(--sunk);position:relative;max-width:100%}
+.wm-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:.3em;pointer-events:none;color:#fff;opacity:.6;font:700 clamp(13px,4.4cqi,34px)/1 var(--f-display);text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.media,.gallery .main{container-type:inline-size}
 .gallery .main img{width:100%;height:100%;object-fit:cover;display:block}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap}
 .thumbs button{width:84px;aspect-ratio:4/3;padding:0;border:2px solid transparent;border-radius:6px;overflow:hidden;cursor:pointer;background:var(--sunk)}
@@ -374,3 +376,5 @@ body{font-size:15.5px}
 .sold-hero>div{flex:1 1 280px;min-width:0;display:grid;gap:8px}
 .sold-hero p{margin:0}
 .sold-stamp{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);border:3px solid var(--gold);border-radius:8px;padding:8px 16px;transform:rotate(-6deg);flex:none}
+
+.media .wm-ov img,.gallery .main .wm-ov img{height:1.9em;width:auto;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.45))}
