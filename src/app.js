@@ -26,7 +26,9 @@ try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
 /* ===== state ===== */
 let S={agents:[],listings:[],loaded:false,error:""};
 let session=null,me=null,recovery=false;
-const F={q:"",type:"",status:"",prov:"",kab:"",agent:"",sort:"new"};
+const F={q:"",type:"",status:"",prov:"",kab:"",agent:"",sort:"new",budget:"",bed:"",facing:""};
+const BUDGETS=[["0-500000000","Di bawah Rp500 jt"],["500000000-1000000000","Rp500 jt – 1 M"],["1000000000-2000000000","Rp1 – 2 M"],["2000000000-5000000000","Rp2 – 5 M"],["5000000000-10000000000","Rp5 – 10 M"],["10000000000-","Di atas Rp10 M"]];
+function totalPrice(l){if(l.price==null||l.price==="")return null;const v=Number(l.price);return l.unit==="are"&&l.size?v*l.size/100:v}
 const REG={data:{},errors:{},done:false,busy:false,msg:null};
 const AUTH={busy:false,msg:null,email:""};
 let DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};
@@ -109,9 +111,12 @@ async function ensureAgent(){
 /* ===== filters & cards ===== */
 function filtered(){
   const q=F.q.trim().toLowerCase();
+  const [bMin,bMax]=F.budget?F.budget.split("-").map(x=>x===""?null:Number(x)):[null,null];
+  const inBudget=l=>{if(!F.budget)return true;const t=totalPrice(l);return t!=null&&t>=bMin&&(bMax==null||t<=bMax)};
   let r=pubListings().filter(l=>(!F.type||l.type===F.type)&&(!F.status||l.status===F.status)&&(!F.prov||l.prov===F.prov)&&(!F.kab||l.kab===F.kab)&&(!F.agent||l.agent_id===F.agent)
+    &&inBudget(l)&&(!F.bed||(l.bedrooms!=null&&Number(l.bedrooms)>=Number(F.bed)))&&(!F.facing||l.facing===F.facing)
     &&(!q||[l.title,l.place,l.kab,l.prov,l.description,l.cert,l.zone,(agentOf(l.agent_id)||{}).name].join(" ").toLowerCase().includes(q)));
-  const p=l=>l.price==null?null:Number(l.price);
+  const p=totalPrice;
   if(F.sort==="new")r.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
   if(F.sort==="big")r.sort((a,b)=>(b.size||0)-(a.size||0));
   if(F.sort==="small")r.sort((a,b)=>(a.size||0)-(b.size||0));
@@ -189,7 +194,12 @@ function listingPage(){
         <select id="f-prov" aria-label="Provinsi"><option value="">Semua provinsi</option>${opt(PROVS,F.prov)}</select>
         <select id="f-kab" aria-label="Kota/kabupaten"><option value="">Semua kota/kabupaten</option>${opt(kabsIn(F.prov),F.kab)}</select>
         <select id="f-agent" aria-label="Agen"><option value="">Semua agen</option>${opt(pubAgents().map(a=>[a.id,a.name]),F.agent)}</select>
+        <select id="f-budget" aria-label="Budget"><option value="">Semua budget</option>${opt(BUDGETS,F.budget)}</select>
+        <select id="f-bed" aria-label="Kamar tidur"><option value="">Kamar tidur</option>${opt([["1","1+ KT"],["2","2+ KT"],["3","3+ KT"],["4","4+ KT"],["5","5+ KT"]],F.bed)}</select>
+        <select id="f-facing" aria-label="Hadap"><option value="">Semua arah hadap</option>${opt(FACING.map(f=>[f,"Hadap "+f]),F.facing)}</select>
         <select id="f-sort" aria-label="Urutkan">${opt([["new","Terbaru"],["cheap","Harga terendah"],["pricey","Harga tertinggi"],["big","Luas terbesar"],["small","Luas terkecil"]],F.sort)}</select>
+      
+        ${(F.type||F.status||F.prov||F.kab||F.agent||F.budget||F.bed||F.facing||F.q)?`<button class="btn-ghost btn-sm" data-act="reset-filter">Hapus filter</button>`:""}
       </div>
     </section>
     <section class="wrap grid" id="results">${grid}</section>`;
@@ -470,6 +480,7 @@ app.addEventListener('click',async e=>{
   const t=e.target.closest('button,a[data-act],a[data-goto]');if(!t)return;
   const act=t.dataset.act;
   if(act==="menu"){MENU=!MENU;render();return}
+  if(act==="reset-filter"){Object.assign(F,{q:"",type:"",status:"",prov:"",kab:"",agent:"",budget:"",bed:"",facing:""});render();return}
   if(t.dataset.goType){F.type=t.dataset.goType;location.hash="listing";return}
   if(t.dataset.goto){e.preventDefault();const el=document.getElementById("g-"+t.dataset.goto);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.classList.contains('chip')){F.type=t.dataset.type;render();return}
@@ -511,7 +522,7 @@ app.addEventListener('change',async e=>{
   const id=e.target.id;
   if(id==="f-prov"){F.prov=e.target.value;F.kab="";render();return}
   if(id==="l-type"){snapForm();render();const el=document.getElementById('l-type');if(el)el.focus();return}
-  const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort"};
+  const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort","f-budget":"budget","f-bed":"bed","f-facing":"facing"};
   if(map[id]){F[map[id]]=e.target.value;render();return}
   if(id==="l-photos"){
     snapForm();const room=MAX_PHOTOS-(DS.form.data.photos||[]).length,picked=[...e.target.files],files=picked.slice(0,Math.max(0,room));
