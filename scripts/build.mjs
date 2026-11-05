@@ -113,9 +113,9 @@ function layout({ lang, title, desc, pathId, pathEn, body, jsonld = [], image, t
 <meta property="og:url" content="${url}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
-<meta property="og:image" content="${esc(image || SITE_URL + "/assets/og-image.png")}">
+<meta property="og:image" content="${esc(image || SITE_URL + "/assets/og-image.png?v=2")}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/favicon.png" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico?v=2" sizes="any"><link rel="icon" href="/assets/favicon.png?v=2" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=2">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
 <link rel="stylesheet" href="/assets/site.css?v=${CSSV}">
@@ -123,7 +123,7 @@ ${jsonld.map(j => `<script type="application/ld+json">${JSON.stringify(j).replac
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <a class="brand" href="${lang === "en" ? "/en/" : "/"}"><picture><source srcset="/assets/np-mark-light.png" media="(prefers-color-scheme: dark)"><img class="brand-mark" src="/assets/np-mark.png" alt="" width="40" height="30"></picture>Nusantara Property</a>
+  <a class="brand" href="${lang === "en" ? "/en/" : "/"}"><picture><source srcset="/assets/np-mark-light.png?v=2" media="(prefers-color-scheme: dark)"><img class="brand-mark" src="/assets/np-mark.png?v=2" alt="" width="30" height="30"></picture>Nusantara Property</a>
   <nav class="mainnav static-nav" aria-label="${lang === "en" ? "Main menu" : "Menu utama"}">${nav}</nav>
   <div class="nav"><div class="lang"><a href="${pathId}" ${lang === "id" ? 'aria-current="true"' : ""}>ID</a><a href="${pathEn}" ${lang === "en" ? 'aria-current="true"' : ""}>EN</a></div></div>
 </div></header>

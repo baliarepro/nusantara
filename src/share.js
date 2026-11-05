@@ -71,7 +71,7 @@ async function render(l,a,site,url,h){
   // header
   x.fillStyle=C.navy;x.fillRect(0,0,W,62);
   {const g=x.createLinearGradient(0,0,W,0);g.addColorStop(0,"#EDBA6A");g.addColorStop(1,"#D4802A");x.fillStyle=g;x.fillRect(0,62,W,2.5)}
-  const logo=await loadImg(location.origin+"/assets/np-mark-light.png");
+  const logo=await loadImg(location.origin+"/assets/np-mark-light.png?v=2");
   let tx=M;if(logo){const lh=26,lw=logo.width*lh/logo.height;x.drawImage(logo,M,18,lw,lh);tx=M+lw+10}
   x.fillStyle=C.white;x.font=`800 17px ${FD}`;x.fillText(site.name,tx,36.5);
   x.textAlign="right";x.font=`600 8px ${FB}`;x.fillStyle="rgba(255,255,255,.75)";x.fillText(h.T("BROSUR LISTING"),W-M,28);
