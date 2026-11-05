@@ -68,7 +68,7 @@ const ROOM = ["Rumah", "Villa", "Apartemen", "Ruko"];
 const UNITS = { total: "", are: "/ are", tahun: "/ tahun" };
 const loc = l => [l.place, l.kab, l.prov].filter(Boolean).join(", ");
 const clip = (s, n) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : s; };
-const isLive = l => l.published && (NOW - new Date(l.updated_at || l.created_at)) / 864e5 < EXPIRE_DAYS;
+const isLive = l => l.published && !l.sold_at && (NOW - new Date(l.updated_at || l.created_at)) / 864e5 < EXPIRE_DAYS;
 
 const listingSlug = l => `${slug(l.title)}-${String(l.id).slice(0, 6)}`;
 const listingPath = (l, lang) => (lang === "en" ? `/en/listing/${listingSlug(l)}/` : `/listing/${listingSlug(l)}/`);

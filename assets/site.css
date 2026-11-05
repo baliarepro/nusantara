@@ -360,3 +360,13 @@ h1,h2,h3{letter-spacing:-.025em}
 .btn{font-weight:700;letter-spacing:-.005em}
 .price,.d-price{font-weight:800;letter-spacing:-.02em}
 body{font-size:15.5px}
+
+/* terjual */
+.pill-sold{background:var(--gold-soft);color:var(--gold-ink)}
+.btn-sold{background:var(--gold-grad);color:#0A2845;border-color:transparent}
+.dash-stats{display:inline-flex;gap:6px;margin-right:auto;margin-left:10px}
+.sold-confirm{color:var(--ink)}
+.sold-hero{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px;margin-bottom:48px}
+.sold-hero>div{flex:1 1 280px;min-width:0;display:grid;gap:8px}
+.sold-hero p{margin:0}
+.sold-stamp{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);border:3px solid var(--gold);border-radius:8px;padding:8px 16px;transform:rotate(-6deg);flex:none}

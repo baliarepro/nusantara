@@ -171,3 +171,7 @@ create index if not exists listings_prov_kab_idx on public.listings (prov, kab);
 create index if not exists listings_type_status_idx on public.listings (type, status);
 create index if not exists listings_total_price_idx on public.listings (total_price);
 create index if not exists listings_created_idx on public.listings (created_at desc);
+
+-- 11. TANDAI TERJUAL / TERSEWA
+alter table public.listings add column if not exists sold_at timestamptz;
+create index if not exists listings_sold_idx on public.listings (sold_at);
