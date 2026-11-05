@@ -89,7 +89,7 @@ const FAQ=[
   ["Bisakah agen lain mengubah listing saya?","Tidak. Setiap listing hanya bisa diubah atau dihapus oleh agen pemiliknya dan admin."],
   ["Siapa yang bisa melihat data pribadi listing?","Alamat persis, harga net, dan catatan di bagian Data pribadi hanya bisa dilihat oleh Anda dan admin. Data ini tidak pernah tampil di website."],
   ["Bagaimana menyembunyikan listing tanpa menghapusnya?","Edit listing, hilangkan centang Tayangkan listing ini di website, lalu simpan. Listing menjadi draf dan bisa ditayangkan lagi kapan saja."],
-  ["Berapa foto yang bisa diunggah?","Sampai 6 foto per listing. Foto pertama menjadi foto sampul, dan ukurannya otomatis dikecilkan agar website tetap cepat."]
+  ["Berapa foto yang bisa diunggah?","Maksimal 5 foto per listing. Foto pertama menjadi foto sampul, dan ukurannya otomatis dikecilkan agar website tetap cepat."]
  ]}
 ];
 

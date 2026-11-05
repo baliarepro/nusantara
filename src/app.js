@@ -13,6 +13,7 @@ const UNITS={total:"",are:"/ are",tahun:"/ tahun"};
 const SPEC=["Tanah","Rumah","Villa","Apartemen","Ruko","Gudang","Komersial","Sewa"];
 const AGENT_COLS="id,name,agency,phone,prov,kab,areas,since,specialties,arebi,bio,photo_url,status,is_admin,created_at";
 const BASE=location.origin+location.pathname;
+const MAX_PHOTOS=5;
 const FROM_LINK=/access_token/.test(location.hash)&&!/type=recovery/.test(location.hash);
 
 const app=document.getElementById('app');
@@ -389,8 +390,10 @@ function listingForm(){
       <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
     <div class="field"><label for="l-zone">Zonasi</label><select id="l-zone" name="zone">${opt([["","—"],...Object.keys(ZONES)],l.zone)}</select></div>
     <div class="field"><label for="l-desc">Deskripsi</label><textarea id="l-desc" name="description" placeholder="Akses jalan, view, fasilitas sekitar…">${esc(l.description)}</textarea></div>
-    <div class="field"><label for="l-photos">Foto (maks. 6)</label><input id="l-photos" type="file" accept="image/*" multiple ${f.uploading?"disabled":""}>
-      <span class="hint">${f.uploading?"Mengunggah foto…":"Foto pertama jadi foto sampul."}</span>
+    ${(()=>{const n=(l.photos||[]).length,full=n>=MAX_PHOTOS;return `<div class="field"><label for="l-photos">Foto <span class="pill ${full?"pill-pending":"pill-approved"}">${n} / ${MAX_PHOTOS}</span></label>
+      <div class="photo-limit">Maksimal ${MAX_PHOTOS} foto per listing. Foto pertama jadi foto sampul.</div>
+      <input id="l-photos" type="file" accept="image/*" multiple ${f.uploading||full?"disabled":""}>
+      <span class="hint">${f.uploading?"Mengunggah foto…":full?`Batas ${MAX_PHOTOS} foto sudah tercapai. Hapus salah satu foto untuk menggantinya.`:`Anda masih bisa menambah ${MAX_PHOTOS-n} foto.`}</span>`})()}
       <div class="pics">${(l.photos||[]).map((u,i)=>`<div class="pic"><img src="${esc(u)}" alt=""><button type="button" data-rmpic="${i}" aria-label="Hapus foto">×</button></div>`).join("")}</div></div>
     <fieldset class="private">
       <legend>Data pribadi <span class="pill pill-pending">Tidak tampil ke publik</span></legend>
@@ -505,7 +508,9 @@ app.addEventListener('change',async e=>{
   const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort"};
   if(map[id]){F[map[id]]=e.target.value;render();return}
   if(id==="l-photos"){
-    snapForm();const files=[...e.target.files].slice(0,6-(DS.form.data.photos||[]).length);if(!files.length)return;
+    snapForm();const room=MAX_PHOTOS-(DS.form.data.photos||[]).length,picked=[...e.target.files],files=picked.slice(0,Math.max(0,room));
+    if(picked.length>files.length)DS.msg={text:`Maksimal ${MAX_PHOTOS} foto per listing. ${picked.length-files.length} foto tidak diunggah.`,err:true};
+    if(!files.length){render();return}
     DS.form.uploading=true;render();
     for(const f of files){try{DS.form.data.photos.push(await uploadPhoto(f,"l-",1600))}catch(err){DS.msg={text:"Satu foto gagal diunggah: "+errMsg(err),err:true}}}
     DS.form.uploading=false;render();return}
