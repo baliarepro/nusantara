@@ -250,8 +250,7 @@ function detail(l){
       <aside class="side">
         <div class="panel"><div class="label">Agen listing ini</div>
           <a class="who" href="#agen-${esc(a.id)}" style="text-decoration:none">${ava(a,"lg")}<span><b style="font-size:17px">${esc(a.name)}</b><br><span style="color:var(--muted)">${esc(a.agency||"")}</span></span></a>
-          ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>
-          <div class="phone"><code>${esc(a.phone)}</code><button class="btn btn-line btn-sm" data-copy="${esc(a.phone)}">Salin nomor</button></div>`:""}
+          ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>`:""}
         </div>
         <div class="panel"><div class="label">Brosur listing</div>
           <button class="btn btn-primary" data-pdf="${esc(l.id)}">Download brosur PDF</button>
@@ -263,7 +262,7 @@ function agentPage(a){
   return `<div class="wrap"><a class="back" href="#agen">← Semua agen</a>
     <div class="agent-hero">${ava(a,"lg")}<div style="min-width:0"><div class="label">${esc(a.agency||"Agen independen")}</div><h1>${esc(a.name)}</h1><div style="color:var(--muted)">${esc([a.areas,[a.kab,a.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</div></div></div>
     ${a.bio?`<p class="desc" style="margin-top:0">${esc(a.bio)}</p>`:""}
-    ${a.phone?`<div class="phone" style="margin-block:16px 26px"><a class="btn btn-wa" href="${waLink(a)}" target="_blank" rel="noopener">WhatsApp ${esc(a.name)}</a><code>${esc(a.phone)}</code><button class="btn btn-line btn-sm" data-copy="${esc(a.phone)}">Salin nomor</button></div>`:""}
+    ${a.phone?`<div class="phone" style="margin-block:16px 26px"><a class="btn btn-wa" href="${waLink(a)}" target="_blank" rel="noopener">WhatsApp ${esc(a.name)}</a></div>`:""}
     <div class="section-head"><h2>${list.length} listing</h2></div>
     <div class="grid">${list.length?list.map(card).join(""):`<div class="empty">Agen ini belum punya listing yang tayang.</div>`}</div></div>`;
 }
