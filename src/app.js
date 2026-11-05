@@ -185,7 +185,7 @@ function home(){
     ${P?`<section class="wrap"><div class="section-head"><div><div class="label">Berita</div><h2>Kabar properti terbaru</h2></div><a class="btn btn-line btn-sm" href="#berita">Semua berita</a></div>
       <div class="news-list news-row" data-noi18n>${P.NEWS.slice(0,3).map(P.newsCard).join("")}</div></section>
     <section class="wrap"><div class="guide-band"><div><div class="label">Panduan</div><h2>Mau beli properti? Periksa ini dulu.</h2><p>Jenis sertifikat, cek legalitas di BPN, hitungan pajak BPHTB dan PPh, sampai alur AJB dan balik nama.</p></div><a class="btn btn-primary" href="#panduan">Baca panduan</a></div></section>`:""}
-    ${agentsSection()}`;
+    ${session?"":`<section class="wrap"><div class="cta-band"><p><b>Anda agen properti?</b> Buat akun, pasang listing Anda di ${esc(SITE.name)}, dan terima calon pembeli langsung ke WhatsApp Anda.</p><a class="btn btn-primary" href="#daftar">Daftar sebagai agen</a></div></section>`}`;
 }
 function listingPage(){
   const all=pubListings(),list=filtered();
