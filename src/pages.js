@@ -135,7 +135,7 @@ return {
    <section class="prose" style="max-width:none"><h2>Masalah di lapangan, dan jawaban kami</h2></section>
    <div class="field-list">${field.map(([h,prob,ans])=>`<div class="field-item"><h3>${h}</h3><div class="field-cols"><div><span class="label">Yang sering terjadi</span><p>${prob}</p></div><div><span class="label">Di ${site.name}</span><p>${ans}</p></div></div></div>`).join("")}</div>
    <section class="prose" style="margin-top:36px"><h2>Berawal dari Bali, untuk seluruh Indonesia</h2>
-    <p>${site.name} didirikan oleh praktisi properti yang aktif di Bali sejak 2009 dan membangun Bali Are Property, agensi independen yang berfokus pada tanah dan properti di Kuta Selatan dan Kuta Utara. Lebih dari 15 tahun di lapangan, dari tanah kavling di Bukit sampai villa di Canggu, membentuk cara platform ini bekerja: informasi harus jujur, lengkap, dan masih berlaku.</p>
+    <p>${site.name} didirikan oleh praktisi properti yang aktif di Bali sejak 2009, dengan fokus pada tanah dan properti di Kuta Selatan dan Kuta Utara. Lebih dari 15 tahun di lapangan, dari tanah kavling di Bukit sampai villa di Canggu, membentuk cara platform ini bekerja: informasi harus jujur, lengkap, dan masih berlaku.</p>
     <p>Pengalaman itu kini dibuka untuk agen dari daerah lain. Siapa pun agen properti yang bekerja dengan cara yang sama bisa bergabung, mengelola listingnya sendiri, dan terhubung langsung dengan pembeli dari seluruh Indonesia.</p>
     <h2>Hubungi kami</h2>
     <p>WhatsApp admin: <code>${site.adminPhone}</code></p>
