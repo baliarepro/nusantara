@@ -152,3 +152,12 @@ alter table public.listings
   add column if not exists building_size numeric,
   add column if not exists bedrooms int,
   add column if not exists bathrooms int;
+
+-- 9. TAMBAHAN: listing yang tidak diperbarui 60 hari otomatis tidak tampil ke publik
+drop policy if exists listings_read on public.listings;
+create policy listings_read on public.listings for select
+  using (
+    (published and updated_at > now() - interval '60 days'
+      and exists (select 1 from public.agents a where a.id = agent_id and a.status = 'approved'))
+    or agent_id = auth.uid() or public.is_admin()
+  );

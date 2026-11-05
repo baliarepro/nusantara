@@ -87,6 +87,7 @@ const FAQ=[
   ["Saya tidak menerima email konfirmasi.","Periksa folder Spam atau Promosi. Jika masih tidak ada setelah beberapa menit, hubungi admin lewat WhatsApp."],
   ["Saya lupa password.","Buka halaman Masuk, isi email Anda, lalu ketuk Lupa password. Tautan untuk membuat password baru akan dikirim ke email Anda."],
   ["Bisakah agen lain mengubah listing saya?","Tidak. Setiap listing hanya bisa diubah atau dihapus oleh agen pemiliknya dan admin."],
+  ["Kenapa listing saya tidak tampil lagi?","Listing otomatis diturunkan bila tidak diperbarui selama 60 hari, supaya pembeli hanya melihat properti yang masih tersedia. Seminggu sebelumnya, peringatan muncul di Dasbor. Ketuk Tayangkan ulang di Dasbor, dan listing tampil lagi untuk 60 hari berikutnya."],
   ["Bagaimana menyembunyikan listing tanpa menghapusnya?","Edit listing, hilangkan centang Tayangkan listing ini di website, lalu simpan. Listing menjadi draf dan bisa ditayangkan lagi kapan saja."],
   ["Berapa foto yang bisa diunggah?","Maksimal 5 foto per listing. Foto pertama menjadi foto sampul, dan ukurannya otomatis dikecilkan agar website tetap cepat."]
  ]}

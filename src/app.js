@@ -39,7 +39,13 @@ const num=n=>Number(n).toLocaleString('id-ID');
 const agentOf=id=>S.agents.find(a=>a.id===id);
 const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const pubAgents=()=>S.agents.filter(a=>a.status==="approved");
-const pubListings=()=>S.listings.filter(l=>l.published&&(agentOf(l.agent_id)||{}).status==="approved");
+const EXPIRE_DAYS=60,WARN_DAYS=7;
+const DAY=86400000;
+const fmtD=d=>d?new Date(d).toLocaleDateString('id-ID',{day:"numeric",month:"short",year:"numeric"}):"";
+const daysLeft=l=>EXPIRE_DAYS-Math.floor((Date.now()-new Date(l.updated_at||l.created_at).getTime())/DAY);
+const isLive=l=>l.published&&daysLeft(l)>0;
+const needsRenew=l=>l.published&&daysLeft(l)<=WARN_DAYS;
+const pubListings=()=>S.listings.filter(l=>isLive(l)&&(agentOf(l.agent_id)||{}).status==="approved");
 const kabsIn=p=>[...new Set(pubListings().filter(l=>!p||l.prov===p).map(l=>l.kab).filter(Boolean))].sort();
 function rupiah(v){
   if(v==null||v==="")return "";v=Number(v);
@@ -135,6 +141,7 @@ function card(l){
         ?`${l.size?`<span>LT <b>${num(l.size)}</b> m²</span>`:""}${l.building_size?`<span>LB <b>${num(l.building_size)}</b> m²</span>`:""}${l.bedrooms!=null?`<span><b>${l.bedrooms}</b> KT</span>`:""}${l.bathrooms!=null?`<span><b>${l.bathrooms}</b> KM</span>`:""}`
         :`${l.size?`<span><b>${num(l.size)}</b> m²</span><span><b>${num(Math.round(l.size)/100)}</b> are</span>`:""}`}${l.cert?`<span><b>${esc(l.cert)}</b></span>`:""}${l.facing?`<span>Hadap <b>${esc(l.facing)}</b></span>`:""}</div>
       ${zoneHtml(l.zone)}${priceHtml(l)}
+      <div class="card-date">${l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY?"Diperbarui":"Tayang"} ${fmtD(l.updated_at||l.created_at)}</div>
       <div class="card-foot"><span class="who">${ava(a)}<span>${esc(a.name)}${a.agency?` · ${esc(a.agency)}`:""}</span></span></div>
     </div></a>`;
 }
@@ -222,9 +229,13 @@ function detail(l){
     ["Zonasi",l.zone?zoneHtml(l.zone):"—"],["Lokasi",esc(l.place)||"—"],["Kota/kabupaten",esc(l.kab)||"—"],["Provinsi",esc(l.prov)||"—"],
     ["Harga",l.price==null?"Tanya agen":`${rupiah(l.price)} ${UNITS[l.unit]||""}`]];
   if(l.price&&l.unit==="total"&&l.size)rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
+  rows.push(["Tanggal tayang",fmtD(l.created_at)]);
+  if(l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY)rows.push(["Terakhir diperbarui",fmtD(l.updated_at)]);
   const mine=session&&(l.agent_id===session.user.id||(me&&me.is_admin));
   return `<div class="wrap"><a class="back" href="#listing">← Semua listing</a>
-    ${!l.published?`<div class="note err" style="margin-bottom:14px">Listing ini belum tayang. Hanya Anda yang bisa melihatnya.</div>`:""}
+    ${!l.published?`<div class="note err" style="margin-bottom:14px">Listing ini belum tayang. Hanya Anda yang bisa melihatnya.</div>`
+      :daysLeft(l)<=0?`<div class="note err renew-note" style="margin-bottom:14px"><span>Listing ini sudah diturunkan karena tidak diperbarui selama ${EXPIRE_DAYS} hari. Pembeli tidak bisa melihatnya.</span>${mine?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>`:""}</div>`
+      :mine&&needsRenew(l)?`<div class="note renew-note" style="margin-bottom:14px"><span>Listing ini akan diturunkan dalam ${daysLeft(l)} hari.</span><button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button></div>`:""}
     <div class="detail"><div>
         <div class="gallery"><div class="main" id="g-main">${pics.length?`<img src="${esc(pics[0])}" alt="${esc(l.title)}">`:mediaHtml(l)}</div>
           ${pics.length>1?`<div class="thumbs">${pics.map((p,i)=>`<button data-thumb="${i}" aria-current="${i===0}" aria-label="Foto ${i+1}"><img src="${esc(p)}" alt=""></button>`).join("")}</div>`:""}</div>
@@ -338,27 +349,46 @@ function dashboard(){
     <div class="dash-head">${ava(me,"lg")}<div style="min-width:0;flex:1"><div class="label">Dasbor agen${me.is_admin?" · Admin":""}</div><h1>${esc(me.name)}</h1>${statusPill(me.status)}</div>
       <button class="btn btn-line btn-sm" data-act="logout">Keluar</button></div>
     ${me.status==="pending"?`<div class="note">Akun Anda sedang ditinjau admin. Sambil menunggu, lengkapi profil Anda. Listing bisa dipasang setelah akun disetujui.</div>`:""}
+    ${!DS.form&&DS.tab!=="mine"&&S.listings.some(l=>l.agent_id===me.id&&needsRenew(l))?`<div class="note err renew-note"><span>Ada listing Anda yang sudah atau akan segera diturunkan.</span><button class="btn btn-line btn-sm" data-dtab="mine">Lihat listing saya</button></div>`:""}
     ${me.status==="rejected"?`<div class="note err">Pendaftaran Anda belum disetujui. Hubungi admin di WhatsApp ${esc(SITE.adminPhone)} untuk informasi lebih lanjut.</div>`:""}
     ${DS.form?"":`<div class="tabs dash-tabs" role="tablist">${tabs.map(([k,t])=>`<button role="tab" aria-selected="${DS.tab===k}" data-dtab="${k}">${t}</button>`).join("")}</div>`}
     ${note(DS.msg)}
     ${body}</div>`;
 }
+function listingPill(l){
+  if(!l.published)return `<span class="pill pill-pending">Draf</span>`;
+  const d=daysLeft(l);
+  if(d<=0)return `<span class="pill pill-rejected">Diturunkan</span>`;
+  if(d<=WARN_DAYS)return `<span class="pill pill-pending">Turun dalam ${d} hari</span>`;
+  return `<span class="pill pill-approved">Tayang · sisa ${d} hari</span>`;
+}
+function renewBanner(list,own){
+  const exp=list.filter(l=>l.published&&daysLeft(l)<=0),soon=list.filter(l=>l.published&&daysLeft(l)>0&&daysLeft(l)<=WARN_DAYS);
+  if(!exp.length&&!soon.length)return "";
+  const ids=[...exp,...soon].map(l=>l.id).join(",");
+  return `<div class="note ${exp.length?"err":""} renew-note"><span>${exp.length?`<b>${exp.length} listing${own?" Anda":""} sudah diturunkan</b> karena tidak diperbarui selama ${EXPIRE_DAYS} hari. `:""}${soon.length?`<b>${soon.length} listing</b> akan diturunkan dalam ${WARN_DAYS} hari. `:""}${own?"Jika properti masih tersedia, tayangkan ulang agar tetap terlihat pembeli.":"Agen pemilik perlu menayangkan ulang listingnya."}</span>
+    ${own?`<button class="btn btn-primary btn-sm" data-renew="${ids}">Tayangkan ulang semua</button>`:""}</div>`;
+}
 function rowItem(l,showAgent){
   const a=agentOf(l.agent_id)||{};const c=DS.confirm===l.id;
   return `<div class="item">${l.photos&&l.photos[0]?`<img class="thumb" src="${esc(l.photos[0])}" alt="">`:`<span class="thumb"></span>`}
     <div><b>${esc(l.title)}</b><small>${esc([showAgent?a.name:"",l.type,[l.kab,l.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
-      <small>${l.published?`<span class="pill pill-approved">Tayang</span>`:`<span class="pill pill-pending">Draf</span>`} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small></div>
+      <small>${listingPill(l)} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small>
+      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small></div>
     ${c?`<span class="confirm">Hapus listing ini? <button class="btn btn-danger btn-sm" data-del-listing="${esc(l.id)}">Ya, hapus</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
-      :`<span class="item-acts"><a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
+      :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
 }
 function myListings(){
   const mine=S.listings.filter(l=>l.agent_id===me.id);
   return `<div class="dash-bar"><span class="label">${mine.length} listing</span>
       <button class="btn btn-primary btn-sm" data-act="new-listing" ${me.status==="approved"?"":"disabled title=\"Menunggu persetujuan admin\""}>Tambah listing</button></div>
+    ${renewBanner(mine,true)}
+    <p class="hint" style="margin:0">Listing otomatis diturunkan bila tidak diperbarui selama ${EXPIRE_DAYS} hari. Menyimpan perubahan atau mengetuk Tayangkan ulang akan memulai hitungan dari awal.</p>
     <div class="list">${mine.length?mine.map(l=>rowItem(l,false)).join(""):`<div class="empty">Belum ada listing. ${me.status==="approved"?"Ketuk Tambah listing untuk memasang yang pertama.":"Anda bisa memasang listing setelah akun disetujui."}</div>`}</div>`;
 }
 function adminListings(){
   return `<div class="dash-bar"><span class="label">${S.listings.length} listing dari semua agen</span></div>
+    ${renewBanner(S.listings,false)}
     <div class="list">${S.listings.length?S.listings.map(l=>rowItem(l,true)).join(""):`<div class="empty">Belum ada listing.</div>`}</div>`;
 }
 function adminAgents(){
@@ -439,7 +469,7 @@ function render(){
   else if(r==="dasbor")main=dashboard();
   else{
     const l=S.listings.find(x=>x.id===r);const a=r.startsWith("agen-")&&agentOf(r.slice(5));
-    if(l&&(l.published||(session&&(l.agent_id===session.user.id||(me&&me.is_admin)))))main=detail(l);
+    if(l&&(isLive(l)||(session&&(l.agent_id===session.user.id||(me&&me.is_admin)))))main=detail(l);
     else if(a&&(a.status==="approved"||(me&&me.is_admin)))main=agentPage(a);
     else if(r==="listing")main=listingPage();
     else if(r==="agen")main=`<div class="page">${agentsSection()}</div>`;
@@ -504,6 +534,11 @@ app.addEventListener('click',async e=>{
     const l=S.listings.find(x=>x.id===t.dataset.editListing);if(!l)return;
     DS.form={data:JSON.parse(JSON.stringify(l))};DS.msg=null;
     if(route()!=="dasbor")location.hash="dasbor";else render();window.scrollTo(0,0);return}
+  if(t.dataset.renew){
+    const ids=t.dataset.renew.split(",").filter(Boolean);t.disabled=true;
+    const {error}=await sb.from('listings').update({published:true}).in('id',ids);
+    DS.msg=error?{text:errMsg(error),err:true}:{text:ids.length>1?`${ids.length} listing ditayangkan ulang untuk ${EXPIRE_DAYS} hari ke depan.`:`Listing ditayangkan ulang untuk ${EXPIRE_DAYS} hari ke depan.`};
+    await load();return}
   if(t.dataset.delListing){
     const {error}=await sb.from('listings').delete().eq('id',t.dataset.delListing);
     DS.confirm=null;DS.msg=error?{text:errMsg(error),err:true}:{text:"Listing dihapus."};await load();return}
