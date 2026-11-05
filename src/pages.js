@@ -87,7 +87,6 @@ const FAQ=[
   ["Saya tidak menerima email konfirmasi.","Periksa folder Spam atau Promosi. Jika masih tidak ada setelah beberapa menit, hubungi admin lewat WhatsApp."],
   ["Saya lupa password.","Buka halaman Masuk, isi email Anda, lalu ketuk Lupa password. Tautan untuk membuat password baru akan dikirim ke email Anda."],
   ["Bisakah agen lain mengubah listing saya?","Tidak. Setiap listing hanya bisa diubah atau dihapus oleh agen pemiliknya dan admin."],
-  ["Siapa yang bisa melihat data pribadi listing?","Alamat persis, harga net, dan catatan di bagian Data pribadi hanya bisa dilihat oleh Anda dan admin. Data ini tidak pernah tampil di website."],
   ["Bagaimana menyembunyikan listing tanpa menghapusnya?","Edit listing, hilangkan centang Tayangkan listing ini di website, lalu simpan. Listing menjadi draf dan bisa ditayangkan lagi kapan saja."],
   ["Berapa foto yang bisa diunggah?","Maksimal 5 foto per listing. Foto pertama menjadi foto sampul, dan ukurannya otomatis dikecilkan agar website tetap cepat."]
  ]}
@@ -127,7 +126,7 @@ return {
    <div class="about-stats"><div><b>${stats.listings}</b><span>listing tayang</span></div><div><b>${stats.agents}</b><span>agen terverifikasi</span></div><div><b>${stats.provs}</b><span>provinsi</span></div></div>
    <div class="about-grid">
     <div class="about-card">${svg("search")}<h3>Untuk pembeli</h3><p>Cari berdasarkan jenis properti, provinsi, kota, dan agen. Lihat luas dalam m² dan are, sertifikat, serta zonasi, lalu hubungi agennya langsung lewat WhatsApp.</p></div>
-    <div class="about-card">${svg("chat")}<h3>Untuk agen</h3><p>Setiap agen punya dasbor sendiri untuk memasang dan mengelola listing. Data sensitif seperti alamat persis dan harga net tersimpan privat, hanya untuk agen dan admin.</p></div>
+    <div class="about-card">${svg("chat")}<h3>Untuk agen</h3><p>Setiap agen punya dasbor sendiri untuk memasang dan mengelola listing. Hanya agen pemilik dan admin yang bisa mengubah atau menghapus listing tersebut.</p></div>
     <div class="about-card">${svg("check")}<h3>Terverifikasi</h3><p>Setiap agen baru ditinjau admin sebelum profil dan listingnya tayang, supaya pembeli berhubungan dengan agen yang jelas identitasnya.</p></div>
    </div>
    <section class="prose" style="margin-top:36px"><h2>Di balik ${site.name}</h2>

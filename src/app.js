@@ -275,7 +275,6 @@ function registerPage(){
           <li><div><b>Konfirmasi email</b><span>Klik tautan yang kami kirim ke email Anda.</span></div></li>
           <li><div><b>Persetujuan admin</b><span>Setelah disetujui, profil Anda tayang dan Anda bisa memasang listing.</span></div></li>
         </ol>
-        <p class="hint" style="margin-top:22px">Alamat persis, harga net, dan catatan yang Anda simpan hanya bisa dilihat oleh Anda dan admin.</p>
       </div>${right}</div></div>`;
 }
 
@@ -373,7 +372,7 @@ function profileForm(isNew){
 }
 function blankListing(){return {id:"",agent_id:me.id,title:"",type:"Tanah",status:"Dijual",prov:me.prov||"",kab:me.kab||"",place:"",size:"",price:"",unit:"total",cert:"",zone:"",description:"",photos:[],published:true}}
 function listingForm(){
-  const f=DS.form,l=f.data,p=f.priv||{};
+  const f=DS.form,l=f.data;
   const other=me.is_admin&&l.agent_id!==me.id;
   return `<a class="back" href="#dasbor" data-act="close-form">← Kembali ke daftar</a>
   <form class="form" id="lf" novalidate>
@@ -395,13 +394,6 @@ function listingForm(){
       <input id="l-photos" type="file" accept="image/*" multiple ${f.uploading||full?"disabled":""}>
       <span class="hint">${f.uploading?"Mengunggah foto…":full?`Batas ${MAX_PHOTOS} foto sudah tercapai. Hapus salah satu foto untuk menggantinya.`:`Anda masih bisa menambah ${MAX_PHOTOS-n} foto.`}</span>`})()}
       <div class="pics">${(l.photos||[]).map((u,i)=>`<div class="pic"><img src="${esc(u)}" alt=""><button type="button" data-rmpic="${i}" aria-label="Hapus foto">×</button></div>`).join("")}</div></div>
-    <fieldset class="private">
-      <legend>Data pribadi <span class="pill pill-pending">Tidak tampil ke publik</span></legend>
-      <p class="hint" style="margin:0">Hanya Anda${other?", agen pemilik,":""} dan admin yang bisa melihat data ini.</p>
-      <div class="field"><label for="v-addr">Alamat persis / titik lokasi</label><input id="v-addr" name="exact_address" value="${esc(p.exact_address)}" placeholder="Alamat lengkap atau link Google Maps"></div>
-      <div class="row"><div class="field"><label for="v-net">Harga net pemilik (Rp)</label><input id="v-net" name="net_price" inputmode="numeric" value="${esc(p.net_price??"")}"><span class="hint" id="h-net"></span></div><div></div></div>
-      <div class="field"><label for="v-notes">Catatan</label><textarea id="v-notes" name="notes" placeholder="Komisi, status dokumen, jadwal survei…">${esc(p.notes)}</textarea></div>
-    </fieldset>
     <label class="agree"><input type="checkbox" id="l-pub" name="published" ${l.published?"checked":""}><span>Tayangkan listing ini di website</span></label>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" ${DS.busy||f.uploading?"disabled":""}>${DS.busy?"Menyimpan…":l.id?"Simpan perubahan":"Simpan listing"}</button>
       <button type="button" class="btn btn-line" data-act="close-form">Batal</button></div>
@@ -436,15 +428,14 @@ function render(){
   hints();
 }
 function hints(){
-  [["l-size","h-size",v=>`= ${num(v/100)} are`],["l-price","h-price",rupiah],["v-net","h-net",rupiah]].forEach(([i,h,f])=>{
+  [["l-size","h-size",v=>`= ${num(v/100)} are`],["l-price","h-price",rupiah]].forEach(([i,h,f])=>{
     const a=document.getElementById(i),b=document.getElementById(h);if(a&&b){const v=Number(String(a.value).replace(/\D/g,""));b.textContent=v?f(v):""}});
 }
 const digits=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null};
 function readForm(form){const o={};new FormData(form).forEach((v,k)=>{if(k in o){o[k]=[].concat(o[k],String(v))}else o[k]=String(v).trim()});return o}
 function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o=readForm(f);
   ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
-  DS.form.data.published=!!o.published;
-  DS.form.priv=Object.assign(DS.form.priv||{},{exact_address:o.exact_address,net_price:o.net_price,notes:o.notes})}}
+  DS.form.data.published=!!o.published;}}
 
 function shrink(file,max,q){
   return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("Foto tidak bisa dibaca"))};
@@ -479,14 +470,13 @@ app.addEventListener('click',async e=>{
     const {error}=await sb.auth.resetPasswordForEmail(AUTH.email,{redirectTo:BASE});
     AUTH.busy=false;AUTH.msg=error?{text:errMsg(error),err:true}:{text:`Tautan untuk mengatur ulang password sudah dikirim ke ${AUTH.email}.`};render();return}
   if(t.dataset.dtab){DS.tab=t.dataset.dtab;DS.msg=null;DS.confirm=null;DS.profile=null;render();return}
-  if(act==="new-listing"){DS.form={data:blankListing(),priv:{}};DS.msg=null;render();window.scrollTo(0,0);return}
+  if(act==="new-listing"){DS.form={data:blankListing()};DS.msg=null;render();window.scrollTo(0,0);return}
   if(act==="close-form"){e.preventDefault();DS.form=null;render();return}
   if(act==="cancel"){DS.confirm=null;render();return}
   if(t.dataset.ask){DS.confirm=t.dataset.ask;render();return}
   if(t.dataset.editListing){
     const l=S.listings.find(x=>x.id===t.dataset.editListing);if(!l)return;
-    const {data}=await sb.from('listing_private').select('*').eq('listing_id',l.id).maybeSingle();
-    DS.form={data:JSON.parse(JSON.stringify(l)),priv:data||{}};DS.msg=null;
+    DS.form={data:JSON.parse(JSON.stringify(l))};DS.msg=null;
     if(route()!=="dasbor")location.hash="dasbor";else render();window.scrollTo(0,0);return}
   if(t.dataset.delListing){
     const {error}=await sb.from('listings').delete().eq('id',t.dataset.delListing);
@@ -500,7 +490,7 @@ app.addEventListener('input',e=>{
   const id=e.target.id;
   if(id==="f-q"){F.q=e.target.value;const r=document.getElementById('results');const list=filtered();
     r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;return}
-  if(/^(l-size|l-price|v-net)$/.test(id))hints();
+  if(/^(l-size|l-price)$/.test(id))hints();
 });
 app.addEventListener('change',async e=>{
   const id=e.target.id;
@@ -568,7 +558,7 @@ app.addEventListener('submit',async e=>{
     DS.profile=null;DS.msg={text:"Profil tersimpan."};await ensureAgent();await load();return;
   }
   if(form.id==="lf"){
-    snapForm();const d=DS.form.data,p=DS.form.priv||{};
+    snapForm();const d=DS.form.data;
     if(!d.title){DS.msg={text:"Isi judul listing.",err:true};render();return}
     if(!d.prov||!d.kab){DS.msg={text:"Pilih provinsi dan isi kota/kabupaten.",err:true};render();return}
     const row={title:d.title,type:d.type,status:d.status,prov:d.prov,kab:d.kab,place:d.place||null,size:digits(d.size),price:digits(d.price),unit:d.unit,
@@ -577,10 +567,6 @@ app.addEventListener('submit',async e=>{
     let id=d.id,error;
     if(id)({error}=await sb.from('listings').update(row).eq('id',id));
     else{const r=await sb.from('listings').insert(row).select('id').single();error=r.error;id=r.data&&r.data.id}
-    if(!error){
-      const pv={listing_id:id,agent_id:d.agent_id||me.id,exact_address:p.exact_address||null,net_price:digits(p.net_price),notes:p.notes||null};
-      ({error}=await sb.from('listing_private').upsert(pv,{onConflict:'listing_id'}));
-    }
     DS.busy=false;
     if(error){DS.msg={text:errMsg(error),err:true};render();return}
     DS.form=null;DS.msg={text:row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf."};await load();window.scrollTo(0,0);return;
