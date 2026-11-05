@@ -41,3 +41,4 @@ revoke all on function public.purge_sold_listings() from public, anon, authentic
 -- d. Jalankan otomatis setiap jam (pg_cron)
 create extension if not exists pg_cron;
 select cron.schedule('hapus-listing-terjual', '23 * * * *', 'select public.purge_sold_listings()');
+-- selesai
