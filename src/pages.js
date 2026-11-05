@@ -2,6 +2,15 @@
    Berita: tambahkan item baru di PALING ATAS array NEWS. */
 window.NP_PAGES=(function(){
 const NEWS_ID=[
+  {date:"2026-11-03",tag:"Rumah subsidi",title:"Penyaluran KPR FLPP 2026 capai 197.048 unit, akad massal disiapkan Desember",
+   summary:"BP Tapera mencatat realisasi KPR FLPP mencapai 194.360 unit senilai Rp24,22 triliun hingga 31 Oktober 2026, hampir 54% dari target 360.000 unit tahun ini. Per 2 November angkanya naik menjadi 197.048 unit senilai Rp24,55 triliun. Bank BTN menyalurkan terbanyak (85.341 unit), dan Jawa Barat menjadi provinsi dengan realisasi tertinggi. Akad massal 71.000 unit pada 17 Desember dan 30.000 unit pada 21 Desember sedang disiapkan.",
+   source:"CNBC Indonesia",url:"https://www.cnbcindonesia.com/news/20261103102709-4-781809/2026-kurang-dari-2-bulan-penyaluran-rumah-subsidi-flpp-baru-segini"},
+  {date:"2026-11-02",tag:"Rumah subsidi",title:"Kementerian PKP berencana targetkan KPR FLPP untuk 40 ribu rusun subsidi",
+   summary:"Dirjen Perumahan Perkotaan Kementerian PKP, Sri Haryati, menyebut target penyaluran KPR FLPP untuk 40.000 unit rumah susun. Ini masih berupa rencana dan target. Menurutnya, dalam lima tahun terakhir produksi rusun subsidi di bawah 200 unit. Proyek yang disebut antara lain rusun di Meikarta, hunian TOD Manggarai, dan rusun Alonia Kemayoran 609 unit yang ditargetkan mulai dibangun awal Januari 2027.",
+   source:"ANTARA",url:"https://www.antaranews.com/berita/5827415/pkp-berencana-targetkan-flpp-untuk-40-ribu-rusun-subsidi-baru"},
+  {date:"2026-10-27",tag:"Sertifikat",title:"ATR/BPN telah menerbitkan hampir 10 juta sertipikat elektronik",
+   summary:"Kementerian ATR/BPN mencatat 9.774.933 sertipikat elektronik terbit sejak layanan dimulai 4 Desember 2023 hingga Oktober 2026, termasuk hasil alih media dari sertipikat analog. Sepanjang 2026 hingga Oktober tercatat 3.077.397 sertipikat. Sertipikat analog dan elektronik memiliki kekuatan hukum yang sama, dan syarat serta biaya alih media bisa dicek di aplikasi Sentuh Tanahku.",
+   source:"ANTARA",url:"https://jogja.antaranews.com/berita/863327/sejak-diluncurkan-pada-2023-kementerian-atrbpnterbitkan-hampir-10-juta-sertipikat-elektronik"},
   {date:"2026-10-28",tag:"Kredit",title:"Kredit properti tumbuh 16,4% per September 2026, KPR naik tipis",
    summary:"Menurut data uang beredar Bank Indonesia, kredit properti tumbuh 16,4% (yoy) menjadi Rp1.703,7 triliun pada September 2026, melambat dari 18,3% di bulan sebelumnya. Penyaluran KPR dan KPA justru naik tipis menjadi 4,3% (yoy) dengan nilai Rp863,1 triliun, berlawanan dengan kredit konsumsi lain yang melemah. Kredit konstruksi masih tumbuh 42,3%.",
    source:"Kontan",url:"https://keuangan.kontan.co.id/news/kredit-properti-tumbuh-164-yoy-september-2026"},
@@ -94,18 +103,27 @@ const FAQ_ID=[
 ];
 
 const NEWS_EN=[
+  {date:"2026-11-03",tag:"Subsidised housing",title:"FLPP subsidised mortgages reach 197,048 units in 2026, mass signings planned for December",
+   summary:"BP Tapera recorded 194,360 FLPP mortgages worth Rp24.22 trillion as of 31 October 2026, nearly 54% of this year's 360,000-unit target. By 2 November the figure had risen to 197,048 units worth Rp24.55 trillion. Bank BTN disbursed the most (85,341 units), and West Java recorded the highest total of any province. Mass signings of 71,000 units on 17 December and 30,000 units on 21 December are being prepared.",
+   source:"CNBC Indonesia",url:NEWS_ID[0].url},
+  {date:"2026-11-02",tag:"Subsidised housing",title:"Housing ministry plans to target FLPP mortgages for 40,000 subsidised apartments",
+   summary:"Sri Haryati, Director General of Urban Housing at the Ministry of Housing and Settlement Areas (PKP), said the target is FLPP mortgage disbursement for 40,000 apartment units. This is still a plan and a target. She said subsidised apartment output over the past five years was under 200 units. Projects named include apartments at Meikarta, TOD housing at Manggarai, and the 609-unit Alonia Kemayoran apartments, with construction targeted to start in early January 2027.",
+   source:"ANTARA",url:NEWS_ID[1].url},
+  {date:"2026-10-27",tag:"Land titles",title:"ATR/BPN has issued nearly 10 million electronic land certificates",
+   summary:"The Ministry of Agrarian Affairs and Spatial Planning (ATR/BPN) recorded 9,774,933 electronic certificates issued from the service launch on 4 December 2023 to October 2026, including analog certificates converted to electronic form. From January to October 2026, 3,077,397 were issued. Analog and electronic certificates have the same legal force, and conversion requirements and fees can be checked in the Sentuh Tanahku app.",
+   source:"ANTARA",url:NEWS_ID[2].url},
   {date:"2026-10-28",tag:"Credit",title:"Property lending grew 16.4% in September 2026, mortgages edged up",
    summary:"According to Bank Indonesia's money supply data, property lending grew 16.4% (yoy) to Rp1,703.7 trillion in September 2026, slowing from 18.3% the month before. House and apartment mortgages rose slightly to 4.3% (yoy) at Rp863.1 trillion, against the trend of weaker consumer lending. Construction lending still grew 42.3%.",
-   source:"Kontan",url:NEWS_ID[0].url},
+   source:"Kontan",url:NEWS_ID[3].url},
   {date:"2026-10-21",tag:"Interest rates",title:"Bank Indonesia holds the BI Rate at 5.75% in October 2026",
    summary:"Bank Indonesia kept its benchmark rate at 5.75%. Over 2026 the BI Rate has risen 100 basis points from 4.75% since mid-May to keep the rupiah stable. For buyers on floating-rate mortgages, instalments are unlikely to fall soon, so a longer fixed-rate period is worth considering.",
-   source:"Bisnis.com",url:NEWS_ID[1].url},
+   source:"Bisnis.com",url:NEWS_ID[4].url},
   {date:"2026-08-07",tag:"House prices",title:"Primary house prices up 0.69% in Q2 2026 as sales start to recover",
    summary:"Bank Indonesia's Residential Property Price Survey recorded a 0.69% (yoy) rise in its residential price index in Q2 2026. Primary-market sales were still down 2.36% (yoy), a big improvement on the 25.67% contraction in Q1, and up 9.39% on the previous quarter.",
-   source:"Industry.co.id",url:NEWS_ID[2].url},
+   source:"Industry.co.id",url:NEWS_ID[5].url},
   {date:"2026-01-05",tag:"Tax",title:"Government covers 100% of VAT on homes throughout 2026",
    summary:"Under Finance Minister Regulation No. 90 of 2025, the government covers 100% of VAT on the portion of the price up to Rp2 billion for landed houses or apartment units priced up to Rp5 billion. The incentive applies to handovers from January to December 2026, and only to purchases from developers that charge VAT.",
-   source:"Suara Surabaya",url:NEWS_ID[3].url}
+   source:"Suara Surabaya",url:NEWS_ID[6].url}
 ];
 const GUIDE_EN=[
  {id:"sertifikat",title:"Know the types of land title",html:`
