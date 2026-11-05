@@ -319,6 +319,10 @@ a.btn-ghost{text-decoration:none;display:inline-flex;align-items:center}
 .field-cols p{margin:4px 0 0;color:var(--muted)}
 .field-cols>div:last-child{border-left:2px solid var(--jade);padding-left:14px}
 .field-cols>div:last-child p{color:var(--ink)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--surface);flex:none}
+.lang button{border:0;background:none;border-radius:999px;padding:4px 9px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;letter-spacing:.03em}
+.lang button[aria-pressed="true"]{background:var(--jade);color:var(--on-jade)}
+@media (max-width:520px){.nav>.btn-line,.nav>.btn-primary{display:none}}
 .card-date{font-size:12.5px;color:var(--muted)}
 .renew-note{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .renew-note span{flex:1 1 260px}
@@ -330,8 +334,9 @@ a.btn-ghost{text-decoration:none;display:inline-flex;align-items:center}
 <body>
 <div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="src/pages.js?v=202611052029"></script>
-<script src="src/share.js?v=202611052029"></script>
-<script src="src/app.js?v=202611052029"></script>
+<script src="src/i18n.js?v=202611052035"></script>
+<script src="src/pages.js?v=202611052035"></script>
+<script src="src/share.js?v=202611052035"></script>
+<script src="src/app.js?v=202611052035"></script>
 </body>
 </html>

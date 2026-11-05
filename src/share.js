@@ -9,17 +9,18 @@ const FM='"IBM Plex Mono",Menlo,monospace';
 /* ---------- teks bagikan ---------- */
 function specs(l,h){
   const r=[];
-  r.push(["Jenis",`${l.type} · ${l.status}`]);
+  const T=h.T||(x=>x);
+  r.push(["Jenis",`${T(l.type)} · ${T(l.status)}`]);
   if(l.size)r.push([h.hasBuilding(l.type)?"Luas tanah":"Luas",`${h.num(l.size)} m² (${h.num(Math.round(l.size)/100)} are)`]);
   if(h.hasBuilding(l.type)&&l.building_size)r.push(["Luas bangunan",`${h.num(l.building_size)} m²`]);
   if(l.bedrooms!=null)r.push(["Kamar tidur",String(l.bedrooms)]);
   if(l.bathrooms!=null)r.push(["Kamar mandi",String(l.bathrooms)]);
-  if(l.cert)r.push(["Sertifikat",l.cert]);
-  if(l.zone)r.push(["Zonasi",l.zone]);
-  if(l.facing)r.push(["Hadap",l.facing]);
-  r.push(["Harga",l.price==null||l.price===""?"Hubungi agen":`${h.rupiah(l.price)}${h.units[l.unit]?" "+h.units[l.unit]:""}`]);
+  if(l.cert)r.push(["Sertifikat",T(l.cert)]);
+  if(l.zone)r.push(["Zonasi",T(l.zone)]);
+  if(l.facing)r.push(["Hadap",T(l.facing)]);
+  r.push(["Harga",l.price==null||l.price===""?T("Hubungi agen"):`${h.rupiah(l.price)}${h.units[l.unit]?" "+T(h.units[l.unit]):""}`]);
   if(l.price&&l.unit==="total"&&l.size&&l.type==="Tanah")r.push(["Harga per are",h.rupiah(l.price/(l.size/100))]);
-  return r;
+  return r.map(([k,v])=>[T(k),v]);
 }
 function text(l,a,site,url,h){
   const loc=[l.place,l.kab,l.prov].filter(Boolean).join(", ");
@@ -72,8 +73,8 @@ async function render(l,a,site,url,h){
   rr(x,M,19,24,24,5);x.fillStyle=C.white;x.fill();
   x.fillStyle=C.navy;x.beginPath();x.moveTo(M+4,37);x.lineTo(M+9.5,29.5);x.lineTo(M+13,33.5);x.lineTo(M+16.5,27);x.lineTo(M+20.5,37);x.closePath();x.fill();
   x.fillStyle=C.white;x.font=`800 17px ${FD}`;x.fillText(site.name,M+32,36.5);
-  x.textAlign="right";x.font=`600 8px ${FB}`;x.fillStyle="rgba(255,255,255,.75)";x.fillText("BROSUR LISTING",W-M,28);
-  x.font=`600 11px ${FB}`;x.fillStyle=C.white;x.fillText(`${l.type} · ${l.status}`,W-M,43);x.textAlign="left";
+  x.textAlign="right";x.font=`600 8px ${FB}`;x.fillStyle="rgba(255,255,255,.75)";x.fillText(h.T("BROSUR LISTING"),W-M,28);
+  x.font=`600 11px ${FB}`;x.fillStyle=C.white;x.fillText(`${h.T(l.type)} · ${h.T(l.status)}`,W-M,43);x.textAlign="left";
   // title block
   let y=88;
   const loc=[l.place,l.kab,l.prov].filter(Boolean).join(" · ").toUpperCase();
@@ -81,9 +82,9 @@ async function render(l,a,site,url,h){
   y+=24;x.fillStyle=C.ink;x.font=`800 22px ${FD}`;
   const tl=wrap(x,l.title,W-2*M).slice(0,2);tl.forEach(t=>{x.fillText(t,M,y);y+=26});
   y+=2;x.font=`700 18px ${FD}`;x.fillStyle=C.navy;
-  const priceTxt=l.price==null||l.price===""?"Harga: hubungi agen":`${h.rupiah(l.price)}${h.units[l.unit]?" "+h.units[l.unit]:""}`;
+  const priceTxt=l.price==null||l.price===""?h.T("Harga: hubungi agen"):`${h.rupiah(l.price)}${h.units[l.unit]?" "+h.T(h.units[l.unit]):""}`;
   x.fillText(priceTxt,M,y);
-  if(l.price&&l.unit==="total"&&l.size&&l.type==="Tanah"){const pw=x.measureText(priceTxt).width;x.font=`500 10.5px ${FB}`;x.fillStyle=C.muted;x.fillText(`·  ${h.rupiah(l.price/(l.size/100))} per are`,M+pw+10,y)}
+  if(l.price&&l.unit==="total"&&l.size&&l.type==="Tanah"){const pw=x.measureText(priceTxt).width;x.font=`500 10.5px ${FB}`;x.fillStyle=C.muted;x.fillText(`·  ${h.rupiah(l.price/(l.size/100))} ${h.T("per are")}`,M+pw+10,y)}
   y+=16;
   // photos
   const pics=(l.photos||[]).slice(0,3),imgs=(await Promise.all(pics.map(loadImg))).filter(Boolean);
@@ -94,8 +95,8 @@ async function render(l,a,site,url,h){
   else plot(x,l,h,M,y,PW,PH);
   y+=PH+24;
   // specs (2 kolom)
-  x.fillStyle=C.navy;x.font=`700 9px ${FB}`;x.fillText("SPESIFIKASI",M,y);y+=10;
-  const rows=specs(l,h).filter(r=>r[0]!=="Harga");
+  x.fillStyle=C.navy;x.font=`700 9px ${FB}`;x.fillText(h.T("SPESIFIKASI"),M,y);y+=10;
+  const rows=specs(l,h).filter(r=>r[0]!==h.T("Harga"));
   const colW=(PW-24)/2,rowH=21,half=Math.ceil(rows.length/2);
   rows.forEach(([k,v],i)=>{
     const col=i<half?0:1,row=col?i-half:i,X=M+col*(colW+24),Y=y+row*rowH;
@@ -110,31 +111,32 @@ async function render(l,a,site,url,h){
   const BH=104,BY=H-26-BH;
   // description
   if(l.description){
-    x.fillStyle=C.navy;x.font=`700 9px ${FB}`;x.fillText("DESKRIPSI",M,y);y+=15;
+    x.fillStyle=C.navy;x.font=`700 9px ${FB}`;x.fillText(h.T("DESKRIPSI"),M,y);y+=15;
     x.fillStyle=C.ink;x.font=`400 10px ${FB}`;
     const maxLines=Math.max(0,Math.floor((BY-14-y)/14.5));
     let ls=wrap(x,l.description,PW);
     if(ls.length>maxLines){ls=ls.slice(0,maxLines);if(ls.length)ls[ls.length-1]=ls[ls.length-1].replace(/\s*\S*$/,"")+" …"}
     ls.forEach(t=>{x.fillText(t,M,y);y+=14.5});
   }
-  if(l.maps_url&&y<BY-26){x.fillStyle=C.muted;x.font=`500 9px ${FB}`;x.fillText("Lokasi Google Maps: "+l.maps_url,M,BY-14)}
+  if(l.maps_url&&y<BY-26){x.fillStyle=C.muted;x.font=`500 9px ${FB}`;x.fillText(h.T("Lokasi Google Maps: ")+l.maps_url,M,BY-14)}
   // contact box
   rr(x,M,BY,PW,BH,10);x.fillStyle=C.soft;x.fill();
   x.fillStyle=C.navy;x.fillRect(M,BY+14,3,BH-28);
-  x.fillStyle=C.navy;x.font=`700 8.5px ${FB}`;x.fillText("INFO & JADWAL SURVEI",M+20,BY+26);
-  x.fillStyle=C.ink;x.font=`800 17px ${FD}`;x.fillText(a?a.name:"Agen",M+20,BY+48);
+  x.fillStyle=C.navy;x.font=`700 8.5px ${FB}`;x.fillText(h.T("INFO & JADWAL SURVEI"),M+20,BY+26);
+  x.fillStyle=C.ink;x.font=`800 17px ${FD}`;x.fillText(a?a.name:h.T("Agen"),M+20,BY+48);
   if(a&&a.agency){x.fillStyle=C.muted;x.font=`500 10px ${FB}`;x.fillText(a.agency,M+20,BY+63)}
   if(a&&a.phone){x.fillStyle=C.ink;x.font=`600 12px ${FM}`;x.fillText(`WhatsApp  ${a.phone}`,M+20,BY+85)}
   const bw=168,bh=38,bx=W-M-18-bw,by=BY+(BH-bh)/2-8;
   rr(x,bx,by,bw,bh,19);x.fillStyle=C.wa;x.fill();
-  x.fillStyle=C.white;x.font=`700 12px ${FB}`;x.textAlign="center";x.fillText("Chat via WhatsApp",bx+bw/2,by+24);
-  x.fillStyle=C.muted;x.font=`500 8px ${FB}`;x.fillText("Ketuk tombol untuk langsung chat",bx+bw/2,by+bh+14);x.textAlign="left";
+  x.fillStyle=C.white;x.font=`700 12px ${FB}`;x.textAlign="center";x.fillText(h.T("Chat via WhatsApp"),bx+bw/2,by+24);
+  x.fillStyle=C.muted;x.font=`500 8px ${FB}`;x.fillText(h.T("Ketuk tombol untuk langsung chat"),bx+bw/2,by+bh+14);x.textAlign="left";
   // footer
   x.fillStyle=C.muted;x.font=`500 7.5px ${FB}`;
   const host=location.host||"nusantara.properties";
-  x.fillText(`${host}  ·  Dibuat ${new Date().toLocaleDateString('id-ID',{day:"numeric",month:"long",year:"numeric"})}  ·  Informasi dapat berubah sewaktu-waktu, konfirmasikan kepada agen sebelum transaksi.`,M,H-12);
+  const dt=new Date().toLocaleDateString(h.locale||'id-ID',{day:"numeric",month:"long",year:"numeric"});
+  x.fillText(h.en?`${host}  ·  Created ${dt}  ·  Information may change at any time; confirm with the agent before any transaction.`:`${host}  ·  Dibuat ${dt}  ·  Informasi dapat berubah sewaktu-waktu, konfirmasikan kepada agen sebelum transaksi.`,M,H-12);
   const links=[];
-  if(a&&a.phone)links.push({rect:[bx,by,bx+bw,by+bh],url:`https://wa.me/${h.wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, saya tertarik dengan listing "${l.title}" di ${site.name}. Boleh minta info lebih lanjut?`)}`});
+  if(a&&a.phone)links.push({rect:[bx,by,bx+bw,by+bh],url:`https://wa.me/${h.wa(a.phone)}?text=${encodeURIComponent(h.en?`Hello ${a.name}, I'm interested in your listing "${l.title}" on ${site.name}. Could you share more information?`:`Halo ${a.name}, saya tertarik dengan listing "${l.title}" di ${site.name}. Boleh minta info lebih lanjut?`)}`});
   links.push({rect:[M,H-22,M+120,H-6],url});
   return {canvas:cv,links};
 }

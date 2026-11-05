@@ -19,6 +19,9 @@ const BASE=location.origin+location.pathname;
 const MAX_PHOTOS=5;
 const FROM_LINK=/access_token/.test(location.hash)&&!/type=recovery/.test(location.hash);
 
+const I=window.NP_I18N||{lang:"id",locale:"id-ID",t:x=>x,translate(){},set(){}};
+const T=x=>I.t(x);
+const EN=()=>I.lang==="en";
 const app=document.getElementById('app');
 let sb=null;
 try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
@@ -35,13 +38,13 @@ let DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};
 
 /* ===== helpers ===== */
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const num=n=>Number(n).toLocaleString('id-ID');
+const num=n=>Number(n).toLocaleString(I.locale);
 const agentOf=id=>S.agents.find(a=>a.id===id);
 const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const pubAgents=()=>S.agents.filter(a=>a.status==="approved");
 const EXPIRE_DAYS=60,WARN_DAYS=7;
 const DAY=86400000;
-const fmtD=d=>d?new Date(d).toLocaleDateString('id-ID',{day:"numeric",month:"short",year:"numeric"}):"";
+const fmtD=d=>d?new Date(d).toLocaleDateString(I.locale,{day:"numeric",month:"short",year:"numeric"}):"";
 const daysLeft=l=>EXPIRE_DAYS-Math.floor((Date.now()-new Date(l.updated_at||l.created_at).getTime())/DAY);
 const isLive=l=>l.published&&daysLeft(l)>0;
 const needsRenew=l=>l.published&&daysLeft(l)<=WARN_DAYS;
@@ -49,14 +52,16 @@ const pubListings=()=>S.listings.filter(l=>isLive(l)&&(agentOf(l.agent_id)||{}).
 const kabsIn=p=>[...new Set(pubListings().filter(l=>!p||l.prov===p).map(l=>l.kab).filter(Boolean))].sort();
 function rupiah(v){
   if(v==null||v==="")return "";v=Number(v);
-  if(v>=1e12)return "Rp "+(v/1e12).toLocaleString('id-ID',{maximumFractionDigits:2})+" T";
-  if(v>=1e9)return "Rp "+(v/1e9).toLocaleString('id-ID',{maximumFractionDigits:2})+" M";
-  if(v>=1e6)return "Rp "+(v/1e6).toLocaleString('id-ID',{maximumFractionDigits:1})+" jt";
+  const L=I.locale,e=EN();
+  if(v>=1e12)return "Rp "+(v/1e12).toLocaleString(L,{maximumFractionDigits:2})+" T";
+  if(v>=1e9)return "Rp "+(v/1e9).toLocaleString(L,{maximumFractionDigits:2})+(e?" B":" M");
+  if(v>=1e6)return "Rp "+(v/1e6).toLocaleString(L,{maximumFractionDigits:1})+(e?" M":" jt");
   return "Rp "+num(v);
 }
 function wa(p){let d=String(p||"").replace(/\D/g,"");if(d.startsWith("0"))d="62"+d.slice(1);return d}
 function waLink(a,l){
-  const t=l?`Halo ${a.name}, saya tertarik dengan listing "${l.title}" (${l.place||l.kab}) di ${SITE.name}. Boleh minta info detail?`:`Halo ${a.name}, saya menemukan Anda di ${SITE.name}.`;
+  const t=EN()?(l?`Hello ${a.name}, I'm interested in your listing "${l.title}" (${l.place||l.kab}) on ${SITE.name}. Could you share more details?`:`Hello ${a.name}, I found you on ${SITE.name}.`)
+    :l?`Halo ${a.name}, saya tertarik dengan listing "${l.title}" (${l.place||l.kab}) di ${SITE.name}. Boleh minta info detail?`:`Halo ${a.name}, saya menemukan Anda di ${SITE.name}.`;
   return `https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(t)}`;
 }
 function ava(a,cls){return `<span class="ava ${cls||""}">${a&&a.photo_url?`<img src="${esc(a.photo_url)}" alt="">`:esc(initials(a&&a.name))}</span>`}
@@ -157,9 +162,9 @@ function bar(){
   return `<header class="bar"><div class="wrap">
     <a class="brand" href="#"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="var(--jade)"/><path d="M5 18 L10 11 L13.5 15 L17 9 L21 18 Z" fill="var(--on-jade)"/></svg>${esc(SITE.name)}</a>
     <nav class="mainnav" aria-label="Menu utama">${links}</nav>
-    <div class="nav">${acct}<button class="menu-btn" data-act="menu" aria-expanded="${MENU}" aria-controls="mnav" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">${MENU?'<path d="M6 6l12 12M18 6L6 18"/>':'<path d="M4 7h16M4 12h16M4 17h16"/>'}</svg></button></div>
+    <div class="nav"><div class="lang" role="group" aria-label="Bahasa"><button data-lang="id" aria-pressed="${!EN()}">ID</button><button data-lang="en" aria-pressed="${EN()}">EN</button></div>${acct}<button class="menu-btn" data-act="menu" aria-expanded="${MENU}" aria-controls="mnav" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">${MENU?'<path d="M6 6l12 12M18 6L6 18"/>':'<path d="M4 7h16M4 12h16M4 17h16"/>'}</svg></button></div>
   </div>
-  <nav class="mnav" id="mnav" ${MENU?"":"hidden"} aria-label="Menu utama"><div class="wrap">${links}${session?"":`<a href="#masuk">Masuk</a>`}</div></nav>
+  <nav class="mnav" id="mnav" ${MENU?"":"hidden"} aria-label="Menu utama"><div class="wrap">${links}${session?`<a href="#dasbor">Dasbor</a>`:`<a href="#masuk">Masuk</a><a href="#daftar">Daftar agen</a>`}</div></nav>
   </header>`;
 }
 function home(){
@@ -176,7 +181,7 @@ function home(){
     <section class="wrap"><div class="section-head"><div><div class="label">Baru tayang</div><h2>Listing terbaru</h2></div><a class="btn btn-line btn-sm" href="#listing">Lihat semua listing</a></div>
       <div class="grid">${!S.loaded?`<div class="empty">Memuat listing…</div>`:S.error?`<div class="empty">${esc(S.error)}</div>`:latest.length?latest.map(card).join(""):`<div class="empty">Belum ada listing yang tayang.</div>`}</div></section>
     ${P?`<section class="wrap"><div class="section-head"><div><div class="label">Berita</div><h2>Kabar properti terbaru</h2></div><a class="btn btn-line btn-sm" href="#berita">Semua berita</a></div>
-      <div class="news-list news-row">${P.NEWS.slice(0,3).map(P.newsCard).join("")}</div></section>
+      <div class="news-list news-row" data-noi18n>${P.NEWS.slice(0,3).map(P.newsCard).join("")}</div></section>
     <section class="wrap"><div class="guide-band"><div><div class="label">Panduan</div><h2>Mau beli properti? Periksa ini dulu.</h2><p>Jenis sertifikat, cek legalitas di BPN, hitungan pajak BPHTB dan PPh, sampai alur AJB dan balik nama.</p></div><a class="btn btn-primary" href="#panduan">Baca panduan</a></div></section>`:""}
     ${agentsSection()}`;
 }
@@ -219,7 +224,7 @@ function agentsSection(){
       :`<div class="empty">${S.loaded?"Belum ada agen yang tayang.":"Memuat agen…"}</div>`}</div>
     ${session?"":`<div class="cta-band"><p><b>Anda agen properti?</b> Buat akun, pasang listing Anda di ${esc(SITE.name)}, dan terima calon pembeli langsung ke WhatsApp Anda.</p><a class="btn btn-primary" href="#daftar">Daftar sebagai agen</a></div>`}</section>`;
 }
-const SH=()=>({num,rupiah,wa,hasBuilding,units:UNITS});
+const SH=()=>({num,rupiah,wa,hasBuilding,units:UNITS,T,en:EN(),locale:I.locale});
 function detail(l){
   const a=agentOf(l.agent_id)||{name:"Agen",phone:""};
   const pics=l.photos||[];
@@ -367,6 +372,8 @@ function renewBanner(list,own){
   const exp=list.filter(l=>l.published&&daysLeft(l)<=0),soon=list.filter(l=>l.published&&daysLeft(l)>0&&daysLeft(l)<=WARN_DAYS);
   if(!exp.length&&!soon.length)return "";
   const ids=[...exp,...soon].map(l=>l.id).join(",");
+  if(EN())return `<div class="note ${exp.length?"err":""} renew-note" data-noi18n><span>${exp.length?`<b>${exp.length} ${own?"of your ":""}listing(s) taken down</b> because they weren't updated for ${EXPIRE_DAYS} days. `:""}${soon.length?`<b>${soon.length} listing(s)</b> will be taken down within ${WARN_DAYS} days. `:""}${own?"If the property is still available, republish it so buyers can keep seeing it.":"The owning agent needs to republish these listings."}</span>
+    ${own?`<button class="btn btn-primary btn-sm" data-renew="${ids}">Republish all</button>`:""}</div>`;
   return `<div class="note ${exp.length?"err":""} renew-note"><span>${exp.length?`<b>${exp.length} listing${own?" Anda":""} sudah diturunkan</b> karena tidak diperbarui selama ${EXPIRE_DAYS} hari. `:""}${soon.length?`<b>${soon.length} listing</b> akan diturunkan dalam ${WARN_DAYS} hari. `:""}${own?"Jika properti masih tersedia, tayangkan ulang agar tetap terlihat pembeli.":"Agen pemilik perlu menayangkan ulang listingnya."}</span>
     ${own?`<button class="btn btn-primary btn-sm" data-renew="${ids}">Tayangkan ulang semua</button>`:""}</div>`;
 }
@@ -481,6 +488,7 @@ function render(){
     else main=home();
   }
   app.innerHTML=bar()+`<main>${main}</main>`+footer();
+  I.translate(app);
   hints();
 }
 function hints(){
@@ -510,6 +518,7 @@ async function uploadPhoto(file,prefix,max){
 app.addEventListener('click',async e=>{
   const t=e.target.closest('button,a[data-act],a[data-goto]');if(!t)return;
   const act=t.dataset.act;
+  if(t.dataset.lang){I.set(t.dataset.lang);MENU=false;render();return}
   if(act==="menu"){MENU=!MENU;render();return}
   if(act==="reset-filter"){Object.assign(F,{q:"",type:"",status:"",prov:"",kab:"",agent:"",budget:"",bed:"",facing:""});render();return}
   if(t.dataset.goType){F.type=t.dataset.goType;location.hash="listing";return}
@@ -518,10 +527,10 @@ app.addEventListener('click',async e=>{
   if(t.dataset.thumb!==undefined){const l=S.listings.find(x=>x.id===route());const i=Number(t.dataset.thumb);
     document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">`;
     document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
-  if(t.dataset.pdf){const l=S.listings.find(x=>x.id===t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent="Menyiapkan PDF…";
-    try{await NP_SHARE.pdf(l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent="PDF terunduh"}catch(err){t.textContent="Gagal membuat PDF, coba lagi"}
+  if(t.dataset.pdf){const l=S.listings.find(x=>x.id===t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent=T("Menyiapkan PDF…");
+    try{await NP_SHARE.pdf(l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent=T("PDF terunduh")}catch(err){t.textContent=T("Gagal membuat PDF, coba lagi")}
     setTimeout(()=>{t.textContent=old;t.disabled=false},2500);return}
-  if(t.dataset.copy){const v=t.dataset.copy,old=t.textContent;try{await navigator.clipboard.writeText(v);t.textContent="Tersalin"}catch(_){t.textContent="Salin manual: "+v}setTimeout(()=>t.textContent=old,2500);return}
+  if(t.dataset.copy){const v=t.dataset.copy,old=t.textContent;try{await navigator.clipboard.writeText(v);t.textContent=T("Tersalin")}catch(_){t.textContent=T("Salin manual: "+v)}setTimeout(()=>t.textContent=old,2500);return}
   if(act==="logout"){await sb.auth.signOut();me=null;DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};location.hash="";render();return}
   if(act==="forgot"){
     const em=(document.getElementById('g-email')||{}).value||"";AUTH.email=em.trim();
@@ -554,7 +563,7 @@ app.addEventListener('click',async e=>{
 app.addEventListener('input',e=>{
   const id=e.target.id;
   if(id==="f-q"){F.q=e.target.value;const r=document.getElementById('results');const list=filtered();
-    r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;return}
+    r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;I.translate(r);return}
   if(/^(l-size|l-price)$/.test(id))hints();
 });
 app.addEventListener('change',async e=>{
