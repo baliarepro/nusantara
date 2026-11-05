@@ -142,3 +142,6 @@ create policy photos_upload on storage.objects for insert to authenticated
 drop policy if exists photos_delete on storage.objects;
 create policy photos_delete on storage.objects for delete to authenticated
   using (bucket_id = 'listing-photos' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
+
+-- 7. TAMBAHAN: link Google Maps untuk listing tanah
+alter table public.listings add column if not exists maps_url text;

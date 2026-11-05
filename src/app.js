@@ -215,6 +215,7 @@ function detail(l){
         ${priceHtml(l,"d-price")}
         <table class="facts"><tbody>${rows.map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("")}</tbody></table>
         ${l.description?`<p class="desc">${esc(l.description)}</p>`:""}
+        ${l.maps_url&&/^https:\/\//.test(l.maps_url)?`<a class="btn btn-line maps-btn" href="${esc(l.maps_url)}" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Lihat lokasi di Google Maps</a>`:""}
       </div>
       <aside class="side">
         <div class="panel"><div class="label">Agen listing ini</div>
@@ -388,6 +389,8 @@ function listingForm(){
     <div class="row"><div class="field"><label for="l-price">Harga publik (Rp)</label><input id="l-price" name="price" inputmode="numeric" value="${esc(l.price??"")}" placeholder="Kosongkan = tanya agen"><span class="hint" id="h-price"></span></div>
       <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
     <div class="field"><label for="l-zone">Zonasi</label><select id="l-zone" name="zone">${opt([["","—"],...Object.keys(ZONES)],l.zone)}</select></div>
+    ${l.type==="Tanah"?`<div class="field"><label for="l-maps">Lokasi Google Maps</label><input id="l-maps" name="maps_url" type="url" inputmode="url" value="${esc(l.maps_url)}" placeholder="https://maps.app.goo.gl/…">
+      <span class="hint">Buka lokasi tanah di aplikasi Google Maps, ketuk Bagikan, lalu salin link dan tempel di sini. Tombol Lihat lokasi akan tampil di halaman listing.</span></div>`:""}
     <div class="field"><label for="l-desc">Deskripsi</label><textarea id="l-desc" name="description" placeholder="Akses jalan, view, fasilitas sekitar…">${esc(l.description)}</textarea></div>
     ${(()=>{const n=(l.photos||[]).length,full=n>=MAX_PHOTOS;return `<div class="field"><label for="l-photos">Foto <span class="pill ${full?"pill-pending":"pill-approved"}">${n} / ${MAX_PHOTOS}</span></label>
       <div class="photo-limit">Maksimal ${MAX_PHOTOS} foto per listing. Foto pertama jadi foto sampul.</div>
@@ -434,7 +437,7 @@ function hints(){
 const digits=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null};
 function readForm(form){const o={};new FormData(form).forEach((v,k)=>{if(k in o){o[k]=[].concat(o[k],String(v))}else o[k]=String(v).trim()});return o}
 function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o=readForm(f);
-  ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
+  ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description","maps_url"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
   DS.form.data.published=!!o.published;}}
 
 function shrink(file,max,q){
@@ -495,6 +498,7 @@ app.addEventListener('input',e=>{
 app.addEventListener('change',async e=>{
   const id=e.target.id;
   if(id==="f-prov"){F.prov=e.target.value;F.kab="";render();return}
+  if(id==="l-type"){snapForm();render();const el=document.getElementById('l-type');if(el)el.focus();return}
   const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort"};
   if(map[id]){F[map[id]]=e.target.value;render();return}
   if(id==="l-photos"){
@@ -561,13 +565,16 @@ app.addEventListener('submit',async e=>{
     snapForm();const d=DS.form.data;
     if(!d.title){DS.msg={text:"Isi judul listing.",err:true};render();return}
     if(!d.prov||!d.kab){DS.msg={text:"Pilih provinsi dan isi kota/kabupaten.",err:true};render();return}
+    const maps=d.type==="Tanah"?String(d.maps_url||"").trim():"";
+    if(maps&&!/^https:\/\/([a-z0-9-]+\.)*(google\.[a-z.]+|goo\.gl)\//i.test(maps)){DS.msg={text:"Link lokasi harus link Google Maps, misalnya https://maps.app.goo.gl/… atau https://www.google.com/maps/…",err:true};render();return}
     const row={title:d.title,type:d.type,status:d.status,prov:d.prov,kab:d.kab,place:d.place||null,size:digits(d.size),price:digits(d.price),unit:d.unit,
-      cert:d.cert||null,zone:d.zone||null,description:d.description||null,photos:d.photos||[],published:!!d.published};
+      cert:d.cert||null,zone:d.zone||null,description:d.description||null,photos:d.photos||[],published:!!d.published,maps_url:maps||null};
     DS.busy=true;DS.msg=null;render();
     let id=d.id,error;
     if(id)({error}=await sb.from('listings').update(row).eq('id',id));
     else{const r=await sb.from('listings').insert(row).select('id').single();error=r.error;id=r.data&&r.data.id}
     DS.busy=false;
+    if(error&&/maps_url/.test(error.message||"")){DS.msg={text:"Kolom Google Maps belum ada di database. Admin perlu menjalankan SQL tambahan di Supabase.",err:true};render();return}
     if(error){DS.msg={text:errMsg(error),err:true};render();return}
     DS.form=null;DS.msg={text:row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf."};await load();window.scrollTo(0,0);return;
   }
