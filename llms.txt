@@ -1,0 +1,23 @@
+# Nusantara Property
+
+> Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
+> English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
+
+Diperbarui / updated: 2026-11-05. Jumlah listing tayang / live listings: 1.
+
+## Halaman utama / Key pages
+- [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
+- [Panduan membeli properti di Indonesia](https://nusantara.properties/panduan/): sertifikat SHM/SHGB/Hak Pakai, cek BPN, BPHTB & PPh, alur AJB, KPR, aturan WNA
+- [Guide to buying property in Indonesia](https://nusantara.properties/en/guide/)
+- [FAQ](https://nusantara.properties/faq/) · [FAQ (English)](https://nusantara.properties/en/faq/)
+- [Tentang kami](https://nusantara.properties/tentang/) · [About us](https://nusantara.properties/en/about/)
+- [Berita properti](https://nusantara.properties/berita/) · [Property news](https://nusantara.properties/en/news/)
+
+## Kategori / Categories
+- [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
+
+## Listing
+- [Villa di Dewi Sri Kuta Bali](https://nusantara.properties/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · Dijual · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 M
+
+## Listings (English)
+- [Villa in Dewi Sri Kuta Bali](https://nusantara.properties/en/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · For sale · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 B
