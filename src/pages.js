@@ -123,15 +123,20 @@ return {
    ${FAQ.map(g=>`<section class="faq"><h2>${g.group}</h2>${g.items.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</section>`).join("")}
    <div class="panel" style="margin-top:28px"><b>Pertanyaan Anda belum terjawab?</b><span>Hubungi admin lewat WhatsApp di <code>${site.adminPhone}</code>.</span>
      <a class="btn btn-wa" style="justify-self:start" href="https://wa.me/62${site.adminPhone.replace(/^0/,"")}" target="_blank" rel="noopener">WhatsApp admin</a></div></div>`},
- about(site,stats){return `<div class="wrap page">${head("Tentang kami",`Satu tempat untuk listing properti dari agen di seluruh Indonesia`,`${site.name} mempertemukan pembeli dengan agen properti yang terverifikasi, dari tanah kavling di Bali sampai rumah di Jabodetabek. Setiap listing dikelola langsung oleh agennya, sehingga informasi yang Anda terima datang dari orang yang benar-benar memasarkan properti itu.`)}
+ about(site,stats){
+  const field=[
+   ["Listing tersebar di banyak grup","Satu properti beredar di puluhan grup WhatsApp dengan harga dan keterangan berbeda, sampai pembeli tidak tahu mana yang benar.","Setiap listing punya satu halaman dan satu agen yang bertanggung jawab. Pembeli tahu persis siapa yang harus dihubungi."],
+   ["Iklan lama tidak pernah turun","Properti sudah terjual, tapi iklannya masih beredar berbulan-bulan dan membuang waktu pembeli maupun agen.","Listing yang tidak diperbarui selama 60 hari otomatis diturunkan. Agen diingatkan seminggu sebelumnya untuk menayangkan ulang bila properti masih tersedia."],
+   ["Informasi penting sering tidak lengkap","Pertanyaan pertama pembeli di lapangan selalu sama: sertifikatnya apa, zonasinya apa, hadap ke mana, lokasinya persis di mana.","Formulir listing meminta data yang memang ditanyakan pembeli: sertifikat, zonasi, luas dalam m² dan are, arah hadap, luas bangunan, kamar, dan titik Google Maps untuk tanah."],
+   ["Sulit menilai siapa agennya","Pembeli tidak bisa membedakan agen yang serius dari perantara yang tidak jelas.","Setiap agen ditinjau admin sebelum profil dan listingnya tayang, lengkap dengan kantor, area kerja, dan pengalaman."]
+  ];
+  return `<div class="wrap page">${head("Tentang kami","Platform properti yang lahir dari pengalaman lapangan",`${site.name} tidak dirancang dari balik meja. Platform ini dibangun dari pengalaman bertahun-tahun mengantar pembeli survei lokasi, mengecek sertifikat, bernegosiasi dengan pemilik tanah, dan mendampingi transaksi sampai akta ditandatangani. Setiap fitur di sini menjawab masalah yang benar-benar ditemui agen dan pembeli di lapangan.`)}
    <div class="about-stats"><div><b>${stats.listings}</b><span>listing tayang</span></div><div><b>${stats.agents}</b><span>agen terverifikasi</span></div><div><b>${stats.provs}</b><span>provinsi</span></div></div>
-   <div class="about-grid">
-    <div class="about-card">${svg("search")}<h3>Untuk pembeli</h3><p>Cari berdasarkan jenis properti, provinsi, kota, dan agen. Lihat luas dalam m² dan are, sertifikat, serta zonasi, lalu hubungi agennya langsung lewat WhatsApp.</p></div>
-    <div class="about-card">${svg("chat")}<h3>Untuk agen</h3><p>Setiap agen punya dasbor sendiri untuk memasang dan mengelola listing. Hanya agen pemilik dan admin yang bisa mengubah atau menghapus listing tersebut.</p></div>
-    <div class="about-card">${svg("check")}<h3>Terverifikasi</h3><p>Setiap agen baru ditinjau admin sebelum profil dan listingnya tayang, supaya pembeli berhubungan dengan agen yang jelas identitasnya.</p></div>
-   </div>
-   <section class="prose" style="margin-top:36px"><h2>Di balik ${site.name}</h2>
-    <p>${site.name} dikelola oleh Bagoes, agen properti di Bali sejak 2009 dan pendiri Bali Are Property, agensi independen yang berfokus pada tanah dan properti di Kuta Selatan dan Kuta Utara. Pengalaman memasarkan properti di Bali selama lebih dari 15 tahun menjadi dasar platform ini: memudahkan pembeli menemukan properti, dan memudahkan agen dari berbagai daerah memasarkannya.</p>
+   <section class="prose" style="max-width:none"><h2>Masalah di lapangan, dan jawaban kami</h2></section>
+   <div class="field-list">${field.map(([h,prob,ans])=>`<div class="field-item"><h3>${h}</h3><div class="field-cols"><div><span class="label">Yang sering terjadi</span><p>${prob}</p></div><div><span class="label">Di ${site.name}</span><p>${ans}</p></div></div></div>`).join("")}</div>
+   <section class="prose" style="margin-top:36px"><h2>Berawal dari Bali, untuk seluruh Indonesia</h2>
+    <p>${site.name} didirikan oleh Bagoes, agen properti di Bali sejak 2009 dan pendiri Bali Are Property, agensi independen yang berfokus pada tanah dan properti di Kuta Selatan dan Kuta Utara. Lebih dari 15 tahun di lapangan, dari tanah kavling di Bukit sampai villa di Canggu, membentuk cara platform ini bekerja: informasi harus jujur, lengkap, dan masih berlaku.</p>
+    <p>Pengalaman itu kini dibuka untuk agen dari daerah lain. Siapa pun agen properti yang bekerja dengan cara yang sama bisa bergabung, mengelola listingnya sendiri, dan terhubung langsung dengan pembeli dari seluruh Indonesia.</p>
     <h2>Hubungi kami</h2>
     <p>WhatsApp admin: <code>${site.adminPhone}</code></p>
     <div class="phone"><a class="btn btn-wa" href="https://wa.me/62${site.adminPhone.replace(/^0/,"")}" target="_blank" rel="noopener">WhatsApp admin</a><a class="btn btn-line" href="#daftar">Daftar sebagai agen</a></div>
