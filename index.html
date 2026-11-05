@@ -43,6 +43,10 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 .bar .wrap{display:flex;align-items:center;gap:16px;padding-block:12px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em}
 .brand svg{flex:none}
+.brand{white-space:nowrap}
+.nav{align-items:center}
+.nav a.btn-line{border:1px solid var(--line)}
+@media (max-width:520px){.nav .nav-listing{display:none}.bar .wrap{gap:8px}.brand{font-size:17px}.nav a,.nav .btn{padding:6px 10px}}
 .nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav a,.btn-ghost{padding:7px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:500;border:0;background:none;cursor:pointer}
 .nav a:hover,.btn-ghost:hover{color:var(--ink);background:var(--sunk)}
@@ -179,12 +183,35 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 .foot{border-top:1px solid var(--line);padding-block:22px 34px;color:var(--muted);font-size:13.5px}
 .foot .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .swatches{display:flex;gap:12px;flex-wrap:wrap}
+/* register */
+.reg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:36px;padding-block:8px 56px;align-items:start}
+@media (max-width:860px){.reg{grid-template-columns:minmax(0,1fr);gap:24px}}
+.reg-intro h1{font-size:clamp(30px,4.4vw,46px);font-weight:800;line-height:1.04}
+.reg-intro h1 em{font-style:normal;color:var(--jade)}
+.reg-intro>p{color:var(--muted);max-width:46ch;margin:14px 0 0;font-size:16px}
+.steps{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:16px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;counter-increment:s}
+.steps li::before{content:counter(s);width:34px;height:34px;border-radius:50%;border:1.5px solid var(--jade);color:var(--jade);display:grid;place-items:center;font-family:var(--f-mono);font-size:14px}
+.steps b{display:block;font-weight:600}
+.steps span{color:var(--muted);font-size:14px}
+.reg .form{padding:22px}
+.checks{display:flex;gap:6px;flex-wrap:wrap}
+.checks label{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:14px;cursor:pointer;font-weight:500}
+.checks input{accent-color:var(--jade);margin:0}
+.checks label:has(input:checked){border-color:var(--jade);background:var(--jade-soft)}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.agree input{margin-top:4px;accent-color:var(--jade)}
+.err-text{color:var(--danger);font-size:13px}
+.done{display:grid;gap:14px}
+.done pre{white-space:pre-wrap;font-family:var(--f-mono);font-size:13px;background:var(--sunk);border-radius:8px;padding:14px;margin:0;max-height:260px;overflow:auto}
+.cta-band{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 20px;border:1px dashed var(--jade);border-radius:var(--r);margin-bottom:40px}
+.cta-band p{margin:0;max-width:52ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div id="app"></div>
-<script type="application/json" id="np-data">{"site":{"name":"Nusantara Property","tagline":"Tanah, rumah, villa dan properti komersial di seluruh Indonesia dari agen-agen terpercaya. Hubungi agennya langsung lewat WhatsApp."},"agents":[{"id":"a-bagoes","name":"Bagoes","agency":"Bali Are Property","phone":"0812868080","areas":"Kuta Selatan & Kuta Utara","bio":"Agen properti independen di Bali sejak 2009. Spesialis tanah di Bukit (Ungasan, Jimbaran, Pecatu, Uluwatu, Kutuh, Pandawa, Balangan) dan Canggu, Berawa, Pererenan, Tibubeneng, Kerobokan.","photo":""}],"listings":[{"id":"l-balangan-6000","agentId":"a-bagoes","title":"Tanah dekat Pantai Balangan","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Balangan, Jimbaran, Kuta Selatan","size":6000,"price":null,"unit":"total","cert":"SHM","zone":"Pariwisata","desc":"Tanah luas dekat Pantai Balangan, zonasi pariwisata. Cocok untuk investor serius: villa resort, hotel butik, atau beach club.","photos":[],"created":"2026-10-20"},{"id":"l-ungasan-300","agentId":"a-bagoes","title":"Tanah hook Jl. Tulip / Jl. Pura Masuka","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Ungasan, Kuta Selatan","size":300,"price":null,"unit":"total","cert":"","zone":"","desc":"Tanah posisi hook (sudut) di pertemuan Jl. Tulip dan Jl. Pura Masuka, Ungasan. Dua sisi jalan.","photos":[],"created":"2026-10-22"},{"id":"l-labuansait-395","agentId":"a-bagoes","title":"Tanah gandeng Labuan Sait","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Labuan Sait, Pecatu, Kuta Selatan","size":395,"price":null,"unit":"total","cert":"","zone":"","desc":"Dua bidang bersebelahan: 214 m² + 181 m², total 395 m². Kawasan Labuan Sait dekat Pantai Padang Padang dan Uluwatu.","photos":[],"created":"2026-10-24"},{"id":"l-labuansait-9025","agentId":"a-bagoes","title":"Tanah 90 are Labuan Sait","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Labuan Sait, Pecatu, Kuta Selatan","size":9025,"price":null,"unit":"total","cert":"","zone":"","desc":"Lahan besar 9.025 m² di kawasan Labuan Sait, Pecatu–Uluwatu.","photos":[],"created":"2026-10-24"},{"id":"l-pandawa-5300","agentId":"a-bagoes","title":"Tanah dekat Pantai Pandawa","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Kutuh, Kuta Selatan","size":5300,"price":null,"unit":"total","cert":"","zone":"","desc":"Tanah 5.300 m² dekat Pantai Pandawa, Kuta Selatan.","photos":[],"created":"2026-10-28"}]}</script>
+<script type="application/json" id="np-data">{"site":{"name":"Nusantara Property","tagline":"Tanah, rumah, villa dan properti komersial di seluruh Indonesia dari agen-agen terpercaya. Hubungi agennya langsung lewat WhatsApp.","adminPhone":"0812868080"},"agents":[{"id":"a-bagoes","name":"Bagoes","agency":"Bali Are Property","phone":"0812868080","areas":"Kuta Selatan & Kuta Utara","bio":"Agen properti independen di Bali sejak 2009. Spesialis tanah di Bukit (Ungasan, Jimbaran, Pecatu, Uluwatu, Kutuh, Pandawa, Balangan) dan Canggu, Berawa, Pererenan, Tibubeneng, Kerobokan.","photo":""}],"listings":[{"id":"l-balangan-6000","agentId":"a-bagoes","title":"Tanah dekat Pantai Balangan","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Balangan, Jimbaran, Kuta Selatan","size":6000,"price":null,"unit":"total","cert":"SHM","zone":"Pariwisata","desc":"Tanah luas dekat Pantai Balangan, zonasi pariwisata. Cocok untuk investor serius: villa resort, hotel butik, atau beach club.","photos":[],"created":"2026-10-20"},{"id":"l-ungasan-300","agentId":"a-bagoes","title":"Tanah hook Jl. Tulip / Jl. Pura Masuka","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Ungasan, Kuta Selatan","size":300,"price":null,"unit":"total","cert":"","zone":"","desc":"Tanah posisi hook (sudut) di pertemuan Jl. Tulip dan Jl. Pura Masuka, Ungasan. Dua sisi jalan.","photos":[],"created":"2026-10-22"},{"id":"l-labuansait-395","agentId":"a-bagoes","title":"Tanah gandeng Labuan Sait","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Labuan Sait, Pecatu, Kuta Selatan","size":395,"price":null,"unit":"total","cert":"","zone":"","desc":"Dua bidang bersebelahan: 214 m² + 181 m², total 395 m². Kawasan Labuan Sait dekat Pantai Padang Padang dan Uluwatu.","photos":[],"created":"2026-10-24"},{"id":"l-labuansait-9025","agentId":"a-bagoes","title":"Tanah 90 are Labuan Sait","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Labuan Sait, Pecatu, Kuta Selatan","size":9025,"price":null,"unit":"total","cert":"","zone":"","desc":"Lahan besar 9.025 m² di kawasan Labuan Sait, Pecatu–Uluwatu.","photos":[],"created":"2026-10-24"},{"id":"l-pandawa-5300","agentId":"a-bagoes","title":"Tanah dekat Pantai Pandawa","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Kutuh, Kuta Selatan","size":5300,"price":null,"unit":"total","cert":"","zone":"","desc":"Tanah 5.300 m² dekat Pantai Pandawa, Kuta Selatan.","photos":[],"created":"2026-10-28"}]}</script>
 <script id="np-main">
 (function(){
 const TYPES=["Tanah","Rumah","Villa","Apartemen","Ruko","Gudang","Komersial"];
@@ -265,7 +292,7 @@ function card(l){
 function bar(){
   return `<header class="bar"><div class="wrap">
     <a class="brand" href="#"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="var(--jade)"/><path d="M5 18 L10 11 L13.5 15 L17 9 L21 18 Z" fill="var(--on-jade)"/></svg>${esc(S.site.name)}</a>
-    <nav class="nav"><a href="#">Listing</a><a href="#agen">Agen</a>${canEdit?`<button class="btn btn-primary btn-sm" data-act="open-drawer">Kelola</button>`:""}</nav>
+    <nav class="nav"><a href="#" class="nav-listing">Listing</a><a href="#agen">Agen</a><a href="#daftar" class="btn btn-line btn-sm" style="color:var(--ink)">Daftar agen</a>${canEdit?`<button class="btn btn-primary btn-sm" data-act="open-drawer">Kelola</button>`:""}</nav>
   </div></header>`;
 }
 function home(){
@@ -299,7 +326,69 @@ function agentsSection(){
   return `<section class="wrap" id="agen-list"><div class="section-head"><div><div class="label">Tim agen</div><h2>Agen kami</h2></div>${canEdit?`<button class="btn btn-line btn-sm" data-act="new-agent">Tambah agen</button>`:""}</div>
     <div class="agents">${S.agents.length?S.agents.map(a=>{const n=S.listings.filter(l=>l.agentId===a.id).length;
       return `<a class="agent" href="#agen-${esc(a.id)}">${ava(a,"lg")}<div><h3>${esc(a.name)}</h3><p>${esc(a.agency||"Agen independen")}</p><p>${esc(a.areas||"")}</p><p class="mono">${n} listing</p></div></a>`}).join("")
-      :`<div class="empty">Belum ada agen.</div>`}</div></section>`;
+      :`<div class="empty">Belum ada agen.</div>`}</div>
+    <div class="cta-band"><p><b>Anda agen properti?</b> Pasang listing Anda di ${esc(S.site.name)} dan terima calon pembeli langsung ke WhatsApp Anda.</p><a class="btn btn-primary" href="#daftar">Daftar sebagai agen</a></div></section>`;
+}
+
+/* ---------- agent registration ---------- */
+const REG={data:{},done:"",errors:{}};
+const SPEC=["Tanah","Rumah","Villa","Apartemen","Ruko","Gudang","Komersial","Sewa"];
+function registerPage(){
+  const d=REG.data,er=REG.errors;
+  const v=k=>esc(d[k]||"");
+  const errT=k=>er[k]?`<span class="err-text">${er[k]}</span>`:"";
+  const right=REG.done?`<div class="form done">
+      <div class="label">Satu langkah lagi</div>
+      <h2 style="font-size:24px">Kirim pendaftaran Anda ke admin</h2>
+      <p style="margin:0;color:var(--muted)">Ketuk tombol di bawah untuk membuka WhatsApp dengan pesan pendaftaran yang sudah terisi, lalu tekan kirim. Pendaftaran baru diproses setelah pesan ini diterima admin.</p>
+      <a class="btn btn-wa" href="https://wa.me/${wa(S.site.adminPhone)}?text=${encodeURIComponent(REG.done)}" target="_blank" rel="noopener">Kirim via WhatsApp</a>
+      <div class="phone">WhatsApp tidak terbuka? Kirim teks ini ke <code>${esc(S.site.adminPhone)}</code> <button class="btn btn-line btn-sm" data-copy="${esc(REG.done)}">Salin teks</button></div>
+      <pre>${esc(REG.done)}</pre>
+      <button class="btn btn-line" data-act="reg-edit" style="justify-self:start">Ubah data</button>
+    </div>`
+  :`<form class="form" id="rf" novalidate>
+      <div class="label">Formulir pendaftaran agen</div>
+      <div class="row"><div class="field"><label for="r-name">Nama lengkap</label><input id="r-name" name="name" autocomplete="name" value="${v("name")}">${errT("name")}</div>
+        <div class="field"><label for="r-agency">Kantor / agensi</label><input id="r-agency" name="agency" value="${v("agency")}" placeholder="Kosongkan jika independen"></div></div>
+      <div class="row"><div class="field"><label for="r-phone">No. WhatsApp</label><input id="r-phone" name="phone" inputmode="tel" autocomplete="tel" value="${v("phone")}" placeholder="0812…">${errT("phone")}</div>
+        <div class="field"><label for="r-email">Email</label><input id="r-email" name="email" type="email" autocomplete="email" value="${v("email")}">${errT("email")}</div></div>
+      <div class="row"><div class="field"><label for="r-prov">Provinsi</label><select id="r-prov" name="prov">${opt([["","Pilih provinsi"],...PROVS],d.prov||"")}</select>${errT("prov")}</div>
+        <div class="field"><label for="r-kab">Kota / kabupaten</label><input id="r-kab" name="kab" value="${v("kab")}" placeholder="Surabaya">${errT("kab")}</div></div>
+      <div class="row"><div class="field"><label for="r-areas">Area spesialis</label><input id="r-areas" name="areas" value="${v("areas")}" placeholder="Citraland, Pakuwon"></div>
+        <div class="field"><label for="r-since">Aktif sebagai agen sejak</label><input id="r-since" name="since" inputmode="numeric" maxlength="4" value="${v("since")}" placeholder="2018"></div></div>
+      <div class="field"><span class="label" style="text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)">Jenis properti yang Anda pasarkan</span>
+        <div class="checks">${SPEC.map(s=>`<label><input type="checkbox" name="spec" value="${s}" ${(d.spec||[]).includes(s)?"checked":""}>${s}</label>`).join("")}</div></div>
+      <div class="field"><label for="r-arebi">No. anggota AREBI (opsional)</label><input id="r-arebi" name="arebi" value="${v("arebi")}"></div>
+      <div class="field"><label for="r-bio">Profil singkat</label><textarea id="r-bio" name="bio" placeholder="Pengalaman, keahlian, bahasa yang dikuasai…">${v("bio")}</textarea></div>
+      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data ini benar, dan setiap listing yang saya pasang adalah properti yang berhak saya pasarkan.</span></label>${errT("agree")}
+      <button class="btn btn-primary" style="justify-self:start">Lanjut</button>
+    </form>`;
+  return `<div class="wrap"><a class="back" href="#">← Kembali ke listing</a>
+    <div class="reg">
+      <div class="reg-intro">
+        <div class="label">Untuk agen properti</div>
+        <h1>Daftar sebagai agen <em>${esc(S.site.name)}</em></h1>
+        <p>Profil dan listing Anda tampil untuk calon pembeli di seluruh Indonesia. Setiap pertanyaan pembeli langsung masuk ke WhatsApp Anda.</p>
+        <ol class="steps">
+          <li><div><b>Isi formulir</b><span>Data diri, area kerja, dan jenis properti yang Anda pasarkan.</span></div></li>
+          <li><div><b>Kirim lewat WhatsApp</b><span>Pesan pendaftaran terisi otomatis dan dikirim ke admin.</span></div></li>
+          <li><div><b>Verifikasi admin</b><span>Admin menghubungi Anda, lalu profil agen Anda tayang dan Anda bisa mulai memasang listing.</span></div></li>
+        </ol>
+      </div>
+      ${right}
+    </div></div>`;
+}
+function readReg(form){
+  const fd=new FormData(form),o={};
+  ["name","agency","phone","email","prov","kab","areas","since","arebi","bio"].forEach(k=>o[k]=String(fd.get(k)||"").trim());
+  o.spec=fd.getAll("spec");o.agree=!!fd.get("agree");return o;
+}
+function regMessage(o){
+  return [`PENDAFTARAN AGEN – ${S.site.name}`,"",
+    `Nama: ${o.name}`,`Kantor/agensi: ${o.agency||"Independen"}`,`WhatsApp: ${o.phone}`,`Email: ${o.email}`,
+    `Lokasi: ${o.kab}, ${o.prov}`,o.areas?`Area spesialis: ${o.areas}`:"",o.since?`Agen sejak: ${o.since}`:"",
+    o.spec.length?`Jenis properti: ${o.spec.join(", ")}`:"",o.arebi?`No. AREBI: ${o.arebi}`:"",o.bio?`\nProfil:\n${o.bio}`:""]
+    .filter(x=>x!=="").join("\n");
 }
 function detail(l){
   const a=agentOf(l.agentId)||{name:"Agen",phone:""};
@@ -411,7 +500,7 @@ function render(keepFocus){
   let main;
   const l=S.listings.find(x=>x.id===r);
   const a=r.startsWith("agen-")&&agentOf(r.slice(5));
-  if(l)main=detail(l);else if(a)main=agentPage(a);else main=home();
+  if(r==="daftar")main=registerPage();else if(l)main=detail(l);else if(a)main=agentPage(a);else main=home();
   const active=keepFocus&&document.activeElement&&document.activeElement.id;
   const pos=active&&document.activeElement.selectionStart;
   app.innerHTML=bar()+`<main>${main}</main>`+footer()+(drawer?drawerHtml():"");
@@ -481,6 +570,7 @@ app.addEventListener('click',async e=>{
   if(act==="new-listing"){drawer.draft=blankListing();drawer.pics=[];drawer.msg=null;render();return}
   if(act==="new-agent-form"){drawer.agentDraft=blankAgent();drawer.agentPic="";drawer.msg=null;render();return}
   if(act==="cancel-del"){drawer.confirm=null;render();return}
+  if(act==="reg-edit"){REG.done="";render();return}
   if(t.dataset.tab){drawer.tab=t.dataset.tab;drawer.confirm=null;drawer.msg=null;render();return}
   if(t.dataset.ask){drawer.confirm=t.dataset.ask;render();return}
   if(t.dataset.edit){const k=t.dataset.kind;openDrawer(k==="agent"?"agent":"listing",t.dataset.edit);return}
@@ -518,6 +608,20 @@ app.addEventListener('change',async e=>{
 });
 app.addEventListener('submit',async e=>{
   e.preventDefault();
+  if(e.target.id==="rf"){
+    const o=readReg(e.target),er={};
+    if(!o.name)er.name="Isi nama lengkap Anda.";
+    if(String(o.phone).replace(/\D/g,"").length<9)er.phone="Isi nomor WhatsApp yang aktif, mis. 0812…";
+    if(!/^\S+@\S+\.\S+$/.test(o.email))er.email="Isi alamat email yang valid.";
+    if(!o.prov)er.prov="Pilih provinsi.";
+    if(!o.kab)er.kab="Isi kota atau kabupaten.";
+    if(!o.agree)er.agree="Centang pernyataan ini untuk melanjutkan.";
+    REG.data=o;REG.errors=er;
+    if(!Object.keys(er).length)REG.done=regMessage(o);
+    render();window.scrollTo(0,0);
+    if(Object.keys(er).length){const f=document.querySelector('.err-text');if(f)f.scrollIntoView({block:"center"})}
+    return;
+  }
   if(e.target.id==="lf"){
     const o=readForm(e.target);const n=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null};
     const l={...drawer.draft,...o,size:n(o.size)||0,price:n(o.price),photos:[...drawer.pics]};
