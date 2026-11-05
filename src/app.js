@@ -393,7 +393,7 @@ function registerPage(){
         <div class="checks">${SPEC.map(s=>`<label><input type="checkbox" name="spec" value="${s}" ${(d.spec||[]).includes(s)?"checked":""}>${s}</label>`).join("")}</div></div>
       <div class="field"><label for="r-arebi">No. anggota AREBI (opsional)</label><input id="r-arebi" name="arebi" value="${v("arebi")}"></div>
       <div class="field"><label for="r-bio">Profil singkat</label><textarea id="r-bio" name="bio" placeholder="Pengalaman, keahlian, bahasa yang dikuasai…">${v("bio")}</textarea></div>
-      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data ini benar. Setiap listing yang saya pasang saya dapat langsung dari pemilik properti (Direct Owner), bukan dari makelar lain atau salinan iklan agen atau situs lain. Saya setuju listing yang melanggar dihapus dan akun saya bisa dinonaktifkan.</span></label>${E("agree")}
+      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data diri ini benar. Setiap listing yang saya pasang saya terima langsung dari pemilik properti dan dapat saya pertanggungjawabkan. Saya memahami listing yang tidak sesuai dapat diturunkan oleh admin.</span></label>${E("agree")}
       <button class="btn btn-primary" style="justify-self:start" ${REG.busy?"disabled":""}>${REG.busy?"Membuat akun…":"Buat akun"}</button>
       <span class="hint">Sudah punya akun? <a href="#masuk">Masuk di sini</a>.</span>
     </form>`;
@@ -565,12 +565,12 @@ function listingForm(){
       <input id="l-photos" type="file" accept="image/*" multiple ${f.uploading||full?"disabled":""}>
       <span class="hint">${f.uploading?"Mengunggah foto…":full?`Batas ${MAX_PHOTOS} foto sudah tercapai. Hapus salah satu foto untuk menggantinya.`:`Anda masih bisa menambah ${MAX_PHOTOS-n} foto.`}</span>`})()}
       <div class="pics">${(l.photos||[]).map((u,i)=>`<div class="pic"><img src="${esc(u)}" alt=""><button type="button" data-rmpic="${i}" aria-label="Hapus foto">×</button></div>`).join("")}</div></div>
-    <div class="rules"><b>Aturan listing</b>
-      <ul><li>Pasang hanya properti yang Anda dapat langsung dari pemilik properti (Direct Owner), dengan izin pemilik untuk memasarkannya.</li>
-      <li>Dilarang memasang listing dari makelar atau agen lain, termasuk yang mengaku DKO, dan dilarang menyalin iklan, foto, atau deskripsi dari situs lain.</li>
-      <li>Harga, luas, sertifikat, dan lokasi harus sesuai data sebenarnya.</li></ul>
-      <span>Listing yang melanggar dihapus tanpa pemberitahuan, dan akun bisa dinonaktifkan.</span></div>
-    <label class="agree"><input type="checkbox" id="l-own" name="own" ${f.own?"checked":""}><span>Saya menyatakan listing ini saya dapat langsung dari pemilik properti (Direct Owner), bukan dari makelar lain atau salinan iklan orang lain, dan datanya benar.</span></label>
+    <div class="rules"><b>Sebelum menayangkan listing</b>
+      <ul><li>Pastikan properti ini Anda terima langsung dari pemiliknya (Direct Owner), dan pemilik sudah mengizinkan Anda memasarkannya.</li>
+      <li>Mohon tidak memasang listing titipan dari makelar lain, termasuk DKO, atau menyalin iklan, foto, dan deskripsi dari situs lain.</li>
+      <li>Pastikan harga, luas, sertifikat, dan lokasi sesuai keadaan sebenarnya.</li></ul>
+      <span>Dengan begitu setiap listing di Nusantara Property dapat dipertanggungjawabkan kepada pembeli. Listing yang tidak sesuai akan kami turunkan.</span></div>
+    <label class="agree"><input type="checkbox" id="l-own" name="own" ${f.own?"checked":""}><span>Saya memastikan listing ini saya terima langsung dari pemilik properti, datanya benar, dan dapat saya pertanggungjawabkan.</span></label>
     <label class="agree"><input type="checkbox" id="l-pub" name="published" ${l.published?"checked":""}><span>Tayangkan listing ini di website</span></label>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" ${DS.busy||f.uploading?"disabled":""}>${DS.busy?"Menyimpan…":l.id?"Simpan perubahan":"Simpan listing"}</button>
       <button type="button" class="btn btn-line" data-act="close-form">Batal</button></div>
@@ -775,7 +775,7 @@ app.addEventListener('submit',async e=>{
     snapForm();const d=DS.form.data;
     if(!d.title){DS.msg={text:"Isi judul listing.",err:true};render();return}
     if(!d.prov||!d.kab){DS.msg={text:"Pilih provinsi dan isi kota/kabupaten.",err:true};render();return}
-    if(!DS.form.own){DS.msg={text:"Centang pernyataan bahwa listing ini Anda dapat langsung dari pemilik properti.",err:true};render();const c=document.getElementById('l-own');if(c)c.scrollIntoView({block:"center"});return}
+    if(!DS.form.own){DS.msg={text:"Mohon centang pernyataan bahwa listing ini dapat Anda pertanggungjawabkan.",err:true};render();const c=document.getElementById('l-own');if(c)c.scrollIntoView({block:"center"});return}
     const maps=d.type==="Tanah"?String(d.maps_url||"").trim():"";
     if(maps&&!/^https:\/\/([a-z0-9-]+\.)*(google\.[a-z.]+|goo\.gl)\//i.test(maps)){DS.msg={text:"Link lokasi harus link Google Maps, misalnya https://maps.app.goo.gl/… atau https://www.google.com/maps/…",err:true};render();return}
     const row={title:d.title,type:d.type,status:d.status,prov:d.prov,kab:d.kab,place:d.place||null,size:digits(d.size),price:digits(d.price),unit:d.unit,
