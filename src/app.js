@@ -472,6 +472,7 @@ function footer(){
   <span class="swatches" aria-label="Warna zonasi">${Object.entries(ZONES).map(([z,v])=>`<span class="zone"><i style="background:var(${v})"></i>${z}</span>`).join("")}</span></div></footer>`;
 }
 function render(){
+  if(location.hash==="#"&&history.replaceState)history.replaceState(null,"",location.pathname+location.search);
   const r=route();let main;
   if(recovery)main=resetPage();
   else if(r==="daftar")main=session?dashboard():registerPage();
