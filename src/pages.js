@@ -213,7 +213,7 @@ return {
    </div></div>`},
  faq(site){const e=EN(),Q=e?FAQ_EN:FAQ_ID;return `<div class="wrap page narrow-page" data-noi18n>${head("FAQ",e?"Frequently asked questions":"Pertanyaan yang sering diajukan","")}
    ${Q.map(g=>`<section class="faq"><h2>${g.group}</h2>${g.items.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</section>`).join("")}
-   <div class="panel" style="margin-top:28px"><b>${e?"Question not answered?":"Pertanyaan Anda belum terjawab?"}</b><span>${e?"Contact the admin on WhatsApp at":"Hubungi admin lewat WhatsApp di"} <code>${site.adminPhone}</code>.</span>
+   <div class="panel" style="margin-top:28px"><b>${e?"Question not answered?":"Pertanyaan Anda belum terjawab?"}</b><span>${e?"Message the admin directly on WhatsApp.":"Hubungi admin langsung lewat WhatsApp."}</span>
      <a class="btn btn-wa" style="justify-self:start" href="https://wa.me/62${site.adminPhone.replace(/^0/,"")}" target="_blank" rel="noopener">WhatsApp admin</a></div></div>`},
  about(site,stats){
   const e=EN();
@@ -250,7 +250,7 @@ return {
     <p>${T.p1}</p>
     <p>${T.p2}</p>
     <h2>${T.contact}</h2>
-    <p>WhatsApp admin: <code>${site.adminPhone}</code></p>
+    <p>${e?"Questions about the platform or joining as an agent? Message the admin on WhatsApp.":"Ada pertanyaan tentang platform atau ingin bergabung sebagai agen? Hubungi admin lewat WhatsApp."}</p>
     <div class="phone"><a class="btn btn-wa" href="https://wa.me/62${site.adminPhone.replace(/^0/,"")}" target="_blank" rel="noopener">WhatsApp admin</a><a class="btn btn-line" href="#daftar">${T.join}</a></div>
    </section></div>`}
 };

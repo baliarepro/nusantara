@@ -358,7 +358,7 @@ function dashboard(){
       <button class="btn btn-line btn-sm" data-act="logout">Keluar</button></div>
     ${me.status==="pending"?`<div class="note">Akun Anda sedang ditinjau admin. Sambil menunggu, lengkapi profil Anda. Listing bisa dipasang setelah akun disetujui.</div>`:""}
     ${!DS.form&&DS.tab!=="mine"&&S.listings.some(l=>l.agent_id===me.id&&needsRenew(l))?`<div class="note err renew-note"><span>Ada listing Anda yang sudah atau akan segera diturunkan.</span><button class="btn btn-line btn-sm" data-dtab="mine">Lihat listing saya</button></div>`:""}
-    ${me.status==="rejected"?`<div class="note err">Pendaftaran Anda belum disetujui. Hubungi admin di WhatsApp ${esc(SITE.adminPhone)} untuk informasi lebih lanjut.</div>`:""}
+    ${me.status==="rejected"?`<div class="note err">Pendaftaran Anda belum disetujui. Hubungi admin lewat WhatsApp untuk informasi lebih lanjut.</div> <a class="btn btn-wa btn-sm" style="justify-self:start" href="https://wa.me/${wa(SITE.adminPhone)}" target="_blank" rel="noopener">WhatsApp admin</a>`:""}
     ${DS.form?"":`<div class="tabs dash-tabs" role="tablist">${tabs.map(([k,t])=>`<button role="tab" aria-selected="${DS.tab===k}" data-dtab="${k}">${t}</button>`).join("")}</div>`}
     ${note(DS.msg)}
     ${body}</div>`;
