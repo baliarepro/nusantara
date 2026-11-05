@@ -251,7 +251,7 @@ function registerPage(){
           <li><div><b>Konfirmasi email</b><span>Klik tautan yang kami kirim ke email Anda.</span></div></li>
           <li><div><b>Persetujuan admin</b><span>Setelah disetujui, profil Anda tayang dan Anda bisa memasang listing.</span></div></li>
         </ol>
-        <p class="hint" style="margin-top:22px">Data pemilik, alamat persis, dan harga net yang Anda simpan hanya bisa dilihat oleh Anda dan admin.</p>
+        <p class="hint" style="margin-top:22px">Alamat persis, harga net, dan catatan yang Anda simpan hanya bisa dilihat oleh Anda dan admin.</p>
       </div>${right}</div></div>`;
 }
 
@@ -372,8 +372,6 @@ function listingForm(){
     <fieldset class="private">
       <legend>Data pribadi <span class="pill pill-pending">Tidak tampil ke publik</span></legend>
       <p class="hint" style="margin:0">Hanya Anda${other?", agen pemilik,":""} dan admin yang bisa melihat data ini.</p>
-      <div class="row"><div class="field"><label for="v-owner">Nama pemilik</label><input id="v-owner" name="owner_name" value="${esc(p.owner_name)}"></div>
-        <div class="field"><label for="v-ophone">No. pemilik</label><input id="v-ophone" name="owner_phone" inputmode="tel" value="${esc(p.owner_phone)}"></div></div>
       <div class="field"><label for="v-addr">Alamat persis / titik lokasi</label><input id="v-addr" name="exact_address" value="${esc(p.exact_address)}" placeholder="Alamat lengkap atau link Google Maps"></div>
       <div class="row"><div class="field"><label for="v-net">Harga net pemilik (Rp)</label><input id="v-net" name="net_price" inputmode="numeric" value="${esc(p.net_price??"")}"><span class="hint" id="h-net"></span></div><div></div></div>
       <div class="field"><label for="v-notes">Catatan</label><textarea id="v-notes" name="notes" placeholder="Komisi, status dokumen, jadwal survei…">${esc(p.notes)}</textarea></div>
@@ -415,7 +413,7 @@ function readForm(form){const o={};new FormData(form).forEach((v,k)=>{if(k in o)
 function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o=readForm(f);
   ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
   DS.form.data.published=!!o.published;
-  DS.form.priv=Object.assign(DS.form.priv||{},{owner_name:o.owner_name,owner_phone:o.owner_phone,exact_address:o.exact_address,net_price:o.net_price,notes:o.notes})}}
+  DS.form.priv=Object.assign(DS.form.priv||{},{exact_address:o.exact_address,net_price:o.net_price,notes:o.notes})}}
 
 function shrink(file,max,q){
   return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("Foto tidak bisa dibaca"))};
@@ -543,7 +541,7 @@ app.addEventListener('submit',async e=>{
     if(id)({error}=await sb.from('listings').update(row).eq('id',id));
     else{const r=await sb.from('listings').insert(row).select('id').single();error=r.error;id=r.data&&r.data.id}
     if(!error){
-      const pv={listing_id:id,agent_id:d.agent_id||me.id,owner_name:p.owner_name||null,owner_phone:p.owner_phone||null,exact_address:p.exact_address||null,net_price:digits(p.net_price),notes:p.notes||null};
+      const pv={listing_id:id,agent_id:d.agent_id||me.id,exact_address:p.exact_address||null,net_price:digits(p.net_price),notes:p.notes||null};
       ({error}=await sb.from('listing_private').upsert(pv,{onConflict:'listing_id'}));
     }
     DS.busy=false;
