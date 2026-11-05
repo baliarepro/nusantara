@@ -330,3 +330,5 @@ a.btn-ghost{text-decoration:none;display:inline-flex;align-items:center}
 .static-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .static-thumbs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px}
 a.chip{text-decoration:none;color:inherit}
+.more{display:grid;justify-items:center;gap:10px;padding-bottom:40px}
+.more:empty{display:none}

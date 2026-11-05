@@ -33,7 +33,16 @@ const L = { id: loadPages("id"), en: loadPages("en") };
 async function getData() {
   if (process.env.MOCK) return JSON.parse(fs.readFileSync(path.join(ROOT, "scripts/mock.json"), "utf8"));
   const h = { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` };
-  const get = async q => { const r = await fetch(`${SB_URL}/rest/v1/${q}`, { headers: h }); if (!r.ok) throw new Error(`${q}: ${r.status} ${await r.text()}`); return r.json(); };
+  const get = async q => {
+    const out = [];
+    for (let from = 0; ; from += 1000) {
+      const r = await fetch(`${SB_URL}/rest/v1/${q}`, { headers: { ...h, Range: `${from}-${from + 999}`, "Range-Unit": "items" } });
+      if (!r.ok && r.status !== 206) throw new Error(`${q}: ${r.status} ${await r.text()}`);
+      const rows = await r.json(); out.push(...rows);
+      if (rows.length < 1000) break;
+    }
+    return out;
+  };
   const agents = await get("agents?select=id,name,agency,phone,prov,kab,areas,since,bio,photo_url,status&status=eq.approved");
   const listings = await get("listings?select=*&published=eq.true&order=created_at.desc");
   return { agents, listings };

@@ -29,7 +29,9 @@ let sb=null;
 try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
 
 /* ===== state ===== */
-let S={agents:[],listings:[],loaded:false,error:""};
+let S={agents:[],listings:[],idx:new Map(),loaded:false,error:"",facets:[],live:0,home:[],mine:[],totalAll:null,noTotal:false,
+  page:{items:[],total:0,loading:false,done:false,key:null},all:{items:[],total:0,loading:false,done:false,started:false},byAgent:{},missing:{},fetching:{}};
+const PAGE=24,ALL_PAGE=50;
 let session=null,me=null,recovery=false;
 const F={q:"",type:"",status:"",prov:"",kab:"",agent:"",sort:"new",budget:"",bed:"",facing:""};
 const BUDGETS=[["0-500000000","Di bawah Rp500 jt"],["500000000-1000000000","Rp500 jt – 1 M"],["1000000000-2000000000","Rp1 – 2 M"],["2000000000-5000000000","Rp2 – 5 M"],["5000000000-10000000000","Rp5 – 10 M"],["10000000000-","Di atas Rp10 M"]];
@@ -50,8 +52,12 @@ const fmtD=d=>d?new Date(d).toLocaleDateString(I.locale,{day:"numeric",month:"sh
 const daysLeft=l=>EXPIRE_DAYS-Math.floor((Date.now()-new Date(l.updated_at||l.created_at).getTime())/DAY);
 const isLive=l=>l.published&&daysLeft(l)>0;
 const needsRenew=l=>l.published&&daysLeft(l)<=WARN_DAYS;
-const pubListings=()=>S.listings.filter(l=>isLive(l)&&(agentOf(l.agent_id)||{}).status==="approved");
-const kabsIn=p=>[...new Set(pubListings().filter(l=>!p||l.prov===p).map(l=>l.kab).filter(Boolean))].sort();
+const getL=id=>S.idx.get(id);
+function merge(rows){(rows||[]).forEach(r=>{if(S.idx.has(r.id)){const i=S.listings.findIndex(x=>x.id===r.id);if(i>=0)S.listings[i]=r}else S.listings.push(r);S.idx.set(r.id,r)});return rows||[]}
+const kabsIn=p=>[...new Set(S.facets.filter(l=>!p||l.prov===p).map(l=>l.kab).filter(Boolean))].sort();
+const cutoff=()=>new Date(Date.now()-EXPIRE_DAYS*DAY).toISOString();
+const approvedIds=()=>{const ids=S.agents.filter(a=>a.status==="approved").map(a=>a.id);return ids.length?ids:["00000000-0000-0000-0000-000000000000"]};
+const liveQ=(cols,opts)=>sb.from('listings').select(cols,opts).eq('published',true).gte('updated_at',cutoff()).in('agent_id',approvedIds());
 function rupiah(v){
   if(v==null||v==="")return "";v=Number(v);
   const L=I.locale,e=EN();
@@ -96,14 +102,94 @@ function errMsg(e){
 /* ===== data ===== */
 async function load(){
   if(!sb){S.error="Layanan data tidak termuat. Muat ulang halaman.";S.loaded=true;render();return}
-  const [a,l]=await Promise.all([
-    sb.from('agents').select(AGENT_COLS),
-    sb.from('listings').select('*').order('created_at',{ascending:false})
-  ]);
-  if(a.error||l.error){S.error=errMsg(a.error||l.error)}else{S.agents=a.data||[];S.listings=l.data||[];S.error=""}
-  S.loaded=true;
+  const a=await sb.from('agents').select(AGENT_COLS);
+  if(a.error){S.error=errMsg(a.error);S.loaded=true;render();return}
+  S.agents=a.data||[];
   if(session)me=agentOf(session.user.id)||me;
+  const jobs=[liveQ('type,status,prov,kab,agent_id').limit(1000),liveQ('id',{count:'exact',head:true}),liveQ('*').order('created_at',{ascending:false}).limit(6),
+    me?sb.from('listings').select('*').eq('agent_id',me.id).order('created_at',{ascending:false}).limit(1000):null,
+    me&&me.is_admin?sb.from('listings').select('id',{count:'exact',head:true}):null];
+  const [f,c,h,m,t]=await Promise.all(jobs);
+  const bad=[f,c,h,m,t].find(x=>x&&x.error);
+  S.error=bad?errMsg(bad.error):"";
+  S.facets=(f&&f.data)||[];S.live=(c&&c.count)??S.facets.length;S.home=merge(h&&h.data);S.mine=m?merge(m.data):[];S.totalAll=t?t.count:null;
+  S.loaded=true;S.page.key=null;S.all={items:[],total:0,loading:false,done:false,started:false};S.byAgent={};S.missing={};
   render();
+}
+function fkey(){return JSON.stringify([F.q.trim(),F.type,F.status,F.prov,F.kab,F.agent,F.sort,F.budget,F.bed,F.facing])}
+async function fetchPage(reset){
+  const P=S.page,key=fkey();
+  if(P.loading&&!reset)return;
+  if(reset){P.items=[];P.total=0;P.done=false;P.key=key}
+  P.loading=true;const tok=P.tok=(P.tok||0)+1;
+  if(reset)paintResults();
+  const tp=S.noTotal?'price':'total_price',from=P.items.length;
+  let q=liveQ('*',{count:'exact'});
+  if(F.type)q=q.eq('type',F.type);if(F.status)q=q.eq('status',F.status);if(F.prov)q=q.eq('prov',F.prov);if(F.kab)q=q.eq('kab',F.kab);
+  if(F.agent)q=q.eq('agent_id',F.agent);if(F.facing)q=q.eq('facing',F.facing);if(F.bed)q=q.gte('bedrooms',Number(F.bed));
+  if(F.budget){const [mn,mx]=F.budget.split("-").map(x=>x===""?null:Number(x));q=q.gte(tp,mn);if(mx!=null)q=q.lte(tp,mx)}
+  const qq=F.q.trim().replace(/[,()%*"\\]/g," ").replace(/\s+/g," ").trim();
+  if(qq)q=q.or(["title","place","kab","prov","description"].map(c=>`${c}.ilike."*${qq}*"`).join(","));
+  if(F.sort==="cheap")q=q.order(tp,{ascending:true,nullsFirst:false});
+  else if(F.sort==="pricey")q=q.order(tp,{ascending:false,nullsFirst:false});
+  else if(F.sort==="big")q=q.order('size',{ascending:false,nullsFirst:false});
+  else if(F.sort==="small")q=q.order('size',{ascending:true,nullsFirst:false});
+  q=q.order('created_at',{ascending:false}).range(from,from+PAGE-1);
+  const {data,error,count}=await q;
+  if(tok!==P.tok)return;
+  P.loading=false;
+  if(error){
+    if(!S.noTotal&&/total_price/.test(error.message||"")){S.noTotal=true;return fetchPage(true)}
+    S.error=errMsg(error);paintResults();return}
+  P.items=P.items.concat(merge(data));P.total=count??P.items.length;P.done=P.items.length>=P.total||(data||[]).length<PAGE;
+  paintResults();
+}
+async function fetchAll(more){
+  const A=S.all;if(A.loading||(A.done&&more))return;
+  A.loading=true;A.started=true;
+  const from=A.items.length;
+  const {data,error,count}=await sb.from('listings').select('*',{count:'exact'}).order('created_at',{ascending:false}).range(from,from+ALL_PAGE-1);
+  A.loading=false;
+  if(error){DS.msg={text:errMsg(error),err:true};render();return}
+  A.items=A.items.concat(merge(data));A.total=count??A.items.length;A.done=A.items.length>=A.total;
+  render();
+}
+async function fetchOne(id){
+  if(S.fetching[id])return;S.fetching[id]=1;
+  const {data}=await sb.from('listings').select('*').eq('id',id).maybeSingle();
+  delete S.fetching[id];
+  if(data)merge([data]);else S.missing[id]=1;
+  render();
+}
+async function fetchAgentListings(id){
+  if(S.fetching["a"+id])return;S.fetching["a"+id]=1;
+  const {data}=await liveQ('*').eq('agent_id',id).order('created_at',{ascending:false}).limit(120);
+  delete S.fetching["a"+id];S.byAgent[id]=merge(data);render();
+}
+function ensureRoute(){
+  if(!sb||!S.loaded)return;
+  const r=route();
+  if(r==="listing"&&S.page.key!==fkey())fetchPage(true);
+  else if(r.startsWith("agen-")&&!S.byAgent[r.slice(5)]&&agentOf(r.slice(5)))fetchAgentListings(r.slice(5));
+  else if(/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(r)&&!getL(r)&&!S.missing[r])fetchOne(r);
+  else if(r==="dasbor"&&me&&me.is_admin&&DS.tab==="all"&&!S.all.started)fetchAll(false);
+}
+function resultsHtml(){
+  const P=S.page;
+  if(!S.loaded||(P.loading&&!P.items.length))return `<div class="empty">Memuat listing…</div>`;
+  if(S.error&&!P.items.length)return `<div class="empty">${esc(S.error)}</div>`;
+  if(!P.items.length)return S.live?`<div class="empty">Belum ada listing yang cocok. Coba hapus beberapa filter.</div>`:`<div class="empty">Belum ada listing yang tayang. Agen yang sudah terdaftar bisa memasang listing dari dasbor.</div>`;
+  return P.items.map(card).join("");
+}
+function moreHtml(){
+  const P=S.page;if(!P.items.length)return "";
+  return `<p class="hint res-count">${resCount(P.items.length,P.total)}</p>${P.done?"":`<button class="btn btn-line" data-act="more" ${P.loading?"disabled":""}>${P.loading?"Memuat…":"Muat lebih banyak"}</button>`}`;
+}
+function resCount(n,t){return EN()?`Showing ${n} of ${t} listings`:`Menampilkan ${n} dari ${t} listing`}
+function paintResults(){
+  const r=document.getElementById('results'),m=document.getElementById('more');
+  if(!r||!m){render();return}
+  r.innerHTML=resultsHtml();m.innerHTML=moreHtml();I.translate(r);I.translate(m);if(I.upgrade)I.upgrade(r);
 }
 async function ensureAgent(){
   if(!session){me=null;return}
@@ -121,22 +207,7 @@ async function ensureAgent(){
   me=data;
 }
 
-/* ===== filters & cards ===== */
-function filtered(){
-  const q=F.q.trim().toLowerCase();
-  const [bMin,bMax]=F.budget?F.budget.split("-").map(x=>x===""?null:Number(x)):[null,null];
-  const inBudget=l=>{if(!F.budget)return true;const t=totalPrice(l);return t!=null&&t>=bMin&&(bMax==null||t<=bMax)};
-  let r=pubListings().filter(l=>(!F.type||l.type===F.type)&&(!F.status||l.status===F.status)&&(!F.prov||l.prov===F.prov)&&(!F.kab||l.kab===F.kab)&&(!F.agent||l.agent_id===F.agent)
-    &&inBudget(l)&&(!F.bed||(l.bedrooms!=null&&Number(l.bedrooms)>=Number(F.bed)))&&(!F.facing||l.facing===F.facing)
-    &&(!q||[l.title,l.place,l.kab,l.prov,l.description,l.cert,l.zone,(agentOf(l.agent_id)||{}).name].join(" ").toLowerCase().includes(q)));
-  const p=totalPrice;
-  if(F.sort==="new")r.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
-  if(F.sort==="big")r.sort((a,b)=>(b.size||0)-(a.size||0));
-  if(F.sort==="small")r.sort((a,b)=>(a.size||0)-(b.size||0));
-  if(F.sort==="cheap")r.sort((a,b)=>(p(a)??Infinity)-(p(b)??Infinity));
-  if(F.sort==="pricey")r.sort((a,b)=>(p(b)??-1)-(p(a)??-1));
-  return r;
-}
+/* ===== cards ===== */
 function card(l){
   const a=agentOf(l.agent_id)||{name:"Agen"};
   return `<a class="card" href="#${esc(l.id)}">
@@ -158,7 +229,7 @@ const NAV=[["","Beranda"],["listing","Listing"],["berita","Berita"],["panduan","
 let MENU=false;
 function bar(){
   const r=route();
-  const cur=k=>(k===r||(k==="listing"&&S.listings.some(l=>l.id===r)))?' aria-current="page"':"";
+  const cur=k=>(k===r||(k==="listing"&&S.idx.has(r)))?' aria-current="page"':"";
   const links=NAV.map(([k,t])=>`<a href="#${k}"${cur(k)}>${t}</a>`).join("");
   const acct=session?`<a href="#dasbor" class="btn btn-primary btn-sm">Dasbor</a>`:`<a href="#masuk" class="nav-login">Masuk</a><a href="#daftar" class="btn btn-line btn-sm" style="color:var(--ink)">Daftar agen</a>`;
   return `<header class="bar"><div class="wrap">
@@ -170,7 +241,7 @@ function bar(){
   </header>`;
 }
 function home(){
-  const P=window.NP_PAGES;const all=pubListings();const latest=[...all].sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,6);
+  const P=window.NP_PAGES;const all=S.facets;const latest=S.home;
   const provCount=new Set(all.map(l=>l.prov).filter(Boolean)).size,kabCount=new Set(all.map(l=>l.kab).filter(Boolean)).size;
   const typeCounts=TYPES.map(t=>[t,all.filter(l=>l.type===t).length]).filter(x=>x[1]);
   return `<section class="wrap hero">
@@ -178,7 +249,7 @@ function home(){
       <p>${esc(SITE.tagline)}</p>
       <form class="search home-search" id="hs" role="search"><input id="h-q" type="search" placeholder="Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…" aria-label="Cari listing"><button class="btn btn-primary">Cari</button></form>
       <div class="chips" style="margin-top:12px">${typeCounts.map(([t,n])=>`<button class="chip" data-go-type="${t}">${t}<span class="n">${n}</span></button>`).join("")}</div>
-      <div class="stats"><span><b>${all.length}</b>listing</span><span><b>${pubAgents().length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
+      <div class="stats"><span><b>${S.live}</b>listing</span><span><b>${pubAgents().length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
     </section>
     <section class="wrap"><div class="section-head"><div><div class="label">Baru tayang</div><h2>Listing terbaru</h2></div><a class="btn btn-line btn-sm" href="#listing">Lihat semua listing</a></div>
       <div class="grid">${!S.loaded?`<div class="empty">Memuat listing…</div>`:S.error?`<div class="empty">${esc(S.error)}</div>`:latest.length?latest.map(card).join(""):`<div class="empty">Belum ada listing yang tayang.</div>`}</div></section>
@@ -188,19 +259,16 @@ function home(){
     ${session?"":`<section class="wrap"><div class="cta-band"><p><b>Anda agen properti?</b> Buat akun, pasang listing Anda di ${esc(SITE.name)}, dan terima calon pembeli langsung ke WhatsApp Anda.</p><a class="btn btn-primary" href="#daftar">Daftar sebagai agen</a></div></section>`}`;
 }
 function listingPage(){
-  const all=pubListings(),list=filtered();
+  const all=S.facets;
   const provCount=new Set(all.map(l=>l.prov).filter(Boolean)).size,kabCount=new Set(all.map(l=>l.kab).filter(Boolean)).size;
   const typeCounts=TYPES.map(t=>[t,all.filter(l=>l.type===t).length]).filter(x=>x[1]);
-  const grid=!S.loaded?`<div class="empty">Memuat listing…</div>`:S.error?`<div class="empty">${esc(S.error)}</div>`
-    :list.length?list.map(card).join(""):all.length?`<div class="empty">Belum ada listing yang cocok. Coba hapus beberapa filter.</div>`
-    :`<div class="empty">Belum ada listing yang tayang. Agen yang sudah terdaftar bisa memasang listing dari dasbor.</div>`;
   return `<section class="wrap page-head" style="padding-bottom:6px"><div class="label">Listing</div><h1>Semua listing</h1>
-      <div class="stats"><span><b>${all.length}</b>listing</span><span><b>${pubAgents().length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
+      <div class="stats"><span><b>${S.live}</b>listing</span><span><b>${pubAgents().length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
     </section>
     <section class="wrap tools" aria-label="Cari dan saring">
       <div class="search"><input id="f-q" type="search" placeholder="Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…" value="${esc(F.q)}" aria-label="Cari listing"></div>
       <div class="chips" role="group" aria-label="Jenis properti">
-        <button class="chip" data-type="" aria-pressed="${!F.type}">Semua<span class="n">${all.length}</span></button>
+        <button class="chip" data-type="" aria-pressed="${!F.type}">Semua<span class="n">${S.live}</span></button>
         ${typeCounts.map(([t,n])=>`<button class="chip" data-type="${t}" aria-pressed="${F.type===t}">${t}<span class="n">${n}</span></button>`).join("")}
       </div>
       <div class="selects">
@@ -216,12 +284,13 @@ function listingPage(){
         ${(F.type||F.status||F.prov||F.kab||F.agent||F.budget||F.bed||F.facing||F.q)?`<button class="btn-ghost btn-sm" data-act="reset-filter">Hapus filter</button>`:""}
       </div>
     </section>
-    <section class="wrap grid" id="results">${grid}</section>`;
+    <section class="wrap grid" id="results">${resultsHtml()}</section>
+    <section class="wrap more" id="more">${moreHtml()}</section>`;
 }
 function agentsSection(){
   const ag=pubAgents();
   return `<section class="wrap" id="agen-list"><div class="section-head"><div><div class="label">Tim agen</div><h2>Agen kami</h2></div></div>
-    <div class="agents">${ag.length?ag.map(a=>{const n=pubListings().filter(l=>l.agent_id===a.id).length;
+    <div class="agents">${ag.length?ag.map(a=>{const n=S.facets.filter(l=>l.agent_id===a.id).length;
       return `<a class="agent" href="#agen-${esc(a.id)}">${ava(a,"lg")}<div><h3>${esc(a.name)}</h3><p>${esc(a.agency||"Agen independen")}</p><p>${esc([a.kab,a.prov].filter(Boolean).join(", "))}</p><p class="mono">${n} listing</p></div></a>`}).join("")
       :`<div class="empty">${S.loaded?"Belum ada agen yang tayang.":"Memuat agen…"}</div>`}</div>
     ${session?"":`<div class="cta-band"><p><b>Anda agen properti?</b> Buat akun, pasang listing Anda di ${esc(SITE.name)}, dan terima calon pembeli langsung ke WhatsApp Anda.</p><a class="btn btn-primary" href="#daftar">Daftar sebagai agen</a></div>`}</section>`;
@@ -265,7 +334,8 @@ function detail(l){
       </aside></div></div>`;
 }
 function agentPage(a){
-  const list=pubListings().filter(l=>l.agent_id===a.id);
+  const list=S.byAgent[a.id];
+  if(!list)return `<div class="wrap"><a class="back" href="#agen">← Semua agen</a><div class="empty" style="margin-top:20px">Memuat listing…</div></div>`;
   return `<div class="wrap"><a class="back" href="#agen">← Semua agen</a>
     <div class="agent-hero">${ava(a,"lg")}<div style="min-width:0"><div class="label">${esc(a.agency||"Agen independen")}</div><h1>${esc(a.name)}</h1><div style="color:var(--muted)">${esc([a.areas,[a.kab,a.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</div></div></div>
     ${a.bio?`<p class="desc" style="margin-top:0">${esc(a.bio)}</p>`:""}
@@ -357,9 +427,10 @@ function dashboard(){
     <div class="dash-head">${ava(me,"lg")}<div style="min-width:0;flex:1"><div class="label">Dasbor agen${me.is_admin?" · Admin":""}</div><h1>${esc(me.name)}</h1>${statusPill(me.status)}</div>
       <button class="btn btn-line btn-sm" data-act="logout">Keluar</button></div>
     ${me.status==="pending"?`<div class="note">Akun Anda sedang ditinjau admin. Sambil menunggu, lengkapi profil Anda. Listing bisa dipasang setelah akun disetujui.</div>`:""}
-    ${!DS.form&&DS.tab!=="mine"&&S.listings.some(l=>l.agent_id===me.id&&needsRenew(l))?`<div class="note err renew-note"><span>Ada listing Anda yang sudah atau akan segera diturunkan.</span><button class="btn btn-line btn-sm" data-dtab="mine">Lihat listing saya</button></div>`:""}
+    ${!DS.form&&DS.tab!=="mine"&&S.mine.some(l=>needsRenew(l))?`<div class="note err renew-note"><span>Ada listing Anda yang sudah atau akan segera diturunkan.</span><button class="btn btn-line btn-sm" data-dtab="mine">Lihat listing saya</button></div>`:""}
     ${me.status==="rejected"?`<div class="note err">Pendaftaran Anda belum disetujui. Hubungi admin lewat WhatsApp untuk informasi lebih lanjut.</div> <a class="btn btn-wa btn-sm" style="justify-self:start" href="https://wa.me/${wa(SITE.adminPhone)}" target="_blank" rel="noopener">WhatsApp admin</a>`:""}
     ${DS.form?"":`<div class="tabs dash-tabs" role="tablist">${tabs.map(([k,t])=>`<button role="tab" aria-selected="${DS.tab===k}" data-dtab="${k}">${t}</button>`).join("")}</div>`}
+    ${capacityNote()}
     ${note(DS.msg)}
     ${body}</div>`;
 }
@@ -389,7 +460,7 @@ function rowItem(l,showAgent){
       :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
 }
 function myListings(){
-  const mine=S.listings.filter(l=>l.agent_id===me.id);
+  const mine=S.mine;
   return `<div class="dash-bar"><span class="label">${mine.length} listing</span>
       <button class="btn btn-primary btn-sm" data-act="new-listing" ${me.status==="approved"?"":"disabled title=\"Menunggu persetujuan admin\""}>Tambah listing</button></div>
     ${renewBanner(mine,true)}
@@ -397,9 +468,18 @@ function myListings(){
     <div class="list">${mine.length?mine.map(l=>rowItem(l,false)).join(""):`<div class="empty">Belum ada listing. ${me.status==="approved"?"Ketuk Tambah listing untuk memasang yang pertama.":"Anda bisa memasang listing setelah akun disetujui."}</div>`}</div>`;
 }
 function adminListings(){
-  return `<div class="dash-bar"><span class="label">${S.listings.length} listing dari semua agen</span></div>
-    ${renewBanner(S.listings,false)}
-    <div class="list">${S.listings.length?S.listings.map(l=>rowItem(l,true)).join(""):`<div class="empty">Belum ada listing.</div>`}</div>`;
+  const A=S.all;
+  if(!A.started||(A.loading&&!A.items.length))return `<div class="empty">Memuat listing…</div>`;
+  return `<div class="dash-bar"><span class="label">${A.total} listing dari semua agen</span></div>
+    ${renewBanner(A.items,false)}
+    <div class="list">${A.items.length?A.items.map(l=>rowItem(l,true)).join(""):`<div class="empty">Belum ada listing.</div>`}</div>
+    ${A.done?"":`<button class="btn btn-line" data-act="more-all" ${A.loading?"disabled":""}>${A.loading?"Memuat…":"Muat lebih banyak"}</button>`}`;
+}
+function capacityNote(){
+  if(!me||!me.is_admin||S.totalAll==null)return "";
+  const n=S.totalAll;
+  if(n<400)return "";
+  return `<div class="note ${n>=550?"err":""}" data-noi18n><b>Kapasitas paket gratis hampir penuh: ${n} listing.</b> Penyimpanan foto Supabase gratis cukup untuk sekitar 600 listing. ${n>=550?"Segera":"Mulai siapkan"} upgrade ke Supabase Pro (Organization → Billing → Upgrade) agar unggah foto tidak gagal.</div>`;
 }
 function adminAgents(){
   const order={pending:0,approved:1,rejected:2};
@@ -407,7 +487,7 @@ function adminAgents(){
   return `<div class="list">${ag.map(a=>`<div class="item agent-item">${ava(a)}<div><b>${esc(a.name)} ${a.is_admin?`<span class="pill pill-approved">Admin</span>`:""}</b>
       <small>${esc([a.agency||"Independen",[a.kab,a.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
       <small>WA ${esc(a.phone)}${a.arebi?` · AREBI ${esc(a.arebi)}`:""}${a.since?` · agen sejak ${esc(a.since)}`:""}</small>
-      <small>${statusPill(a.status)} ${S.listings.filter(l=>l.agent_id===a.id).length} listing</small></div>
+      <small>${statusPill(a.status)} ${S.facets.filter(l=>l.agent_id===a.id).length} listing tayang</small></div>
       <span class="item-acts">${a.status!=="approved"?`<button class="btn btn-primary btn-sm" data-agent-status="approved" data-id="${esc(a.id)}">Setujui</button>`:""}
         ${a.status!=="rejected"&&!a.is_admin?`<button class="btn btn-line btn-sm" data-agent-status="rejected" data-id="${esc(a.id)}">${a.status==="approved"?"Nonaktifkan":"Tolak"}</button>`:""}
         <a class="btn-ghost btn-sm" href="https://wa.me/${wa(a.phone)}" target="_blank" rel="noopener">WhatsApp</a></span></div>`).join("")}</div>`;
@@ -479,15 +559,17 @@ function render(){
   else if(r==="masuk")main=session?dashboard():loginPage();
   else if(r==="dasbor")main=dashboard();
   else{
-    const l=S.listings.find(x=>x.id===r);const a=r.startsWith("agen-")&&agentOf(r.slice(5));
+    const l=getL(r);const a=r.startsWith("agen-")&&agentOf(r.slice(5));
+    const pendingId=!l&&/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(r)&&!S.missing[r];
     if(l&&(isLive(l)||(session&&(l.agent_id===session.user.id||(me&&me.is_admin)))))main=detail(l);
+    else if(pendingId)main=`<div class="wrap"><div class="empty" style="margin-top:28px">Memuat listing…</div></div>`;
     else if(a&&(a.status==="approved"||(me&&me.is_admin)))main=agentPage(a);
     else if(r==="listing")main=listingPage();
     else if(r==="agen")main=`<div class="page">${agentsSection()}</div>`;
     else if(r==="berita"&&window.NP_PAGES)main=NP_PAGES.news();
     else if(r==="panduan"&&window.NP_PAGES)main=NP_PAGES.guide();
     else if(r==="faq"&&window.NP_PAGES)main=NP_PAGES.faq(SITE);
-    else if(r==="tentang"&&window.NP_PAGES){const L=pubListings();main=NP_PAGES.about(SITE,{listings:L.length,agents:pubAgents().length,provs:new Set(L.map(l=>l.prov).filter(Boolean)).size})}
+    else if(r==="tentang"&&window.NP_PAGES){main=NP_PAGES.about(SITE,{listings:S.live,agents:pubAgents().length,provs:new Set(S.facets.map(l=>l.prov).filter(Boolean)).size})}
     else main=home();
   }
   app.innerHTML=bar()+`<main>${main}</main>`+footer();
@@ -495,9 +577,10 @@ function render(){
   I.translate(app);
   if(I.upgrade)I.upgrade(app);
   hints();
+  setTimeout(ensureRoute,0);
 }
 function setTitle(r){
-  const e=EN(),l=S.listings.find(x=>x.id===r),ag=r.startsWith("agen-")&&agentOf(r.slice(5));
+  const e=EN(),l=getL(r),ag=r.startsWith("agen-")&&agentOf(r.slice(5));
   const base=e?"Nusantara Property – Land, Houses & Villas in Bali and Across Indonesia":"Nusantara Property – Jual Beli Tanah, Rumah & Villa di Bali dan Seluruh Indonesia";
   const map={listing:e?"All property listings":"Semua listing properti",berita:e?"Indonesian property news":"Berita properti Indonesia",panduan:e?"Guide to buying property in Indonesia":"Panduan membeli properti di Indonesia",
     tentang:e?"About us":"Tentang kami",faq:"FAQ",daftar:e?"Join as an agent":"Daftar sebagai agen",masuk:e?"Agent sign in":"Masuk agen",dasbor:e?"Agent dashboard":"Dasbor agen",agen:e?"Our agents":"Agen kami"};
@@ -520,7 +603,7 @@ function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o
 function shrink(file,max,q){
   return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("Foto tidak bisa dibaca"))};
     img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("Foto gagal diproses")),'image/jpeg',q||.8)};img.src=url});
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("Foto gagal diproses")),'image/jpeg',q||.74)};img.src=url});
 }
 async function uploadPhoto(file,prefix,max){
   const blob=await shrink(file,max);
@@ -536,14 +619,16 @@ app.addEventListener('click',async e=>{
   const act=t.dataset.act;
   if(t.dataset.lang){I.set(t.dataset.lang);MENU=false;render();return}
   if(act==="menu"){MENU=!MENU;render();return}
+  if(act==="more"){fetchPage(false);return}
+  if(act==="more-all"){fetchAll(true);return}
   if(act==="reset-filter"){Object.assign(F,{q:"",type:"",status:"",prov:"",kab:"",agent:"",budget:"",bed:"",facing:""});render();return}
   if(t.dataset.goType){F.type=t.dataset.goType;location.hash="listing";return}
   if(t.dataset.goto){e.preventDefault();const el=document.getElementById("g-"+t.dataset.goto);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
   if(t.classList.contains('chip')){F.type=t.dataset.type;render();return}
-  if(t.dataset.thumb!==undefined){const l=S.listings.find(x=>x.id===route());const i=Number(t.dataset.thumb);
+  if(t.dataset.thumb!==undefined){const l=getL(route());const i=Number(t.dataset.thumb);
     document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">`;
     document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
-  if(t.dataset.pdf){const l=S.listings.find(x=>x.id===t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent=T("Menyiapkan PDF…");
+  if(t.dataset.pdf){const l=getL(t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent=T("Menyiapkan PDF…");
     try{await NP_SHARE.pdf(EN()?{...l,title:TT(l.title)}:l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent=T("PDF terunduh")}catch(err){t.textContent=T("Gagal membuat PDF, coba lagi")}
     setTimeout(()=>{t.textContent=old;t.disabled=false},2500);return}
   if(t.dataset.copy){const v=t.dataset.copy,old=t.textContent;try{await navigator.clipboard.writeText(v);t.textContent=T("Tersalin")}catch(_){t.textContent=T("Salin manual: "+v)}setTimeout(()=>t.textContent=old,2500);return}
@@ -560,7 +645,7 @@ app.addEventListener('click',async e=>{
   if(act==="cancel"){DS.confirm=null;render();return}
   if(t.dataset.ask){DS.confirm=t.dataset.ask;render();return}
   if(t.dataset.editListing){
-    const l=S.listings.find(x=>x.id===t.dataset.editListing);if(!l)return;
+    const l=getL(t.dataset.editListing);if(!l)return;
     DS.form={data:JSON.parse(JSON.stringify(l))};DS.msg=null;
     if(route()!=="dasbor")location.hash="dasbor";else render();window.scrollTo(0,0);return}
   if(t.dataset.renew){
@@ -578,8 +663,7 @@ app.addEventListener('click',async e=>{
 });
 app.addEventListener('input',e=>{
   const id=e.target.id;
-  if(id==="f-q"){F.q=e.target.value;const r=document.getElementById('results');const list=filtered();
-    r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;I.translate(r);if(I.upgrade)I.upgrade(r);return}
+  if(id==="f-q"){F.q=e.target.value;clearTimeout(window.__npq);window.__npq=setTimeout(()=>{if(S.page.key!==fkey())fetchPage(true)},350);return}
   if(/^(l-size|l-price)$/.test(id))hints();
 });
 app.addEventListener('change',async e=>{
@@ -593,7 +677,7 @@ app.addEventListener('change',async e=>{
     if(picked.length>files.length)DS.msg={text:`Maksimal ${MAX_PHOTOS} foto per listing. ${picked.length-files.length} foto tidak diunggah.`,err:true};
     if(!files.length){render();return}
     DS.form.uploading=true;render();
-    for(const f of files){try{DS.form.data.photos.push(await uploadPhoto(f,"l-",1600))}catch(err){DS.msg={text:"Satu foto gagal diunggah: "+errMsg(err),err:true}}}
+    for(const f of files){try{DS.form.data.photos.push(await uploadPhoto(f,"l-",1280))}catch(err){DS.msg={text:"Satu foto gagal diunggah: "+errMsg(err),err:true}}}
     DS.form.uploading=false;render();return}
   if(id==="p-photo"){
     const f=e.target.files[0];if(!f)return;const pf=document.getElementById('pf');DS.profile=Object.assign({},me||{},readForm(pf));

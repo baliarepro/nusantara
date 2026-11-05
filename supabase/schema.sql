@@ -161,3 +161,13 @@ create policy listings_read on public.listings for select
       and exists (select 1 from public.agents a where a.id = agent_id and a.status = 'approved'))
     or agent_id = auth.uid() or public.is_admin()
   );
+
+-- 10. SKALA RIBUAN LISTING: harga total (untuk filter budget & urutan harga) + indeks pencarian
+alter table public.listings add column if not exists total_price numeric
+  generated always as (case when unit = 'are' and size is not null then price * size / 100 else price end) stored;
+create index if not exists listings_live_idx on public.listings (published, updated_at desc);
+create index if not exists listings_agent_idx on public.listings (agent_id);
+create index if not exists listings_prov_kab_idx on public.listings (prov, kab);
+create index if not exists listings_type_status_idx on public.listings (type, status);
+create index if not exists listings_total_price_idx on public.listings (total_price);
+create index if not exists listings_created_idx on public.listings (created_at desc);

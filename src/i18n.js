@@ -75,7 +75,7 @@ const D={
 "Kolom baru belum ada di database. Admin perlu menjalankan SQL tambahan di Supabase.":"New fields are missing in the database. The admin needs to run the extra SQL in Supabase.",
 "Listing tersimpan dan tayang.":"Listing saved and published.","Listing tersimpan sebagai draf.":"Listing saved as a draft.","Listing dihapus.":"Listing deleted.",
 "Agen disetujui. Profilnya sekarang tayang.":"Agent approved. Their profile is now live.","Status agen diperbarui.":"Agent status updated.",
-"Menyiapkan PDF…":"Preparing PDF…","PDF terunduh":"PDF downloaded","Gagal membuat PDF, coba lagi":"Couldn't create the PDF, try again","Tersalin":"Copied","Pendaftaran Anda belum disetujui. Hubungi admin lewat WhatsApp untuk informasi lebih lanjut.":"Your registration has not been approved. Contact the admin on WhatsApp for more information.","WhatsApp admin":"WhatsApp admin",
+"Menyiapkan PDF…":"Preparing PDF…","PDF terunduh":"PDF downloaded","Gagal membuat PDF, coba lagi":"Couldn't create the PDF, try again","Tersalin":"Copied","Muat lebih banyak":"Load more","Memuat…":"Loading…","Pendaftaran Anda belum disetujui. Hubungi admin lewat WhatsApp untuk informasi lebih lanjut.":"Your registration has not been approved. Contact the admin on WhatsApp for more information.","WhatsApp admin":"WhatsApp admin",
 // pdf
 "BROSUR LISTING":"LISTING BROCHURE","SPESIFIKASI":"SPECIFICATIONS","DESKRIPSI":"DESCRIPTION","INFO & JADWAL SURVEI":"INFO & SITE VISITS","Chat via WhatsApp":"Chat on WhatsApp","Ketuk tombol untuk langsung chat":"Tap the button to chat directly",
 "Harga: hubungi agen":"Price: contact the agent","Hubungi agen":"Contact the agent","Lokasi Google Maps:":"Google Maps location:","per are":"per are"
@@ -88,6 +88,7 @@ const P=[
  [/^Tayang (.+)$/,m=>"Listed "+m[1]],
  [/^Diperbarui (.+)$/,m=>"Updated "+m[1]],
  [/^Turun dalam (\d+) hari$/,m=>`Expires in ${m[1]} days`],
+ [/^(\d+) listing tayang$/,m=>`${m[1]} live listing${m[1]==="1"?"":"s"}`],
  [/^(\d+) listing$/,m=>`${m[1]} listing${m[1]==="1"?"":"s"}`],
  [/^(\d+) listing dari semua agen$/,m=>`${m[1]} listings from all agents`],
  [/^Agen \((\d+) baru\)$/,m=>`Agents (${m[1]} new)`],
