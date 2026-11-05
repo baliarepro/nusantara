@@ -233,7 +233,7 @@ function bar(){
   const links=NAV.map(([k,t])=>`<a href="#${k}"${cur(k)}>${t}</a>`).join("");
   const acct=session?`<a href="#dasbor" class="btn btn-primary btn-sm">Dasbor</a>`:`<a href="#masuk" class="nav-login">Masuk</a><a href="#daftar" class="btn btn-line btn-sm" style="color:var(--ink)">Daftar agen</a>`;
   return `<header class="bar"><div class="wrap">
-    <a class="brand" href="#"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="var(--jade)"/><path d="M5 18 L10 11 L13.5 15 L17 9 L21 18 Z" fill="var(--on-jade)"/></svg>${esc(SITE.name)}</a>
+    <a class="brand" href="#"><picture><source srcset="/assets/np-mark-light.png" media="(prefers-color-scheme: dark)"><img class="brand-mark" src="/assets/np-mark.png" alt="" width="40" height="30"></picture>${esc(SITE.name)}</a>
     <nav class="mainnav" aria-label="Menu utama">${links}</nav>
     <div class="nav"><div class="lang" role="group" aria-label="Bahasa"><button data-lang="id" aria-pressed="${!EN()}">ID</button><button data-lang="en" aria-pressed="${EN()}">EN</button></div>${acct}<button class="menu-btn" data-act="menu" aria-expanded="${MENU}" aria-controls="mnav" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">${MENU?'<path d="M6 6l12 12M18 6L6 18"/>':'<path d="M4 7h16M4 12h16M4 17h16"/>'}</svg></button></div>
   </div>

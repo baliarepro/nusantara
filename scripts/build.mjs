@@ -106,7 +106,7 @@ function layout({ lang, title, desc, pathId, pathEn, body, jsonld = [], image, t
 <link rel="alternate" hreflang="en" href="${SITE_URL}${pathEn}">
 <link rel="alternate" hreflang="x-default" href="${SITE_URL}${pathId}">
 <meta name="robots" content="${noindex ? "noindex,follow" : "index,follow,max-image-preview:large"}">
-<meta name="theme-color" content="#24506E">
+<meta name="theme-color" content="#0A2845">
 <meta property="og:type" content="${type}">
 <meta property="og:site_name" content="Nusantara Property">
 <meta property="og:locale" content="${lang === "en" ? "en_US" : "id_ID"}">
@@ -115,7 +115,7 @@ function layout({ lang, title, desc, pathId, pathEn, body, jsonld = [], image, t
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:image" content="${esc(image || SITE_URL + "/assets/og-image.png")}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/favicon.png" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>:root{color-scheme:light}body{margin:0}img{max-width:100%}</style>
 <link rel="stylesheet" href="/assets/site.css?v=${CSSV}">
@@ -123,7 +123,7 @@ ${jsonld.map(j => `<script type="application/ld+json">${JSON.stringify(j).replac
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <a class="brand" href="${lang === "en" ? "/en/" : "/"}"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="var(--jade)"/><path d="M5 18 L10 11 L13.5 15 L17 9 L21 18 Z" fill="var(--on-jade)"/></svg>Nusantara Property</a>
+  <a class="brand" href="${lang === "en" ? "/en/" : "/"}"><picture><source srcset="/assets/np-mark-light.png" media="(prefers-color-scheme: dark)"><img class="brand-mark" src="/assets/np-mark.png" alt="" width="40" height="30"></picture>Nusantara Property</a>
   <nav class="mainnav static-nav" aria-label="${lang === "en" ? "Main menu" : "Menu utama"}">${nav}</nav>
   <div class="nav"><div class="lang"><a href="${pathId}" ${lang === "id" ? 'aria-current="true"' : ""}>ID</a><a href="${pathEn}" ${lang === "en" ? 'aria-current="true"' : ""}>EN</a></div></div>
 </div></header>

@@ -1,7 +1,7 @@
 /* Bagikan listing (teks WhatsApp) dan unduh brosur PDF 1 halaman A4.
    PDF digambar di canvas lalu dibungkus ke file PDF tanpa library eksternal. */
 window.NP_SHARE=(function(){
-const C={navy:"#24506E",ink:"#1A2733",muted:"#5D6B78",line:"#DCE3EA",soft:"#E4EDF4",bg:"#F5F7F9",wa:"#1E8A55",gold:"#A8843F",white:"#FFFFFF"};
+const C={navy:"#0A2845",ink:"#0F2236",muted:"#5A6878",line:"#DCE3EA",soft:"#E3EAF2",bg:"#F5F7F9",wa:"#1E8A55",gold:"#D4802A",white:"#FFFFFF"};
 const FD='"Bricolage Grotesque","Avenir Next","Segoe UI",Arial,sans-serif';
 const FB='"Instrument Sans","Helvetica Neue",Arial,sans-serif';
 const FM='"IBM Plex Mono",Menlo,monospace';
@@ -70,9 +70,10 @@ async function render(l,a,site,url,h){
   x.fillStyle=C.white;x.fillRect(0,0,W,H);
   // header
   x.fillStyle=C.navy;x.fillRect(0,0,W,62);
-  rr(x,M,19,24,24,5);x.fillStyle=C.white;x.fill();
-  x.fillStyle=C.navy;x.beginPath();x.moveTo(M+4,37);x.lineTo(M+9.5,29.5);x.lineTo(M+13,33.5);x.lineTo(M+16.5,27);x.lineTo(M+20.5,37);x.closePath();x.fill();
-  x.fillStyle=C.white;x.font=`800 17px ${FD}`;x.fillText(site.name,M+32,36.5);
+  {const g=x.createLinearGradient(0,0,W,0);g.addColorStop(0,"#EDBA6A");g.addColorStop(1,"#D4802A");x.fillStyle=g;x.fillRect(0,62,W,2.5)}
+  const logo=await loadImg(location.origin+"/assets/np-mark-light.png");
+  let tx=M;if(logo){const lh=26,lw=logo.width*lh/logo.height;x.drawImage(logo,M,18,lw,lh);tx=M+lw+10}
+  x.fillStyle=C.white;x.font=`800 17px ${FD}`;x.fillText(site.name,tx,36.5);
   x.textAlign="right";x.font=`600 8px ${FB}`;x.fillStyle="rgba(255,255,255,.75)";x.fillText(h.T("BROSUR LISTING"),W-M,28);
   x.font=`600 11px ${FB}`;x.fillStyle=C.white;x.fillText(`${h.T(l.type)} · ${h.T(l.status)}`,W-M,43);x.textAlign="left";
   // title block
