@@ -236,7 +236,7 @@ function detail(l){
     ["Hadap",esc(l.facing)||"—"],["Sertifikat",esc(l.cert)||"—"],
     ["Zonasi",l.zone?zoneHtml(l.zone):"—"],["Lokasi",esc(l.place)||"—"],["Kota/kabupaten",esc(l.kab)||"—"],["Provinsi",esc(l.prov)||"—"],
     ["Harga",l.price==null?"Tanya agen":`${rupiah(l.price)} ${UNITS[l.unit]||""}`]];
-  if(l.price&&l.unit==="total"&&l.size)rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
+  if(l.price&&l.unit==="total"&&l.size&&l.type==="Tanah")rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
   rows.push(["Tanggal tayang",fmtD(l.created_at)]);
   if(l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY)rows.push(["Terakhir diperbarui",fmtD(l.updated_at)]);
   const mine=session&&(l.agent_id===session.user.id||(me&&me.is_admin));
