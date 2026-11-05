@@ -1,0 +1,144 @@
+-- Nusantara Property: tabel agen & listing + aturan privasi per agen
+-- Jalankan sekali di Supabase → SQL Editor → New query → Run
+
+-- 1. PROFIL AGEN (1 baris per akun login)
+create table if not exists public.agents (
+  id uuid primary key references auth.users(id) on delete cascade,
+  name text not null,
+  agency text,
+  phone text not null,
+  email text,
+  prov text,
+  kab text,
+  areas text,
+  since int,
+  specialties text[] default '{}',
+  arebi text,
+  bio text,
+  photo_url text,
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  is_admin boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+-- 2. LISTING (data publik)
+create table if not exists public.listings (
+  id uuid primary key default gen_random_uuid(),
+  agent_id uuid not null default auth.uid() references public.agents(id) on delete cascade,
+  title text not null,
+  type text not null default 'Tanah',
+  status text not null default 'Dijual',
+  prov text,
+  kab text,
+  place text,
+  size numeric,
+  price numeric,
+  unit text default 'total',
+  cert text,
+  zone text,
+  description text,
+  photos text[] default '{}',
+  published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- 3. DATA PRIBADI LISTING (hanya agen pemilik & admin)
+create table if not exists public.listing_private (
+  listing_id uuid primary key references public.listings(id) on delete cascade,
+  agent_id uuid not null default auth.uid() references public.agents(id) on delete cascade,
+  owner_name text,
+  owner_phone text,
+  exact_address text,
+  net_price numeric,
+  notes text
+);
+
+-- 4. FUNGSI BANTU
+create or replace function public.is_admin() returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select is_admin from public.agents where id = auth.uid()), false)
+$$;
+
+create or replace function public.is_approved() returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select status = 'approved' from public.agents where id = auth.uid()), false)
+$$;
+
+-- Agen tidak bisa menyetujui dirinya sendiri atau menjadi admin
+create or replace function public.protect_agent_fields() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is not null and not public.is_admin() then
+    if tg_op = 'INSERT' then
+      new.status := 'pending';
+      new.is_admin := false;
+    else
+      new.status := old.status;
+      new.is_admin := old.is_admin;
+    end if;
+  end if;
+  return new;
+end $$;
+drop trigger if exists agents_protect on public.agents;
+create trigger agents_protect before insert or update on public.agents
+  for each row execute function public.protect_agent_fields();
+
+create or replace function public.touch_updated_at() returns trigger
+language plpgsql as $$ begin new.updated_at := now(); return new; end $$;
+drop trigger if exists listings_touch on public.listings;
+create trigger listings_touch before update on public.listings
+  for each row execute function public.touch_updated_at();
+
+-- 5. ATURAN AKSES (Row Level Security)
+alter table public.agents enable row level security;
+alter table public.listings enable row level security;
+alter table public.listing_private enable row level security;
+
+-- Agen: publik melihat agen yang sudah disetujui; agen melihat & mengubah profilnya sendiri; admin semua
+drop policy if exists agents_read on public.agents;
+create policy agents_read on public.agents for select
+  using (status = 'approved' or id = auth.uid() or public.is_admin());
+drop policy if exists agents_insert on public.agents;
+create policy agents_insert on public.agents for insert to authenticated
+  with check (id = auth.uid());
+drop policy if exists agents_update on public.agents;
+create policy agents_update on public.agents for update to authenticated
+  using (id = auth.uid() or public.is_admin()) with check (id = auth.uid() or public.is_admin());
+drop policy if exists agents_delete on public.agents;
+create policy agents_delete on public.agents for delete to authenticated
+  using (public.is_admin());
+
+-- Listing: publik melihat listing tayang dari agen yang disetujui; agen hanya mengelola miliknya; admin semua
+drop policy if exists listings_read on public.listings;
+create policy listings_read on public.listings for select
+  using (
+    (published and exists (select 1 from public.agents a where a.id = agent_id and a.status = 'approved'))
+    or agent_id = auth.uid() or public.is_admin()
+  );
+drop policy if exists listings_insert on public.listings;
+create policy listings_insert on public.listings for insert to authenticated
+  with check ((agent_id = auth.uid() and public.is_approved()) or public.is_admin());
+drop policy if exists listings_update on public.listings;
+create policy listings_update on public.listings for update to authenticated
+  using (agent_id = auth.uid() or public.is_admin())
+  with check ((agent_id = auth.uid() and public.is_approved()) or public.is_admin());
+drop policy if exists listings_delete on public.listings;
+create policy listings_delete on public.listings for delete to authenticated
+  using (agent_id = auth.uid() or public.is_admin());
+
+-- Data pribadi: hanya pemilik listing & admin
+drop policy if exists private_all on public.listing_private;
+create policy private_all on public.listing_private for all to authenticated
+  using (agent_id = auth.uid() or public.is_admin())
+  with check (agent_id = auth.uid() or public.is_admin());
+
+-- 6. FOTO LISTING (penyimpanan)
+insert into storage.buckets (id, name, public) values ('listing-photos', 'listing-photos', true)
+  on conflict (id) do nothing;
+drop policy if exists photos_upload on storage.objects;
+create policy photos_upload on storage.objects for insert to authenticated
+  with check (bucket_id = 'listing-photos' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists photos_delete on storage.objects;
+create policy photos_delete on storage.objects for delete to authenticated
+  using (bucket_id = 'listing-photos' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
