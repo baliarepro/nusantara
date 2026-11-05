@@ -1,13 +1,10 @@
--- Jalankan SETELAH Anda daftar di website dan sudah masuk ke dasbor satu kali.
--- Ganti email di baris bawah dengan email akun agen Anda, lalu Run.
+-- Jalankan SEKALI, setelah Anda daftar dan masuk ke dasbor website.
+-- Menjadikan agen pertama yang terdaftar sebagai admin + memasukkan 5 listing awal.
 do $$
 declare uid uuid;
 begin
-  select id into uid from auth.users where email = 'GANTI_DENGAN_EMAIL_ANDA';
-  if uid is null then raise exception 'Email itu belum terdaftar di website.'; end if;
-  if not exists (select 1 from public.agents where id = uid) then
-    raise exception 'Profil agen belum ada. Masuk ke dasbor website satu kali dulu, lalu jalankan lagi.';
-  end if;
+  select id into uid from public.agents order by created_at limit 1;
+  if uid is null then raise exception 'Belum ada agen terdaftar.'; end if;
 
   update public.agents set is_admin = true, status = 'approved' where id = uid;
 
