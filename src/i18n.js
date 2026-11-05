@@ -126,11 +126,58 @@ function translate(root){
   nodes.forEach(n=>{const v=t(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v});
   root.querySelectorAll("[placeholder],[aria-label],[title]").forEach(el=>{["placeholder","aria-label","title"].forEach(a=>{if(el.hasAttribute(a)){const v=t(el.getAttribute(a));if(v!==el.getAttribute(a))el.setAttribute(a,v)}})});
 }
+
+/* ===== terjemahan otomatis judul listing =====
+   1) kamus istilah properti (langsung tampil), 2) mesin terjemahan MyMemory (disimpan di browser). */
+const G=[
+ [/\bkolam renang\b/gi,"swimming pool"],[/\bview laut\b/gi,"sea view"],[/\bpemandangan laut\b/gi,"sea view"],[/\bview sawah\b/gi,"rice field view"],
+ [/\bsiap huni\b/gi,"move-in ready"],[/\bpinggir jalan\b/gi,"roadside"],[/\bjalan utama\b/gi,"main road"],[/\bdi bawah harga pasar\b/gi,"below market price"],
+ [/\btanah hook\b/gi,"corner land"],[/\btanah gandeng\b/gi,"adjacent land plots"],[/\btanah kavling\b/gi,"land plot"],
+ [/\b(\d+)\s*lantai\b/gi,"$1-storey"],[/\b(\d+)\s*kamar tidur\b/gi,"$1-bedroom"],[/\b(\d+)\s*KT\b/g,"$1 bed"],[/\b(\d+)\s*KM\b/g,"$1 bath"]
+];
+const PLACE=[[/(?<!Jl\.\s|Jalan\s)\bPantai\s+([A-Z][\w'-]*(?:\s+[A-Z][\w'-]*)?)/g,"$1 Beach"],[/\bGunung\s+([A-Z][\w'-]*)/g,"Mount $1"],[/\bDanau\s+([A-Z][\w'-]*)/g,"Lake $1"],[/(?<!Jl\.\s|Jalan\s)\bPura\s+([A-Z][\w'-]*)/g,"$1 Temple"]];
+const W={tanah:"land",rumah:"house",villa:"villa",vila:"villa",apartemen:"apartment",ruko:"shophouse",gudang:"warehouse",kos:"boarding house",kost:"boarding house",hotel:"hotel",
+ dekat:"near",di:"in",dan:"and",dengan:"with",untuk:"for",ke:"to",dari:"from",atau:"or",
+ dijual:"for sale",jual:"for sale",disewakan:"for rent",sewa:"for rent",murah:"affordable",strategis:"strategic",luas:"spacious",besar:"large",kecil:"small",
+ baru:"new",mewah:"luxury",minimalis:"minimalist",modern:"modern",cantik:"beautiful",asri:"green",tenang:"quiet",nyaman:"comfortable",eksklusif:"exclusive",
+ kavling:"plot",gandeng:"adjacent",hook:"corner",pojok:"corner",jalan:"road",utama:"main",kota:"city",pusat:"center",kawasan:"area",lingkungan:"neighbourhood",
+ pantai:"beach",laut:"sea",sawah:"rice field",tebing:"cliff",bukit:"hill",gunung:"mountain",sungai:"river",danau:"lake",hutan:"forest",
+ kamar:"room",lantai:"floor",kolam:"pool",taman:"garden",garasi:"garage",dapur:"kitchen",
+ investasi:"investment",bisnis:"business",usaha:"business",cocok:"suitable",bonus:"bonus",furnished:"furnished",full:"full",semi:"semi",
+ sertifikat:"certificate",pariwisata:"tourism",permukiman:"residential",pertanian:"agricultural",nego:"negotiable",stasiun:"station",cepat:"quick",bandara:"airport",kampus:"campus",sekolah:"school",tol:"toll road",pasar:"market"};
+function gloss(text){
+  let s=String(text||"");
+  PLACE.forEach(([re,r])=>s=s.replace(re,r));
+  G.forEach(([re,r])=>s=s.replace(re,r));
+  s=s.replace(/[A-Za-zÀ-ÿ]+/g,w=>{const k=w.toLowerCase();if(!(k in W))return w;const v=W[k];return w[0]===w[0].toUpperCase()&&w[0]!==w[0].toLowerCase()?v.charAt(0).toUpperCase()+v.slice(1):v});
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+const CK="np-mt:";
+function cached(text){try{return localStorage.getItem(CK+text)}catch(e){return null}}
+const pending=new Map();
+function machine(text){
+  const c=cached(text);if(c)return Promise.resolve(c);
+  if(pending.has(text))return pending.get(text);
+  const pr=fetch("https://api.mymemory.translated.net/get?langpair=id|en&q="+encodeURIComponent(text))
+    .then(r=>r.ok?r.json():null).then(j=>{
+      const out=j&&j.responseStatus==200&&j.responseData&&j.responseData.translatedText;
+      if(out&&!/MYMEMORY WARNING|INVALID|QUERY LENGTH/i.test(out)){const v=out.replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/&amp;/g,"&");try{localStorage.setItem(CK+text,v)}catch(e){}return v}
+      return null}).catch(()=>null);
+  pending.set(text,pr);return pr;
+}
+function title(text){return LANG==="en"?(cached(text)||gloss(text)):text}
+function upgrade(root){
+  if(LANG!=="en"||!root)return;
+  root.querySelectorAll("[data-mt]").forEach(el=>{
+    const src=el.getAttribute("data-mt");if(!src||cached(src))return;
+    machine(src).then(v=>{if(v&&LANG==="en"&&el.isConnected&&el.getAttribute("data-mt")===src)el.textContent=v});
+  });
+}
 return {
   get lang(){return LANG},
   set(l){LANG=l==="en"?"en":"id";try{localStorage.setItem("np-lang",LANG)}catch(e){}document.documentElement.lang=LANG},
   get locale(){return LANG==="en"?"en-GB":"id-ID"},
-  t,translate
+  t,translate,title,upgrade,gloss
 };
 })();
 document.documentElement.lang=window.NP_I18N.lang;

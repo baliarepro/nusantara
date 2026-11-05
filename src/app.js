@@ -21,6 +21,8 @@ const FROM_LINK=/access_token/.test(location.hash)&&!/type=recovery/.test(locati
 
 const I=window.NP_I18N||{lang:"id",locale:"id-ID",t:x=>x,translate(){},set(){}};
 const T=x=>I.t(x);
+const TT=x=>I.title?I.title(x):x;
+const mt=x=>EN()?` data-mt="${esc(x)}" data-noi18n`:"";
 const EN=()=>I.lang==="en";
 const app=document.getElementById('app');
 let sb=null;
@@ -140,7 +142,7 @@ function card(l){
   return `<a class="card" href="#${esc(l.id)}">
     <div class="media">${mediaHtml(l)}<div class="tags"><span class="tag">${esc(l.type)}</span>${l.status==="Disewakan"?`<span class="tag sewa">Disewakan</span>`:""}</div></div>
     <div class="card-body">
-      <h3>${esc(l.title)}</h3>
+      <h3${mt(l.title)}>${esc(TT(l.title))}</h3>
       <div class="loc">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(", ")}</div>
       <div class="specs">${hasBuilding(l.type)
         ?`${l.size?`<span>LT <b>${num(l.size)}</b> m²</span>`:""}${l.building_size?`<span>LB <b>${num(l.building_size)}</b> m²</span>`:""}${l.bedrooms!=null?`<span><b>${l.bedrooms}</b> KT</span>`:""}${l.bathrooms!=null?`<span><b>${l.bathrooms}</b> KM</span>`:""}`
@@ -246,7 +248,7 @@ function detail(l){
         <div class="gallery"><div class="main" id="g-main">${pics.length?`<img src="${esc(pics[0])}" alt="${esc(l.title)}">`:mediaHtml(l)}</div>
           ${pics.length>1?`<div class="thumbs">${pics.map((p,i)=>`<button data-thumb="${i}" aria-current="${i===0}" aria-label="Foto ${i+1}"><img src="${esc(p)}" alt=""></button>`).join("")}</div>`:""}</div>
         <div class="label" style="margin-top:22px">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(" · ")}</div>
-        <h1 class="d-title">${esc(l.title)}</h1>
+        <h1 class="d-title"${mt(l.title)}>${esc(TT(l.title))}</h1>
         ${priceHtml(l,"d-price")}
         <table class="facts"><tbody>${rows.map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("")}</tbody></table>
         ${l.description?`<p class="desc">${esc(l.description)}</p>`:""}
@@ -489,6 +491,7 @@ function render(){
   }
   app.innerHTML=bar()+`<main>${main}</main>`+footer();
   I.translate(app);
+  if(I.upgrade)I.upgrade(app);
   hints();
 }
 function hints(){
@@ -528,7 +531,7 @@ app.addEventListener('click',async e=>{
     document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">`;
     document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
   if(t.dataset.pdf){const l=S.listings.find(x=>x.id===t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent=T("Menyiapkan PDF…");
-    try{await NP_SHARE.pdf(l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent=T("PDF terunduh")}catch(err){t.textContent=T("Gagal membuat PDF, coba lagi")}
+    try{await NP_SHARE.pdf(EN()?{...l,title:TT(l.title)}:l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent=T("PDF terunduh")}catch(err){t.textContent=T("Gagal membuat PDF, coba lagi")}
     setTimeout(()=>{t.textContent=old;t.disabled=false},2500);return}
   if(t.dataset.copy){const v=t.dataset.copy,old=t.textContent;try{await navigator.clipboard.writeText(v);t.textContent=T("Tersalin")}catch(_){t.textContent=T("Salin manual: "+v)}setTimeout(()=>t.textContent=old,2500);return}
   if(act==="logout"){await sb.auth.signOut();me=null;DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};location.hash="";render();return}
@@ -563,7 +566,7 @@ app.addEventListener('click',async e=>{
 app.addEventListener('input',e=>{
   const id=e.target.id;
   if(id==="f-q"){F.q=e.target.value;const r=document.getElementById('results');const list=filtered();
-    r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;I.translate(r);return}
+    r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;I.translate(r);if(I.upgrade)I.upgrade(r);return}
   if(/^(l-size|l-price)$/.test(id))hints();
 });
 app.addEventListener('change',async e=>{
