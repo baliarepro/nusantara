@@ -10,6 +10,9 @@ const PROVS=["Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau","J
 const CERTS=["SHM","SHGB","Hak Pakai","Leasehold"];
 const ZONES={"Pariwisata":"--z-pariwisata","Permukiman":"--z-permukiman","Pertanian":"--z-pertanian","Perdagangan & Jasa":"--z-dagang"};
 const UNITS={total:"",are:"/ are",tahun:"/ tahun"};
+const FACING=["Utara","Timur Laut","Timur","Tenggara","Selatan","Barat Daya","Barat","Barat Laut"];
+const ROOM_TYPES=["Rumah","Villa","Apartemen","Ruko"];
+const hasBuilding=t=>t&&t!=="Tanah";
 const SPEC=["Tanah","Rumah","Villa","Apartemen","Ruko","Gudang","Komersial","Sewa"];
 const AGENT_COLS="id,name,agency,phone,prov,kab,areas,since,specialties,arebi,bio,photo_url,status,is_admin,created_at";
 const BASE=location.origin+location.pathname;
@@ -123,7 +126,9 @@ function card(l){
     <div class="card-body">
       <h3>${esc(l.title)}</h3>
       <div class="loc">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(", ")}</div>
-      <div class="specs">${l.size?`<span><b>${num(l.size)}</b> m²</span>`:""}${l.type==="Tanah"&&l.size?`<span><b>${num(Math.round(l.size)/100)}</b> are</span>`:""}${l.cert?`<span><b>${esc(l.cert)}</b></span>`:""}</div>
+      <div class="specs">${hasBuilding(l.type)
+        ?`${l.size?`<span>LT <b>${num(l.size)}</b> m²</span>`:""}${l.building_size?`<span>LB <b>${num(l.building_size)}</b> m²</span>`:""}${l.bedrooms!=null?`<span><b>${l.bedrooms}</b> KT</span>`:""}${l.bathrooms!=null?`<span><b>${l.bathrooms}</b> KM</span>`:""}`
+        :`${l.size?`<span><b>${num(l.size)}</b> m²</span><span><b>${num(Math.round(l.size)/100)}</b> are</span>`:""}`}${l.cert?`<span><b>${esc(l.cert)}</b></span>`:""}${l.facing?`<span>Hadap <b>${esc(l.facing)}</b></span>`:""}</div>
       ${zoneHtml(l.zone)}${priceHtml(l)}
       <div class="card-foot"><span class="who">${ava(a)}<span>${esc(a.name)}${a.agency?` · ${esc(a.agency)}`:""}</span></span></div>
     </div></a>`;
@@ -200,7 +205,10 @@ function agentsSection(){
 function detail(l){
   const a=agentOf(l.agent_id)||{name:"Agen",phone:""};
   const pics=l.photos||[];
-  const rows=[["Jenis",`${esc(l.type)} · ${esc(l.status)}`],["Luas",l.size?`${num(l.size)} m² (${num(Math.round(l.size)/100)} are)`:"—"],["Sertifikat",esc(l.cert)||"—"],
+  const rows=[["Jenis",`${esc(l.type)} · ${esc(l.status)}`],[hasBuilding(l.type)?"Luas tanah":"Luas",l.size?`${num(l.size)} m² (${num(Math.round(l.size)/100)} are)`:"—"],
+    ...(hasBuilding(l.type)?[["Luas bangunan",l.building_size?`${num(l.building_size)} m²`:"—"]]:[]),
+    ...(ROOM_TYPES.includes(l.type)?[["Kamar tidur",l.bedrooms??"—"],["Kamar mandi",l.bathrooms??"—"]]:[]),
+    ["Hadap",esc(l.facing)||"—"],["Sertifikat",esc(l.cert)||"—"],
     ["Zonasi",l.zone?zoneHtml(l.zone):"—"],["Lokasi",esc(l.place)||"—"],["Kota/kabupaten",esc(l.kab)||"—"],["Provinsi",esc(l.prov)||"—"],
     ["Harga",l.price==null?"Tanya agen":`${rupiah(l.price)} ${UNITS[l.unit]||""}`]];
   if(l.price&&l.unit==="total"&&l.size)rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
@@ -384,8 +392,12 @@ function listingForm(){
     <div class="row"><div class="field"><label for="l-prov">Provinsi</label><select id="l-prov" name="prov">${opt([["","Pilih provinsi"],...PROVS],l.prov)}</select></div>
       <div class="field"><label for="l-kab">Kota / kabupaten</label><input id="l-kab" name="kab" value="${esc(l.kab)}" placeholder="Jakarta Selatan"></div></div>
     <div class="field"><label for="l-place">Kecamatan / kelurahan / perumahan</label><input id="l-place" name="place" value="${esc(l.place)}" placeholder="Kebayoran Baru"></div>
-    <div class="row"><div class="field"><label for="l-size">Luas (m²)</label><input id="l-size" name="size" inputmode="numeric" value="${esc(l.size??"")}" placeholder="500"><span class="hint" id="h-size"></span></div>
-      <div class="field"><label for="l-cert">Sertifikat</label><select id="l-cert" name="cert">${opt([["","—"],...CERTS],l.cert)}</select></div></div>
+    <div class="row"><div class="field"><label for="l-size">${hasBuilding(l.type)?"Luas tanah (m²)":"Luas (m²)"}</label><input id="l-size" name="size" inputmode="numeric" value="${esc(l.size??"")}" placeholder="500"><span class="hint" id="h-size"></span></div>
+      ${hasBuilding(l.type)?`<div class="field"><label for="l-bsize">Luas bangunan (m²)</label><input id="l-bsize" name="building_size" inputmode="numeric" value="${esc(l.building_size??"")}" placeholder="150"></div>`:`<div class="field"><label for="l-cert">Sertifikat</label><select id="l-cert" name="cert">${opt([["","—"],...CERTS],l.cert)}</select></div>`}</div>
+    ${ROOM_TYPES.includes(l.type)?`<div class="row"><div class="field"><label for="l-bed">Kamar tidur</label><input id="l-bed" name="bedrooms" type="number" min="0" max="99" inputmode="numeric" value="${esc(l.bedrooms??"")}" placeholder="3"></div>
+      <div class="field"><label for="l-bath">Kamar mandi</label><input id="l-bath" name="bathrooms" type="number" min="0" max="99" inputmode="numeric" value="${esc(l.bathrooms??"")}" placeholder="2"></div></div>`:""}
+    <div class="row">${hasBuilding(l.type)?`<div class="field"><label for="l-cert">Sertifikat</label><select id="l-cert" name="cert">${opt([["","—"],...CERTS],l.cert)}</select></div>`:""}
+      <div class="field"><label for="l-facing">Hadap / orientasi</label><select id="l-facing" name="facing">${opt([["","—"],...FACING],l.facing)}</select></div>${hasBuilding(l.type)?"":"<div></div>"}</div>
     <div class="row"><div class="field"><label for="l-price">Harga publik (Rp)</label><input id="l-price" name="price" inputmode="numeric" value="${esc(l.price??"")}" placeholder="Kosongkan = tanya agen"><span class="hint" id="h-price"></span></div>
       <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
     <div class="field"><label for="l-zone">Zonasi</label><select id="l-zone" name="zone">${opt([["","—"],...Object.keys(ZONES)],l.zone)}</select></div>
@@ -437,7 +449,7 @@ function hints(){
 const digits=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null};
 function readForm(form){const o={};new FormData(form).forEach((v,k)=>{if(k in o){o[k]=[].concat(o[k],String(v))}else o[k]=String(v).trim()});return o}
 function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o=readForm(f);
-  ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description","maps_url"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
+  ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description","maps_url","building_size","bedrooms","bathrooms","facing"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
   DS.form.data.published=!!o.published;}}
 
 function shrink(file,max,q){
@@ -568,13 +580,14 @@ app.addEventListener('submit',async e=>{
     const maps=d.type==="Tanah"?String(d.maps_url||"").trim():"";
     if(maps&&!/^https:\/\/([a-z0-9-]+\.)*(google\.[a-z.]+|goo\.gl)\//i.test(maps)){DS.msg={text:"Link lokasi harus link Google Maps, misalnya https://maps.app.goo.gl/… atau https://www.google.com/maps/…",err:true};render();return}
     const row={title:d.title,type:d.type,status:d.status,prov:d.prov,kab:d.kab,place:d.place||null,size:digits(d.size),price:digits(d.price),unit:d.unit,
-      cert:d.cert||null,zone:d.zone||null,description:d.description||null,photos:d.photos||[],published:!!d.published,maps_url:maps||null};
+      cert:d.cert||null,zone:d.zone||null,description:d.description||null,photos:d.photos||[],published:!!d.published,maps_url:maps||null,facing:d.facing||null,
+      building_size:hasBuilding(d.type)?digits(d.building_size):null,bedrooms:ROOM_TYPES.includes(d.type)?digits(d.bedrooms):null,bathrooms:ROOM_TYPES.includes(d.type)?digits(d.bathrooms):null};
     DS.busy=true;DS.msg=null;render();
     let id=d.id,error;
     if(id)({error}=await sb.from('listings').update(row).eq('id',id));
     else{const r=await sb.from('listings').insert(row).select('id').single();error=r.error;id=r.data&&r.data.id}
     DS.busy=false;
-    if(error&&/maps_url/.test(error.message||"")){DS.msg={text:"Kolom Google Maps belum ada di database. Admin perlu menjalankan SQL tambahan di Supabase.",err:true};render();return}
+    if(error&&/maps_url|facing|building_size|bedrooms|bathrooms/.test(error.message||"")){DS.msg={text:"Kolom baru belum ada di database. Admin perlu menjalankan SQL tambahan di Supabase.",err:true};render();return}
     if(error){DS.msg={text:errMsg(error),err:true};render();return}
     DS.form=null;DS.msg={text:row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf."};await load();window.scrollTo(0,0);return;
   }

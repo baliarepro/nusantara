@@ -145,3 +145,10 @@ create policy photos_delete on storage.objects for delete to authenticated
 
 -- 7. TAMBAHAN: link Google Maps untuk listing tanah
 alter table public.listings add column if not exists maps_url text;
+
+-- 8. TAMBAHAN: hadap, luas bangunan, kamar tidur, kamar mandi
+alter table public.listings
+  add column if not exists facing text,
+  add column if not exists building_size numeric,
+  add column if not exists bedrooms int,
+  add column if not exists bathrooms int;
