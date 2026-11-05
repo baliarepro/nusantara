@@ -5,8 +5,9 @@
   --gold:#D4802A;--gold-ink:#B8701F;--gold-soft:#FBF1E3;--gold-grad:linear-gradient(135deg,#EDBA6A,#D4802A);
   --z-pariwisata:#E58FB0;--z-permukiman:#E9C43B;--z-pertanian:#5FA463;--z-dagang:#D25B4B;--z-lain:#9AA5A0;
   --wa:#1E8A55;--danger:#B4473C;
-  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
-  --f-body:"Instrument Sans","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-display:"Plus Jakarta Sans","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-serif:"DM Serif Display",Georgia,"Times New Roman",serif;
+  --f-body:"Plus Jakarta Sans","Helvetica Neue",Arial,system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --r:10px;
 }
@@ -52,7 +53,7 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 /* hero */
 .hero{padding-block:44px 22px}
 .hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.02;max-width:17ch}
-.hero h1 em{font-style:normal;color:var(--gold-ink)}
+.hero h1 em{font-family:var(--f-serif);font-style:italic;font-weight:400;letter-spacing:0;color:var(--gold-ink)}
 .hero p{color:var(--muted);max-width:58ch;margin:14px 0 0;font-size:16.5px}
 .stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;font-size:13.5px;color:var(--muted)}
 .stats b{font-family:var(--f-mono);color:var(--ink);font-weight:500;font-size:15px;margin-right:4px}
@@ -349,3 +350,13 @@ a.chip{text-decoration:none;color:inherit}
 .chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--on-jade)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .guide-band{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
  :root:not([data-theme="light"]) .guide-band p{color:var(--muted)}}
+
+/* typography: tegas & elegan */
+h1,h2,h3{letter-spacing:-.025em}
+.hero h1{font-weight:800;letter-spacing:-.035em}
+.page-head h1,.d-title,.reg-intro h1,.agent-hero h1{font-weight:800;letter-spacing:-.03em}
+.brand{font-weight:800;letter-spacing:-.025em}
+.label{letter-spacing:.12em;font-weight:700}
+.btn{font-weight:700;letter-spacing:-.005em}
+.price,.d-price{font-weight:800;letter-spacing:-.02em}
+body{font-size:15.5px}

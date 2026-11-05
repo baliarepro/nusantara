@@ -2,8 +2,8 @@
    PDF digambar di canvas lalu dibungkus ke file PDF tanpa library eksternal. */
 window.NP_SHARE=(function(){
 const C={navy:"#0A2845",ink:"#0F2236",muted:"#5A6878",line:"#DCE3EA",soft:"#E3EAF2",bg:"#F5F7F9",wa:"#1E8A55",gold:"#D4802A",white:"#FFFFFF"};
-const FD='"Bricolage Grotesque","Avenir Next","Segoe UI",Arial,sans-serif';
-const FB='"Instrument Sans","Helvetica Neue",Arial,sans-serif';
+const FD='"Plus Jakarta Sans","Avenir Next","Segoe UI",Arial,sans-serif';
+const FB='"Plus Jakarta Sans","Helvetica Neue",Arial,sans-serif';
 const FM='"IBM Plex Mono",Menlo,monospace';
 
 /* ---------- teks bagikan ---------- */
