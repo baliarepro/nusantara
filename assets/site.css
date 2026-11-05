@@ -316,6 +316,10 @@ a.btn-ghost{text-decoration:none;display:inline-flex;align-items:center}
 .renew-note{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .renew-note span{flex:1 1 260px}
 .maps-btn{margin-top:18px;color:var(--jade)}
+.rules{font-size:13.5px;padding:12px 14px;border-radius:8px;background:var(--gold-soft);color:var(--ink);display:grid;gap:6px}
+.rules ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.report-link{font-size:13px;color:var(--muted);text-decoration:underline;align-self:flex-start;padding:4px 2px}
+.report-link:hover{color:var(--ink)}
 .photo-limit{font-size:13.5px;padding:8px 12px;border-radius:8px;background:var(--jade-soft)}
 .panel code,.prose code{font-family:var(--f-mono);background:var(--sunk);padding:2px 8px;border-radius:6px}
 

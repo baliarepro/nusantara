@@ -354,6 +354,7 @@ function detail(l){
         <div class="panel"><div class="label">Brosur listing</div>
           <button class="btn btn-primary" data-pdf="${esc(l.id)}">Download brosur PDF</button>
           ${mine?`<button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}" style="justify-self:start">Edit listing ini</button>`:""}</div>
+        ${mine?"":`<a class="report-link" href="https://wa.me/${wa(SITE.adminPhone)}?text=${encodeURIComponent(`Halo admin ${SITE.name}, saya ingin melaporkan listing "${l.title}" (${BASE}#${l.id}). Alasan: `)}" target="_blank" rel="noopener">Laporkan listing ini</a>`}
       </aside></div></div>`;
 }
 function agentPage(a){
@@ -392,7 +393,7 @@ function registerPage(){
         <div class="checks">${SPEC.map(s=>`<label><input type="checkbox" name="spec" value="${s}" ${(d.spec||[]).includes(s)?"checked":""}>${s}</label>`).join("")}</div></div>
       <div class="field"><label for="r-arebi">No. anggota AREBI (opsional)</label><input id="r-arebi" name="arebi" value="${v("arebi")}"></div>
       <div class="field"><label for="r-bio">Profil singkat</label><textarea id="r-bio" name="bio" placeholder="Pengalaman, keahlian, bahasa yang dikuasai…">${v("bio")}</textarea></div>
-      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data ini benar, dan setiap listing yang saya pasang adalah properti yang berhak saya pasarkan.</span></label>${E("agree")}
+      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data ini benar. Setiap listing yang saya pasang saya dapat langsung dari pemilik atau kuasanya, bukan salinan iklan agen atau situs lain. Saya setuju listing yang melanggar dihapus dan akun saya bisa dinonaktifkan.</span></label>${E("agree")}
       <button class="btn btn-primary" style="justify-self:start" ${REG.busy?"disabled":""}>${REG.busy?"Membuat akun…":"Buat akun"}</button>
       <span class="hint">Sudah punya akun? <a href="#masuk">Masuk di sini</a>.</span>
     </form>`;
@@ -564,6 +565,12 @@ function listingForm(){
       <input id="l-photos" type="file" accept="image/*" multiple ${f.uploading||full?"disabled":""}>
       <span class="hint">${f.uploading?"Mengunggah foto…":full?`Batas ${MAX_PHOTOS} foto sudah tercapai. Hapus salah satu foto untuk menggantinya.`:`Anda masih bisa menambah ${MAX_PHOTOS-n} foto.`}</span>`})()}
       <div class="pics">${(l.photos||[]).map((u,i)=>`<div class="pic"><img src="${esc(u)}" alt=""><button type="button" data-rmpic="${i}" aria-label="Hapus foto">×</button></div>`).join("")}</div></div>
+    <div class="rules"><b>Aturan listing</b>
+      <ul><li>Pasang hanya properti yang Anda dapat langsung dari pemilik atau kuasanya, dengan izin untuk memasarkannya.</li>
+      <li>Dilarang menyalin iklan, foto, atau deskripsi milik agen atau situs lain.</li>
+      <li>Harga, luas, sertifikat, dan lokasi harus sesuai data sebenarnya.</li></ul>
+      <span>Listing yang melanggar dihapus tanpa pemberitahuan, dan akun bisa dinonaktifkan.</span></div>
+    <label class="agree"><input type="checkbox" id="l-own" name="own" ${f.own?"checked":""}><span>Saya menyatakan listing ini saya dapat langsung dari pemilik atau kuasanya, bukan salinan iklan orang lain, dan datanya benar.</span></label>
     <label class="agree"><input type="checkbox" id="l-pub" name="published" ${l.published?"checked":""}><span>Tayangkan listing ini di website</span></label>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" ${DS.busy||f.uploading?"disabled":""}>${DS.busy?"Menyimpan…":l.id?"Simpan perubahan":"Simpan listing"}</button>
       <button type="button" class="btn btn-line" data-act="close-form">Batal</button></div>
@@ -623,7 +630,7 @@ const digits=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null
 function readForm(form){const o={};new FormData(form).forEach((v,k)=>{if(k in o){o[k]=[].concat(o[k],String(v))}else o[k]=String(v).trim()});return o}
 function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o=readForm(f);
   ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description","maps_url","building_size","bedrooms","bathrooms","facing"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
-  DS.form.data.published=!!o.published;}}
+  DS.form.data.published=!!o.published;DS.form.own=!!o.own;}}
 
 function shrink(file,max,q){
   return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("Foto tidak bisa dibaca"))};
@@ -768,6 +775,7 @@ app.addEventListener('submit',async e=>{
     snapForm();const d=DS.form.data;
     if(!d.title){DS.msg={text:"Isi judul listing.",err:true};render();return}
     if(!d.prov||!d.kab){DS.msg={text:"Pilih provinsi dan isi kota/kabupaten.",err:true};render();return}
+    if(!DS.form.own){DS.msg={text:"Centang pernyataan bahwa listing ini Anda dapat langsung dari pemilik atau kuasanya.",err:true};render();const c=document.getElementById('l-own');if(c)c.scrollIntoView({block:"center"});return}
     const maps=d.type==="Tanah"?String(d.maps_url||"").trim():"";
     if(maps&&!/^https:\/\/([a-z0-9-]+\.)*(google\.[a-z.]+|goo\.gl)\//i.test(maps)){DS.msg={text:"Link lokasi harus link Google Maps, misalnya https://maps.app.goo.gl/… atau https://www.google.com/maps/…",err:true};render();return}
     const row={title:d.title,type:d.type,status:d.status,prov:d.prov,kab:d.kab,place:d.place||null,size:digits(d.size),price:digits(d.price),unit:d.unit,
