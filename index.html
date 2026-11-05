@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Nusantara Property: listing tanah, rumah, villa dan properti komersial di seluruh Indonesia langsung dari agennya. Hubungi agen via WhatsApp.">
+<meta property="og:title" content="Nusantara Property">
+<meta property="og:description" content="Listing properti di seluruh Indonesia langsung dari agennya.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Nusantara Property</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style id="np-style">
+/* Layout: sticky bar, compact hero with search + type chips, card grid of plots; hash views for listing detail & agent page; editor drawer for agents */
+:root{
+  --bg:#F2F5F1;--surface:#FFFFFF;--sunk:#E8EDE8;--ink:#14201B;--muted:#5A6A63;--line:#D6DED8;
+  --jade:#0D5C4D;--jade-soft:#DCEBE5;--on-jade:#FFFFFF;--sun:#B77A0A;
+  --z-pariwisata:#E58FB0;--z-permukiman:#E9C43B;--z-pertanian:#5FA463;--z-dagang:#D25B4B;--z-lain:#9AA5A0;
+  --wa:#1F8F4E;--danger:#B3372B;
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Instrument Sans","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1412;--surface:#151F1C;--sunk:#1B2723;--ink:#E6EEEA;--muted:#93A49C;--line:#27352F;
+  --jade:#46B597;--jade-soft:#17322A;--on-jade:#06201A;--sun:#E7B04A;--wa:#3DBB73;--danger:#E2685B;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1412;--surface:#151F1C;--sunk:#1B2723;--ink:#E6EEEA;--muted:#93A49C;--line:#27352F;
+  --jade:#46B597;--jade-soft:#17322A;--on-jade:#06201A;--sun:#E7B04A;--wa:#3DBB73;--danger:#E2685B;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+.label{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:16px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em}
+.brand svg{flex:none}
+.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav a,.btn-ghost{padding:7px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:500;border:0;background:none;cursor:pointer}
+.nav a:hover,.btn-ghost:hover{color:var(--ink);background:var(--sunk)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--jade);color:var(--on-jade)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-line{border-color:var(--line);background:var(--surface)}
+.btn-line:hover{border-color:var(--muted)}
+.btn-wa{background:var(--wa);color:#fff}
+.btn-sm{padding:6px 12px;font-size:13.5px}
+.btn[disabled]{opacity:.55;cursor:progress}
+
+/* hero */
+.hero{padding-block:44px 22px}
+.hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.02;max-width:17ch}
+.hero h1 em{font-style:normal;color:var(--jade)}
+.hero p{color:var(--muted);max-width:58ch;margin:14px 0 0;font-size:16.5px}
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;font-size:13.5px;color:var(--muted)}
+.stats b{font-family:var(--f-mono);color:var(--ink);font-weight:500;font-size:15px;margin-right:4px}
+
+/* toolbar */
+.tools{display:grid;gap:12px;padding-block:6px 18px}
+.search{display:flex;gap:8px;flex-wrap:wrap}
+.search input{flex:1 1 260px;min-width:0;padding:12px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.selects{display:flex;gap:8px;flex-wrap:wrap}
+.selects select{padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);max-width:100%}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:500;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .n{font-family:var(--f-mono);font-size:12px;opacity:.65;margin-left:6px}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;padding-bottom:28px}
+.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-decoration:none;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-2px);border-color:var(--muted)}
+.media{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--sunk);overflow:hidden}
+.media img{width:100%;height:100%;object-fit:cover;display:block}
+.plot{position:absolute;inset:0;display:grid;place-items:center;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:22px 22px;background-position:-1px -1px}
+.plot .shape{border:2px solid var(--jade);background:color-mix(in srgb,var(--jade) 9%,transparent);display:grid;place-items:center;padding:10px 16px;text-align:center}
+.plot .big{white-space:nowrap;font-family:var(--f-mono);font-size:26px;font-weight:500;color:var(--jade);line-height:1}
+.plot .small{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-top:4px}
+.tags{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{background:var(--surface);color:var(--ink);font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+.tag.sewa{background:var(--sun);color:#fff;border-color:transparent}
+.card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:18px;font-weight:700;line-height:1.2}
+.loc{color:var(--muted);font-size:13.5px}
+.specs{display:flex;gap:6px 14px;flex-wrap:wrap;font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.specs span b{color:var(--ink);font-weight:500}
+.zone{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.zone i{width:10px;height:10px;border-radius:2px;display:inline-block;background:var(--z-lain)}
+.price{font-family:var(--f-display);font-weight:700;font-size:20px;margin-top:auto;padding-top:4px}
+.price small{font-family:var(--f-body);font-weight:500;font-size:13px;color:var(--muted)}
+.price.ask{font-size:16px;color:var(--muted);font-weight:600}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.who{display:flex;align-items:center;gap:8px;min-width:0;font-size:13.5px}
+.who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ava{flex:none;width:28px;height:28px;border-radius:50%;background:var(--jade-soft);color:var(--jade);display:grid;place-items:center;font-weight:700;font-size:12px;overflow:hidden;font-family:var(--f-display)}
+.ava img{width:100%;height:100%;object-fit:cover}
+.ava.lg{width:64px;height:64px;font-size:22px}
+
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:36px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:26px 14px;border-top:1px solid var(--line)}
+.section-head h2{font-size:26px;font-weight:700}
+
+/* agents */
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;padding-bottom:40px}
+.agent{display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);text-decoration:none}
+.agent:hover{border-color:var(--muted)}
+.agent div{min-width:0}
+.agent h3{font-size:17px}
+.agent p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+
+/* detail */
+.back{display:inline-flex;gap:6px;align-items:center;margin-block:22px 14px;color:var(--muted);text-decoration:none;font-weight:500}
+.back:hover{color:var(--ink)}
+.detail{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px;padding-bottom:48px}
+@media (max-width:860px){.detail{grid-template-columns:minmax(0,1fr)}}
+.gallery{display:grid;gap:8px}
+.gallery .main{aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;background:var(--sunk);position:relative;max-width:100%}
+.gallery .main img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumbs button{width:84px;aspect-ratio:4/3;padding:0;border:2px solid transparent;border-radius:6px;overflow:hidden;cursor:pointer;background:var(--sunk)}
+.thumbs button[aria-current="true"]{border-color:var(--jade)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.d-title{font-size:clamp(26px,3.6vw,38px);font-weight:800;line-height:1.08;margin-top:6px}
+.d-price{font-family:var(--f-display);font-size:28px;font-weight:700;margin-top:10px}
+.facts{width:100%;border-collapse:collapse;margin-top:18px;font-size:14.5px}
+.facts th{text-align:left;color:var(--muted);font-weight:500;padding:9px 12px 9px 0;width:40%;vertical-align:top}
+.facts td{padding:9px 0;font-family:var(--f-mono);font-size:14px}
+.facts tr+tr th,.facts tr+tr td{border-top:1px solid var(--line)}
+.desc{white-space:pre-line;max-width:65ch;margin-top:18px}
+.side{display:flex;flex-direction:column;gap:14px;align-self:start;position:sticky;top:calc(env(safe-area-inset-top,0px) + 78px)}
+@media (max-width:860px){.side{position:static}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px}
+.phone{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.phone code{font-family:var(--f-mono);font-size:15px;user-select:all;background:var(--sunk);padding:5px 10px;border-radius:6px}
+.agent-hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding-block:8px 22px}
+.agent-hero h1{font-size:clamp(26px,4vw,40px);font-weight:800}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 40%,transparent);z-index:20}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--bg);z-index:21;display:flex;flex-direction:column;border-left:1px solid var(--line);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.drawer-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.drawer-head h2{font-size:20px;margin-right:auto}
+.tabs{display:flex;gap:4px;padding:10px 18px 0;background:var(--surface);border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:8px 12px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:2px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--jade)}
+.drawer-body{overflow:auto;padding:18px;display:grid;gap:18px;align-content:start;flex:1}
+.form{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+.field{display:grid;gap:5px;min-width:0}
+.field label{font-size:13px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.field textarea{min-height:96px;resize:vertical}
+.hint{font-size:12.5px;color:var(--muted)}
+.pics{display:flex;gap:8px;flex-wrap:wrap}
+.pic{position:relative;width:86px;aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--sunk)}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);cursor:pointer;line-height:1;font-size:13px}
+.list{display:grid;gap:8px}
+.item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.item div{min-width:0;flex:1}
+.item b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.item small{color:var(--muted)}
+.confirm{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--danger);flex-wrap:wrap}
+.btn-danger{background:var(--danger);color:#fff}
+.note{padding:12px 14px;border-radius:8px;background:var(--jade-soft);font-size:14px}
+.note.err{background:color-mix(in srgb,var(--danger) 14%,var(--surface));color:var(--ink)}
+.foot{border-top:1px solid var(--line);padding-block:22px 34px;color:var(--muted);font-size:13.5px}
+.foot .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.swatches{display:flex;gap:12px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="application/json" id="np-data">{"site":{"name":"Nusantara Property","tagline":"Tanah, rumah, villa dan properti komersial di seluruh Indonesia dari agen-agen terpercaya. Hubungi agennya langsung lewat WhatsApp."},"agents":[{"id":"a-bagoes","name":"Bagoes","agency":"Bali Are Property","phone":"0812868080","areas":"Kuta Selatan & Kuta Utara","bio":"Agen properti independen di Bali sejak 2009. Spesialis tanah di Bukit (Ungasan, Jimbaran, Pecatu, Uluwatu, Kutuh, Pandawa, Balangan) dan Canggu, Berawa, Pererenan, Tibubeneng, Kerobokan.","photo":""}],"listings":[{"id":"l-balangan-6000","agentId":"a-bagoes","title":"Tanah dekat Pantai Balangan","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Balangan, Jimbaran, Kuta Selatan","size":6000,"price":null,"unit":"total","cert":"SHM","zone":"Pariwisata","desc":"Tanah luas dekat Pantai Balangan, zonasi pariwisata. Cocok untuk investor serius: villa resort, hotel butik, atau beach club.","photos":[],"created":"2026-10-20"},{"id":"l-ungasan-300","agentId":"a-bagoes","title":"Tanah hook Jl. Tulip / Jl. Pura Masuka","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Ungasan, Kuta Selatan","size":300,"price":null,"unit":"total","cert":"","zone":"","desc":"Tanah posisi hook (sudut) di pertemuan Jl. Tulip dan Jl. Pura Masuka, Ungasan. Dua sisi jalan.","photos":[],"created":"2026-10-22"},{"id":"l-labuansait-395","agentId":"a-bagoes","title":"Tanah gandeng Labuan Sait","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Labuan Sait, Pecatu, Kuta Selatan","size":395,"price":null,"unit":"total","cert":"","zone":"","desc":"Dua bidang bersebelahan: 214 m² + 181 m², total 395 m². Kawasan Labuan Sait dekat Pantai Padang Padang dan Uluwatu.","photos":[],"created":"2026-10-24"},{"id":"l-labuansait-9025","agentId":"a-bagoes","title":"Tanah 90 are Labuan Sait","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Labuan Sait, Pecatu, Kuta Selatan","size":9025,"price":null,"unit":"total","cert":"","zone":"","desc":"Lahan besar 9.025 m² di kawasan Labuan Sait, Pecatu–Uluwatu.","photos":[],"created":"2026-10-24"},{"id":"l-pandawa-5300","agentId":"a-bagoes","title":"Tanah dekat Pantai Pandawa","type":"Tanah","status":"Dijual","prov":"Bali","kab":"Badung","place":"Kutuh, Kuta Selatan","size":5300,"price":null,"unit":"total","cert":"","zone":"","desc":"Tanah 5.300 m² dekat Pantai Pandawa, Kuta Selatan.","photos":[],"created":"2026-10-28"}]}</script>
+<script id="np-main">
+(function(){
+const TYPES=["Tanah","Rumah","Villa","Apartemen","Ruko","Gudang","Komersial"];
+const STATUS=["Dijual","Disewakan"];
+const PROVS=["Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau","Jambi","Sumatera Selatan","Kepulauan Bangka Belitung","Bengkulu","Lampung","DKI Jakarta","Jawa Barat","Banten","Jawa Tengah","DI Yogyakarta","Jawa Timur","Bali","Nusa Tenggara Barat","Nusa Tenggara Timur","Kalimantan Barat","Kalimantan Tengah","Kalimantan Selatan","Kalimantan Timur","Kalimantan Utara","Sulawesi Utara","Gorontalo","Sulawesi Tengah","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tenggara","Maluku","Maluku Utara","Papua","Papua Barat","Papua Barat Daya","Papua Tengah","Papua Pegunungan","Papua Selatan"];
+const kabsIn=p=>[...new Set(S.listings.filter(l=>!p||l.prov===p).map(l=>l.kab).filter(Boolean))].sort();
+const CERTS=["SHM","SHGB","Hak Pakai","Leasehold"];
+const ZONES={"Pariwisata":"--z-pariwisata","Permukiman":"--z-permukiman","Pertanian":"--z-pertanian","Perdagangan & Jasa":"--z-dagang"};
+const UNITS={total:"",are:"/ are",tahun:"/ tahun"};
+const RESET=':root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}';
+const FONTS='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap';
+
+let S=JSON.parse(document.getElementById('np-data').textContent);
+const F={q:"",type:"",status:"",prov:"",kab:"",agent:"",sort:"new"};
+let canEdit=false,artifactApi=null,drawer=null; // drawer: {tab, editId, agentEditId, draft, pics, confirm, busy, msg}
+const app=document.getElementById('app');
+
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=n=>Number(n).toLocaleString('id-ID');
+const agentOf=id=>S.agents.find(a=>a.id===id);
+const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+function rupiah(v){
+  if(v==null||v==="")return "";
+  v=Number(v);
+  if(v>=1e12)return "Rp "+(v/1e12).toLocaleString('id-ID',{maximumFractionDigits:2})+" T";
+  if(v>=1e9)return "Rp "+(v/1e9).toLocaleString('id-ID',{maximumFractionDigits:2})+" M";
+  if(v>=1e6)return "Rp "+(v/1e6).toLocaleString('id-ID',{maximumFractionDigits:1})+" jt";
+  return "Rp "+num(v);
+}
+function wa(phone){let d=String(phone||"").replace(/\D/g,"");if(d.startsWith("0"))d="62"+d.slice(1);return d}
+function waLink(a,l){
+  const t=l?`Halo ${a.name}, saya tertarik dengan listing "${l.title}" (${l.place}) di ${S.site.name}. Boleh minta info detail?`:`Halo ${a.name}, saya menemukan Anda di ${S.site.name}.`;
+  return `https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(t)}`;
+}
+function ava(a,cls){return `<span class="ava ${cls||""}">${a&&a.photo?`<img src="${a.photo}" alt="">`:esc(initials(a&&a.name))}</span>`}
+function zoneHtml(z){if(!z)return "";const v=ZONES[z]||"--z-lain";return `<span class="zone"><i style="background:var(${v})"></i>Zona ${esc(z)}</span>`}
+function priceHtml(l,cls){
+  if(l.price==null||l.price==="")return `<div class="${cls||"price"} ask">Harga: tanya agen</div>`;
+  let extra="";
+  if(l.unit==="total"&&l.size&&l.type==="Tanah")extra=` <small>· ${rupiah(l.price/(l.size/100))}/are</small>`;
+  return `<div class="${cls||"price"}">${rupiah(l.price)} <small>${UNITS[l.unit]||""}</small>${extra}</div>`;
+}
+function mediaHtml(l){
+  if(l.photos&&l.photos.length)return `<img src="${l.photos[0]}" alt="${esc(l.title)}" loading="lazy">`;
+  const are=l.size?(l.size/100):0;
+  const w=Math.max(34,Math.min(78,22+Math.sqrt(l.size||100)*.6));
+  return `<div class="plot" aria-hidden="true"><div class="shape" style="width:${w}%;aspect-ratio:${l.size>2000?'1.5':'1.15'}"><div><div class="big">${l.size?num(Math.round(are*100)/100)+" are":esc(l.type)}</div><div class="small">${l.size?num(l.size)+" m²":""}</div></div></div></div>`;
+}
+
+/* ---------- filters ---------- */
+function filtered(){
+  const q=F.q.trim().toLowerCase();
+  let r=S.listings.filter(l=>(!F.type||l.type===F.type)&&(!F.status||l.status===F.status)&&(!F.prov||l.prov===F.prov)&&(!F.kab||l.kab===F.kab)&&(!F.agent||l.agentId===F.agent)
+    &&(!q||[l.title,l.place,l.kab,l.prov,l.desc,l.cert,l.zone,(agentOf(l.agentId)||{}).name].join(" ").toLowerCase().includes(q)));
+  const p=l=>l.price==null||l.price===""?null:Number(l.price);
+  if(F.sort==="new")r.sort((a,b)=>String(b.created).localeCompare(String(a.created)));
+  if(F.sort==="big")r.sort((a,b)=>(b.size||0)-(a.size||0));
+  if(F.sort==="small")r.sort((a,b)=>(a.size||0)-(b.size||0));
+  if(F.sort==="cheap")r.sort((a,b)=>(p(a)??Infinity)-(p(b)??Infinity));
+  if(F.sort==="pricey")r.sort((a,b)=>(p(b)??-1)-(p(a)??-1));
+  return r;
+}
+function card(l){
+  const a=agentOf(l.agentId)||{name:"Agen"};
+  return `<a class="card" href="#${esc(l.id)}">
+    <div class="media">${mediaHtml(l)}<div class="tags"><span class="tag">${esc(l.type)}</span>${l.status==="Disewakan"?`<span class="tag sewa">Disewakan</span>`:""}</div></div>
+    <div class="card-body">
+      <h3>${esc(l.title)}</h3>
+      <div class="loc">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(", ")}</div>
+      <div class="specs">${l.size?`<span><b>${num(l.size)}</b> m²</span>`:""}${l.type==="Tanah"&&l.size?`<span><b>${num(Math.round(l.size)/100)}</b> are</span>`:""}${l.cert?`<span><b>${esc(l.cert)}</b></span>`:""}</div>
+      ${zoneHtml(l.zone)}
+      ${priceHtml(l)}
+      <div class="card-foot"><span class="who">${ava(a)}<span>${esc(a.name)}${a.agency?` · ${esc(a.agency)}`:""}</span></span></div>
+    </div></a>`;
+}
+
+/* ---------- views ---------- */
+function bar(){
+  return `<header class="bar"><div class="wrap">
+    <a class="brand" href="#"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="var(--jade)"/><path d="M5 18 L10 11 L13.5 15 L17 9 L21 18 Z" fill="var(--on-jade)"/></svg>${esc(S.site.name)}</a>
+    <nav class="nav"><a href="#">Listing</a><a href="#agen">Agen</a>${canEdit?`<button class="btn btn-primary btn-sm" data-act="open-drawer">Kelola</button>`:""}</nav>
+  </div></header>`;
+}
+function home(){
+  const list=filtered();
+  const provCount=new Set(S.listings.map(l=>l.prov).filter(Boolean)).size;
+  const kabCount=new Set(S.listings.map(l=>l.kab).filter(Boolean)).size;
+  const typeCounts=TYPES.map(t=>[t,S.listings.filter(l=>l.type===t).length]).filter(x=>x[1]);
+  return `<section class="wrap hero">
+      <h1>Properti Indonesia, <em>langsung dari agennya.</em></h1>
+      <p>${esc(S.site.tagline)}</p>
+      <div class="stats"><span><b>${S.listings.length}</b>listing</span><span><b>${S.agents.length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
+    </section>
+    <section class="wrap tools" aria-label="Cari dan saring">
+      <div class="search"><input id="f-q" type="search" placeholder="Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…" value="${esc(F.q)}" aria-label="Cari listing"></div>
+      <div class="chips" role="group" aria-label="Jenis properti">
+        <button class="chip" data-type="" aria-pressed="${!F.type}">Semua<span class="n">${S.listings.length}</span></button>
+        ${typeCounts.map(([t,n])=>`<button class="chip" data-type="${t}" aria-pressed="${F.type===t}">${t}<span class="n">${n}</span></button>`).join("")}
+      </div>
+      <div class="selects">
+        <select id="f-status" aria-label="Status"><option value="">Dijual & disewakan</option>${STATUS.map(s=>`<option ${F.status===s?"selected":""}>${s}</option>`).join("")}</select>
+        <select id="f-prov" aria-label="Provinsi"><option value="">Semua provinsi</option>${PROVS.map(k=>`<option ${F.prov===k?"selected":""}>${k}</option>`).join("")}</select>
+        <select id="f-kab" aria-label="Kota/kabupaten"><option value="">Semua kota/kabupaten</option>${kabsIn(F.prov).map(k=>`<option ${F.kab===k?"selected":""}>${esc(k)}</option>`).join("")}</select>
+        <select id="f-agent" aria-label="Agen"><option value="">Semua agen</option>${S.agents.map(a=>`<option value="${esc(a.id)}" ${F.agent===a.id?"selected":""}>${esc(a.name)}</option>`).join("")}</select>
+        <select id="f-sort" aria-label="Urutkan">${[["new","Terbaru"],["cheap","Harga terendah"],["pricey","Harga tertinggi"],["big","Luas terbesar"],["small","Luas terkecil"]].map(([v,t])=>`<option value="${v}" ${F.sort===v?"selected":""}>${t}</option>`).join("")}</select>
+      </div>
+    </section>
+    <section class="wrap grid" id="results">${list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba hapus beberapa filter.</div>`}</section>
+    ${agentsSection()}`;
+}
+function agentsSection(){
+  return `<section class="wrap" id="agen-list"><div class="section-head"><div><div class="label">Tim agen</div><h2>Agen kami</h2></div>${canEdit?`<button class="btn btn-line btn-sm" data-act="new-agent">Tambah agen</button>`:""}</div>
+    <div class="agents">${S.agents.length?S.agents.map(a=>{const n=S.listings.filter(l=>l.agentId===a.id).length;
+      return `<a class="agent" href="#agen-${esc(a.id)}">${ava(a,"lg")}<div><h3>${esc(a.name)}</h3><p>${esc(a.agency||"Agen independen")}</p><p>${esc(a.areas||"")}</p><p class="mono">${n} listing</p></div></a>`}).join("")
+      :`<div class="empty">Belum ada agen.</div>`}</div></section>`;
+}
+function detail(l){
+  const a=agentOf(l.agentId)||{name:"Agen",phone:""};
+  const pics=l.photos||[];
+  const are=l.size?num(Math.round(l.size)/100):"";
+  const rows=[["Jenis",`${esc(l.type)} · ${esc(l.status)}`],["Luas",l.size?`${num(l.size)} m² (${are} are)`:"—"],["Sertifikat",esc(l.cert)||"—"],
+    ["Zonasi",l.zone?zoneHtml(l.zone):"—"],["Lokasi",esc(l.place)||"—"],["Kota/kabupaten",esc(l.kab)||"—"],["Provinsi",esc(l.prov)||"—"],
+    ["Harga",l.price==null||l.price===""?"Tanya agen":`${rupiah(l.price)} ${UNITS[l.unit]||""}`]];
+  if(l.price&&l.unit==="total"&&l.size)rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
+  return `<div class="wrap"><a class="back" href="#">← Semua listing</a>
+    <div class="detail">
+      <div>
+        <div class="gallery"><div class="main" id="g-main">${pics.length?`<img src="${pics[0]}" alt="${esc(l.title)}">`:mediaHtml(l)}</div>
+          ${pics.length>1?`<div class="thumbs">${pics.map((p,i)=>`<button data-thumb="${i}" aria-current="${i===0}" aria-label="Foto ${i+1}"><img src="${p}" alt=""></button>`).join("")}</div>`:""}</div>
+        <div class="label" style="margin-top:22px">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(" · ")}</div>
+        <h1 class="d-title">${esc(l.title)}</h1>
+        ${priceHtml(l,"d-price")}
+        <table class="facts"><tbody>${rows.map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("")}</tbody></table>
+        ${l.desc?`<p class="desc">${esc(l.desc)}</p>`:""}
+      </div>
+      <aside class="side">
+        <div class="panel">
+          <div class="label">Agen listing ini</div>
+          <a class="who" href="#agen-${esc(a.id)}" style="text-decoration:none">${ava(a,"lg")}<span><b style="font-size:17px">${esc(a.name)}</b><br><span style="color:var(--muted)">${esc(a.agency||"")}</span></span></a>
+          ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>
+          <div class="phone"><code id="ph">${esc(a.phone)}</code><button class="btn btn-line btn-sm" data-copy="${esc(a.phone)}">Salin nomor</button></div>`:""}
+        </div>
+        <div class="panel"><div class="label">Bagikan listing</div><div class="phone"><button class="btn btn-line btn-sm" data-copy-link="${esc(l.id)}">Salin tautan listing</button></div>
+          ${canEdit?`<button class="btn btn-line btn-sm" data-act="edit-listing" data-id="${esc(l.id)}">Edit listing ini</button>`:""}</div>
+      </aside>
+    </div></div>`;
+}
+function agentPage(a){
+  const list=S.listings.filter(l=>l.agentId===a.id);
+  return `<div class="wrap"><a class="back" href="#agen">← Semua agen</a>
+    <div class="agent-hero">${ava(a,"lg")}<div style="min-width:0"><div class="label">${esc(a.agency||"Agen independen")}</div><h1>${esc(a.name)}</h1><div style="color:var(--muted)">${esc(a.areas||"")}</div></div></div>
+    ${a.bio?`<p class="desc" style="margin-top:0">${esc(a.bio)}</p>`:""}
+    ${a.phone?`<div class="phone" style="margin-block:16px 26px"><a class="btn btn-wa" href="${waLink(a)}" target="_blank" rel="noopener">WhatsApp ${esc(a.name)}</a><code>${esc(a.phone)}</code><button class="btn btn-line btn-sm" data-copy="${esc(a.phone)}">Salin nomor</button></div>`:""}
+    <div class="section-head"><h2>${list.length} listing</h2></div>
+    <div class="grid">${list.length?list.map(card).join(""):`<div class="empty">Agen ini belum punya listing.</div>`}</div></div>`;
+}
+function footer(){
+  return `<footer class="foot"><div class="wrap"><span>© ${new Date().getFullYear()} ${esc(S.site.name)} · Informasi listing dari masing-masing agen.</span>
+  <span class="swatches" aria-label="Warna zonasi">${Object.entries(ZONES).map(([z,v])=>`<span class="zone"><i style="background:var(${v})"></i>${z}</span>`).join("")}</span></div></footer>`;
+}
+
+/* ---------- drawer (editor) ---------- */
+function blankListing(){return {id:"",agentId:(S.agents[0]||{}).id||"",title:"",type:"Tanah",status:"Dijual",prov:"",kab:"",place:"",size:"",price:"",unit:"total",cert:"SHM",zone:"",desc:"",photos:[]}}
+function blankAgent(){return {id:"",name:"",agency:"",phone:"",areas:"",bio:"",photo:""}}
+function opt(list,v){return list.map(x=>{const [val,lab]=Array.isArray(x)?x:[x,x];return `<option value="${esc(val)}" ${String(v)===String(val)?"selected":""}>${esc(lab)}</option>`}).join("")}
+function drawerHtml(){
+  const d=drawer;
+  const msg=d.msg?`<div class="note ${d.msg.err?"err":""}">${esc(d.msg.text)}</div>`:"";
+  let body="";
+  if(d.tab==="listing"){
+    const l=d.draft;
+    body=`${msg}<form class="form" id="lf">
+      <div class="label">${l.id?"Edit listing":"Listing baru"}</div>
+      ${S.agents.length?"":`<div class="note err">Tambahkan agen dulu di tab Agen.</div>`}
+      <div class="field"><label for="l-agent">Agen</label><select id="l-agent" name="agentId" required>${opt(S.agents.map(a=>[a.id,a.name+(a.agency?" · "+a.agency:"")]),l.agentId)}</select></div>
+      <div class="field"><label for="l-title">Judul</label><input id="l-title" name="title" required maxlength="90" value="${esc(l.title)}" placeholder="Rumah 2 lantai dekat stasiun MRT"></div>
+      <div class="row"><div class="field"><label for="l-type">Jenis</label><select id="l-type" name="type">${opt(TYPES,l.type)}</select></div>
+        <div class="field"><label for="l-status">Status</label><select id="l-status" name="status">${opt(STATUS,l.status)}</select></div></div>
+      <div class="row"><div class="field"><label for="l-prov">Provinsi</label><select id="l-prov" name="prov" required>${opt([["","Pilih provinsi"],...PROVS],l.prov)}</select></div>
+        <div class="field"><label for="l-kab">Kota / kabupaten</label><input id="l-kab" name="kab" required list="kab-list" value="${esc(l.kab)}" placeholder="Jakarta Selatan"><datalist id="kab-list">${kabsIn("").map(k=>`<option value="${esc(k)}">`).join("")}</datalist></div></div>
+      <div class="field"><label for="l-place">Kecamatan / kelurahan / perumahan</label><input id="l-place" name="place" value="${esc(l.place)}" placeholder="Kebayoran Baru"></div>
+      <div class="row"><div class="field"><label for="l-size">Luas (m²)</label><input id="l-size" name="size" inputmode="numeric" value="${esc(l.size)}" placeholder="500"><span class="hint" id="h-size"></span></div>
+        <div class="field"><label for="l-cert">Sertifikat</label><select id="l-cert" name="cert">${opt([["","—"],...CERTS],l.cert)}</select></div></div>
+      <div class="row"><div class="field"><label for="l-price">Harga (Rp)</label><input id="l-price" name="price" inputmode="numeric" value="${esc(l.price??"")}" placeholder="Kosongkan = tanya agen"><span class="hint" id="h-price"></span></div>
+        <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
+      <div class="field"><label for="l-zone">Zonasi</label><select id="l-zone" name="zone">${opt([["","—"],...Object.keys(ZONES)],l.zone)}</select></div>
+      <div class="field"><label for="l-desc">Deskripsi</label><textarea id="l-desc" name="desc" placeholder="Akses jalan, view, jarak ke pantai…">${esc(l.desc)}</textarea></div>
+      <div class="field"><label for="l-photos">Foto (maks. 4)</label><input id="l-photos" type="file" accept="image/*" multiple>
+        <span class="hint">Foto dikecilkan otomatis agar halaman tetap cepat.</span><div class="pics">${d.pics.map((p,i)=>`<div class="pic"><img src="${p}" alt=""><button type="button" data-rmpic="${i}" aria-label="Hapus foto">×</button></div>`).join("")}</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" ${d.busy||!S.agents.length?"disabled":""}>${d.busy?"Menyimpan…":l.id?"Simpan perubahan":"Terbitkan listing"}</button>${l.id?`<button type="button" class="btn btn-line" data-act="new-listing">Batal edit</button>`:""}</div>
+    </form>
+    <div><div class="label" style="margin-bottom:8px">Semua listing (${S.listings.length})</div><div class="list">${S.listings.map(x=>itemRow(x.id,x.title,`${(agentOf(x.agentId)||{}).name||"?"} · ${x.place||x.kab}`,"listing")).join("")}</div></div>`;
+  }else{
+    const a=d.agentDraft;
+    body=`${msg}<form class="form" id="af">
+      <div class="label">${a.id?"Edit agen":"Agen baru"}</div>
+      <div class="row"><div class="field"><label for="a-name">Nama</label><input id="a-name" name="name" required value="${esc(a.name)}"></div>
+        <div class="field"><label for="a-agency">Agensi</label><input id="a-agency" name="agency" value="${esc(a.agency)}" placeholder="Nama kantor / independen"></div></div>
+      <div class="row"><div class="field"><label for="a-phone">No. WhatsApp</label><input id="a-phone" name="phone" required inputmode="tel" value="${esc(a.phone)}" placeholder="0812…"></div>
+        <div class="field"><label for="a-areas">Area spesialis</label><input id="a-areas" name="areas" value="${esc(a.areas)}" placeholder="Canggu, Ubud"></div></div>
+      <div class="field"><label for="a-bio">Profil singkat</label><textarea id="a-bio" name="bio">${esc(a.bio)}</textarea></div>
+      <div class="field"><label for="a-photo">Foto profil</label><input id="a-photo" type="file" accept="image/*">${d.agentPic?`<div class="pics"><div class="pic"><img src="${d.agentPic}" alt=""><button type="button" data-rmapic="1" aria-label="Hapus foto">×</button></div></div>`:""}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" ${d.busy?"disabled":""}>${d.busy?"Menyimpan…":a.id?"Simpan agen":"Tambah agen"}</button>${a.id?`<button type="button" class="btn btn-line" data-act="new-agent-form">Batal edit</button>`:""}</div>
+    </form>
+    <div><div class="label" style="margin-bottom:8px">Semua agen (${S.agents.length})</div><div class="list">${S.agents.map(x=>itemRow(x.id,x.name,`${x.agency||"Independen"} · ${S.listings.filter(l=>l.agentId===x.id).length} listing`,"agent")).join("")}</div></div>`;
+  }
+  return `<div class="scrim" data-act="close-drawer"></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-label="Kelola listing">
+    <div class="drawer-head"><h2>Kelola</h2><button class="btn-ghost" data-act="close-drawer" aria-label="Tutup">Tutup</button></div>
+    <div class="tabs" role="tablist"><button role="tab" aria-selected="${d.tab==="listing"}" data-tab="listing">Listing</button><button role="tab" aria-selected="${d.tab==="agent"}" data-tab="agent">Agen</button></div>
+    <div class="drawer-body">${body}</div></aside>`;
+}
+function itemRow(id,title,sub,kind){
+  const c=drawer.confirm===id;
+  return `<div class="item"><div><b>${esc(title)}</b><small>${esc(sub)}</small></div>
+    ${c?`<span class="confirm">Hapus${kind==="agent"?" agen & listingnya":""}? <button class="btn btn-danger btn-sm" data-del="${esc(id)}" data-kind="${kind}">Ya, hapus</button><button class="btn btn-line btn-sm" data-act="cancel-del">Batal</button></span>`
+      :`<button class="btn btn-line btn-sm" data-edit="${esc(id)}" data-kind="${kind}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(id)}">Hapus</button>`}</div>`;
+}
+
+/* ---------- render ---------- */
+function route(){return decodeURIComponent((location.hash||"").slice(1))}
+function render(keepFocus){
+  const r=route();
+  let main;
+  const l=S.listings.find(x=>x.id===r);
+  const a=r.startsWith("agen-")&&agentOf(r.slice(5));
+  if(l)main=detail(l);else if(a)main=agentPage(a);else main=home();
+  const active=keepFocus&&document.activeElement&&document.activeElement.id;
+  const pos=active&&document.activeElement.selectionStart;
+  app.innerHTML=bar()+`<main>${main}</main>`+footer()+(drawer?drawerHtml():"");
+  if(active){const el=document.getElementById(active);if(el){el.focus();try{if(pos!=null)el.setSelectionRange(pos,pos)}catch(e){}}}
+  if(drawer)hints();
+}
+function hints(){
+  const s=document.getElementById('l-size'),p=document.getElementById('l-price');
+  const hs=document.getElementById('h-size'),hp=document.getElementById('h-price');
+  if(s&&hs){const v=Number(String(s.value).replace(/\D/g,""));hs.textContent=v?`= ${num(v/100)} are`:""}
+  if(p&&hp){const v=Number(String(p.value).replace(/\D/g,""));hp.textContent=v?rupiah(v):""}
+}
+
+/* ---------- save (republish page) ---------- */
+function buildDoc(){
+  const style=document.getElementById('np-style').textContent;
+  const main=document.getElementById('np-main').textContent;
+  const data=JSON.stringify(S).replace(/</g,"\\u003c");
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'
+    +'<title>'+esc(S.site.name)+'</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="'+FONTS+'">\n'
+    +'<style id="np-style">'+style+'</style>\n<div id="app"></div>\n<script type="application/json" id="np-data">'+data+'<\/script>\n<script id="np-main">'+main+'<\/script>\n</body></html>';
+}
+async function save(okText){
+  drawer.busy=true;drawer.msg=null;render();
+  try{
+    if(!artifactApi)throw {code:"not_granted"};
+    try{sessionStorage.setItem("np-flash",okText)}catch(e){}
+    await artifactApi.publish(buildDoc());
+    drawer.busy=false;drawer.msg={text:okText};render();
+  }catch(e){
+    try{sessionStorage.removeItem("np-flash")}catch(_){}
+    drawer.busy=false;
+    const c=e&&e.code;
+    const t=c==="conflict"?"Ada agen lain yang baru saja menyimpan. Halaman dimuat ulang ke versi terbaru; silakan ulangi perubahan Anda."
+      :(c==="not_writer"||c==="not_granted"||c==="capability_disabled"||c==="not_declared")?"Akun Anda hanya bisa melihat. Minta pemilik halaman memberi akses edit agar bisa menambah listing."
+      :c==="too_large"?"Halaman sudah terlalu besar. Kurangi jumlah atau ukuran foto, lalu simpan lagi."
+      :c==="rate_limited"?"Terlalu sering menyimpan. Tunggu sebentar, lalu coba lagi."
+      :"Gagal menyimpan karena gangguan layanan. Coba lagi sebentar lagi.";
+    drawer.msg={text:t,err:true};render();
+  }
+}
+function readForm(form){const o={};new FormData(form).forEach((v,k)=>o[k]=String(v).trim());return o}
+function slug(s){return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"x"}
+function uid(p,s){let id=p+slug(s),i=2;const all=new Set([...S.listings.map(x=>x.id),...S.agents.map(x=>x.id)]);let c=id;while(all.has(c))c=id+"-"+(i++);return c}
+
+function shrink(file,max){
+  return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=()=>{const img=new Image();img.onerror=rej;img.onload=()=>{
+    const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.72))};img.src=r.result};r.readAsDataURL(file)});
+}
+
+/* ---------- events ---------- */
+function openDrawer(tab,id){
+  drawer={tab:tab||"listing",draft:blankListing(),pics:[],agentDraft:blankAgent(),agentPic:"",confirm:null,busy:false,msg:null};
+  if(id&&tab==="listing"){const l=S.listings.find(x=>x.id===id);if(l){drawer.draft=JSON.parse(JSON.stringify(l));drawer.pics=[...(l.photos||[])]}}
+  if(id&&tab==="agent"){const a=agentOf(id);if(a){drawer.agentDraft={...a};drawer.agentPic=a.photo||""}}
+  render();
+}
+app.addEventListener('click',async e=>{
+  const t=e.target.closest('button,[data-act]');if(!t)return;
+  const act=t.dataset.act;
+  if(t.dataset.type!==undefined&&t.classList.contains('chip')){F.type=t.dataset.type;render();return}
+  if(act==="open-drawer")return openDrawer("listing");
+  if(act==="new-agent")return openDrawer("agent");
+  if(act==="edit-listing")return openDrawer("listing",t.dataset.id);
+  if(act==="close-drawer"){drawer=null;render();return}
+  if(act==="new-listing"){drawer.draft=blankListing();drawer.pics=[];drawer.msg=null;render();return}
+  if(act==="new-agent-form"){drawer.agentDraft=blankAgent();drawer.agentPic="";drawer.msg=null;render();return}
+  if(act==="cancel-del"){drawer.confirm=null;render();return}
+  if(t.dataset.tab){drawer.tab=t.dataset.tab;drawer.confirm=null;drawer.msg=null;render();return}
+  if(t.dataset.ask){drawer.confirm=t.dataset.ask;render();return}
+  if(t.dataset.edit){const k=t.dataset.kind;openDrawer(k==="agent"?"agent":"listing",t.dataset.edit);return}
+  if(t.dataset.del){
+    const id=t.dataset.del;
+    if(t.dataset.kind==="agent"){S.agents=S.agents.filter(a=>a.id!==id);S.listings=S.listings.filter(l=>l.agentId!==id)}
+    else S.listings=S.listings.filter(l=>l.id!==id);
+    drawer.confirm=null;await save("Terhapus.");return;
+  }
+  if(t.dataset.rmpic!==undefined){drawer.pics.splice(Number(t.dataset.rmpic),1);snapshotForm();render();return}
+  if(t.dataset.rmapic){drawer.agentPic="";snapshotForm();render();return}
+  if(t.dataset.thumb!==undefined){const l=S.listings.find(x=>x.id===route());const i=Number(t.dataset.thumb);
+    document.getElementById('g-main').innerHTML=`<img src="${l.photos[i]}" alt="${esc(l.title)}">`;
+    document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
+  const copy=t.dataset.copy||(t.dataset.copyLink!==undefined?location.href.split("#")[0]+"#"+t.dataset.copyLink:null);
+  if(copy){const old=t.textContent;try{await navigator.clipboard.writeText(copy);t.textContent="Tersalin"}catch(_){t.textContent="Salin manual: "+copy}setTimeout(()=>t.textContent=old,2500)}
+});
+function snapshotForm(){
+  const lf=document.getElementById('lf');if(lf&&drawer.tab==="listing")Object.assign(drawer.draft,readForm(lf));
+  const af=document.getElementById('af');if(af&&drawer.tab==="agent")Object.assign(drawer.agentDraft,readForm(af));
+}
+app.addEventListener('input',e=>{
+  const id=e.target.id;
+  if(id==="f-q"){F.q=e.target.value;const r=document.getElementById('results');const list=filtered();r.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Belum ada listing yang cocok. Coba kata lain atau hapus filter.</div>`;return}
+  if(id==="l-size"||id==="l-price")hints();
+});
+app.addEventListener('change',async e=>{
+  const id=e.target.id;
+  if(id==="f-prov"){F.prov=e.target.value;F.kab="";render();return}
+  const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort"};
+  if(map[id]){F[map[id]]=e.target.value;render();return}
+  if(id==="l-photos"){snapshotForm();const files=[...e.target.files].slice(0,4-drawer.pics.length);
+    for(const f of files){try{drawer.pics.push(await shrink(f,1200))}catch(_){drawer.msg={text:"Satu foto tidak bisa dibaca. Coba format JPG atau PNG.",err:true}}}render();return}
+  if(id==="a-photo"){snapshotForm();const f=e.target.files[0];if(f){try{drawer.agentPic=await shrink(f,320)}catch(_){}}render();return}
+});
+app.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(e.target.id==="lf"){
+    const o=readForm(e.target);const n=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null};
+    const l={...drawer.draft,...o,size:n(o.size)||0,price:n(o.price),photos:[...drawer.pics]};
+    if(!l.id){l.id=uid("l-",l.title);l.created=new Date().toISOString().slice(0,10);S.listings.push(l)}
+    else S.listings=S.listings.map(x=>x.id===l.id?l:x);
+    await save(drawer.draft.id?"Perubahan listing tersimpan.":"Listing terbit.");
+  }
+  if(e.target.id==="af"){
+    const o=readForm(e.target);const a={...drawer.agentDraft,...o,photo:drawer.agentPic};
+    if(!a.id){a.id=uid("a-",a.name);S.agents.push(a)}else S.agents=S.agents.map(x=>x.id===a.id?a:x);
+    await save(drawer.agentDraft.id?"Profil agen tersimpan.":"Agen ditambahkan.");
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==="Escape"&&drawer){drawer=null;render()}});
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
+
+render();
+
+/* light up editing for people with edit access */
+(async()=>{
+  try{
+    const [u,art]=await Promise.all([window.claude?.use?.("user")??null,window.claude?.use?.("artifact")??null]);
+    artifactApi=art;
+    canEdit=!!(art&&u&&await u.canEdit());
+    if(canEdit){
+      let flash=null;try{flash=sessionStorage.getItem("np-flash");sessionStorage.removeItem("np-flash")}catch(_){}
+      if(flash){drawer=null;openDrawer("listing");drawer.msg={text:flash}}
+      render();
+    }
+  }catch(_){}
+})();
+})();
+</script>
+
+</body>
+</html>
