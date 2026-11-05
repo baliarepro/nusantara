@@ -46,13 +46,14 @@ const num=n=>Number(n).toLocaleString(I.locale);
 const agentOf=id=>S.agents.find(a=>a.id===id);
 const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const pubAgents=()=>S.agents.filter(a=>a.status==="approved");
-const EXPIRE_DAYS=60,WARN_DAYS=7;
+const EXPIRE_DAYS=60,WARN_DAYS=7,SOLD_DAYS=7;
 const DAY=86400000;
 const fmtD=d=>d?new Date(d).toLocaleDateString(I.locale,{day:"numeric",month:"short",year:"numeric"}):"";
 const daysLeft=l=>EXPIRE_DAYS-Math.floor((Date.now()-new Date(l.updated_at||l.created_at).getTime())/DAY);
 const isSold=l=>!!(l&&l.sold_at);
 const isLive=l=>l.published&&!isSold(l)&&daysLeft(l)>0;
 const needsRenew=l=>l.published&&!isSold(l)&&daysLeft(l)<=WARN_DAYS;
+const soldLeft=l=>Math.max(0,SOLD_DAYS-Math.floor((Date.now()-new Date(l.sold_at).getTime())/DAY));
 const soldWord=l=>l.status==="Disewakan"?"Tersewa":"Terjual";
 const getL=id=>S.idx.get(id);
 function merge(rows){(rows||[]).forEach(r=>{if(S.idx.has(r.id)){const i=S.listings.findIndex(x=>x.id===r.id);if(i>=0)S.listings[i]=r}else S.listings.push(r);S.idx.set(r.id,r)});return rows||[]}
@@ -102,6 +103,20 @@ function errMsg(e){
 }
 
 /* ===== data ===== */
+// Listing terjual/tersewa dihapus permanen SOLD_DAYS hari setelah ditandai.
+// Utamanya dikerjakan server (pg_cron, schema.sql bagian 12); ini cadangan saat agen/admin membuka dasbor.
+async function purgeSold(){
+  try{
+    let q=sb.from('listings').delete().not('sold_at','is',null).lt('sold_at',new Date(Date.now()-SOLD_DAYS*DAY).toISOString());
+    if(!me.is_admin)q=q.eq('agent_id',me.id);
+    await q;
+    if(me.is_admin){
+      const t=await sb.from('photo_trash').select('path').limit(500);
+      const paths=(t.data||[]).map(r=>r.path);
+      if(paths.length){const {error}=await sb.storage.from('listing-photos').remove(paths);if(!error)await sb.from('photo_trash').delete().in('path',paths)}
+    }
+  }catch(e){}
+}
 async function load(){
   if(!sb){S.error="Layanan data tidak termuat. Muat ulang halaman.";S.loaded=true;render();return}
   if(S.noSold==null){const pr=await sb.from('listings').select('sold_at').limit(1);S.noSold=!!(pr.error&&/sold_at/.test(pr.error.message||""))}
@@ -109,6 +124,7 @@ async function load(){
   if(a.error){S.error=errMsg(a.error);S.loaded=true;render();return}
   S.agents=a.data||[];
   if(session)me=agentOf(session.user.id)||me;
+  if(me&&!S.noSold)await purgeSold();
   const jobs=[liveQ('type,status,prov,kab,agent_id').limit(1000),liveQ('id',{count:'exact',head:true}),liveQ('*').order('created_at',{ascending:false}).limit(6),
     me?sb.from('listings').select('*').eq('agent_id',me.id).order('created_at',{ascending:false}).limit(1000):null,
     me&&me.is_admin?sb.from('listings').select('id',{count:'exact',head:true}):null];
@@ -443,7 +459,7 @@ function dashboard(){
     ${body}</div>`;
 }
 function listingPill(l){
-  if(isSold(l))return `<span class="pill pill-sold">${soldWord(l)} · ${fmtD(l.sold_at)}</span>`;
+  if(isSold(l)){const d=soldLeft(l);return `<span class="pill pill-sold">${soldWord(l)} · ${fmtD(l.sold_at)}</span> <span class="pill pill-rejected">${d<=1?"Dihapus permanen hari ini":`Dihapus permanen dalam ${d} hari`}</span>`}
   if(!l.published)return `<span class="pill pill-pending">Draf</span>`;
   const d=daysLeft(l);
   if(d<=0)return `<span class="pill pill-rejected">Diturunkan</span>`;
@@ -465,7 +481,7 @@ function rowItem(l,showAgent){
     <div><b>${esc(l.title)}</b><small>${esc([showAgent?a.name:"",l.type,[l.kab,l.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
       <small>${listingPill(l)} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small>
       <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small></div>
-    ${cs?`<span class="confirm sold-confirm">Tandai "${esc(l.title)}" sebagai ${soldWord(l).toLowerCase()}? Listing akan hilang dari pencarian. <button class="btn btn-primary btn-sm" data-sold="${esc(l.id)}">Ya, ${soldWord(l).toLowerCase()}</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
+    ${cs?`<span class="confirm sold-confirm">Tandai "${esc(l.title)}" sebagai ${soldWord(l).toLowerCase()}? Listing hilang dari pencarian dan dihapus permanen ${SOLD_DAYS} hari kemudian. <button class="btn btn-primary btn-sm" data-sold="${esc(l.id)}">Ya, ${soldWord(l).toLowerCase()}</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :c?`<span class="confirm">Hapus listing ini? <button class="btn btn-danger btn-sm" data-del-listing="${esc(l.id)}">Ya, hapus</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}${S.noSold?"":isSold(l)?`<button class="btn btn-line btn-sm" data-unsold="${esc(l.id)}">Batalkan ${soldWord(l).toLowerCase()}</button>`:l.published?`<button class="btn btn-sold btn-sm" data-ask-sold="${esc(l.id)}">Tandai ${soldWord(l).toLowerCase()}</button>`:""}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
 }
@@ -657,7 +673,7 @@ app.addEventListener('click',async e=>{
   if(t.dataset.sold||t.dataset.unsold){
     const id=t.dataset.sold||t.dataset.unsold,l=getL(id),on=!!t.dataset.sold;t.disabled=true;
     const {error}=await sb.from('listings').update({sold_at:on?new Date().toISOString():null}).eq('id',id);
-    DS.confirmSold=null;DS.msg=error?{text:errMsg(error),err:true}:{text:on?`Listing ditandai ${soldWord(l).toLowerCase()}. Selamat! Listing tidak lagi tampil di pencarian.`:"Tanda terjual dibatalkan. Listing tampil lagi di website."};
+    DS.confirmSold=null;DS.msg=error?{text:errMsg(error),err:true}:{text:on?`Listing ditandai ${soldWord(l).toLowerCase()}. Selamat! Listing tidak lagi tampil di pencarian dan akan dihapus permanen dalam ${SOLD_DAYS} hari.`:"Tanda terjual dibatalkan. Listing tampil lagi di website."};
     await load();return}
   if(t.dataset.similar){const l=getL(t.dataset.similar);Object.assign(F,{q:"",type:l.type,status:l.status,prov:l.prov||"",kab:"",agent:"",budget:"",bed:"",facing:""});location.hash="listing";return}
   if(t.dataset.ask){DS.confirm=t.dataset.ask;render();return}
