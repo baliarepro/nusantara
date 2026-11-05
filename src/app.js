@@ -219,6 +219,8 @@ function agentsSection(){
       :`<div class="empty">${S.loaded?"Belum ada agen yang tayang.":"Memuat agen…"}</div>`}</div>
     ${session?"":`<div class="cta-band"><p><b>Anda agen properti?</b> Buat akun, pasang listing Anda di ${esc(SITE.name)}, dan terima calon pembeli langsung ke WhatsApp Anda.</p><a class="btn btn-primary" href="#daftar">Daftar sebagai agen</a></div>`}</section>`;
 }
+const SH=()=>({num,rupiah,wa,hasBuilding,units:UNITS});
+function shareText(l){return window.NP_SHARE?NP_SHARE.text(l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH()):BASE+"#"+l.id}
 function detail(l){
   const a=agentOf(l.agent_id)||{name:"Agen",phone:""};
   const pics=l.photos||[];
@@ -252,7 +254,11 @@ function detail(l){
           ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>
           <div class="phone"><code>${esc(a.phone)}</code><button class="btn btn-line btn-sm" data-copy="${esc(a.phone)}">Salin nomor</button></div>`:""}
         </div>
-        <div class="panel"><div class="label">Bagikan listing</div><div class="phone"><button class="btn btn-line btn-sm" data-copy="${esc(BASE+"#"+l.id)}">Salin tautan listing</button></div>
+        <div class="panel share-panel"><div class="label">Bagikan ke calon pembeli</div>
+          <p class="hint" style="margin:0">Spesifikasi lengkap dan kontak WhatsApp agen ikut terkirim.</p>
+          <a class="btn btn-wa" href="https://wa.me/?text=${encodeURIComponent(shareText(l))}" target="_blank" rel="noopener">Bagikan via WhatsApp</a>
+          <div class="phone">${navigator.share?`<button class="btn btn-line btn-sm" data-share="${esc(l.id)}">Bagikan ke aplikasi lain</button>`:""}<button class="btn btn-line btn-sm" data-copy-share="${esc(l.id)}">Salin teks</button><button class="btn btn-line btn-sm" data-copy="${esc(BASE+"#"+l.id)}">Salin tautan</button></div>
+          <button class="btn btn-primary" data-pdf="${esc(l.id)}">Download brosur PDF</button>
           ${mine?`<button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}" style="justify-self:start">Edit listing ini</button>`:""}</div>
       </aside></div></div>`;
 }
@@ -517,6 +523,11 @@ app.addEventListener('click',async e=>{
   if(t.dataset.thumb!==undefined){const l=S.listings.find(x=>x.id===route());const i=Number(t.dataset.thumb);
     document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">`;
     document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
+  if(t.dataset.share){const l=S.listings.find(x=>x.id===t.dataset.share);try{await navigator.share({title:l.title,text:shareText(l)})}catch(_){}return}
+  if(t.dataset.copyShare){const l=S.listings.find(x=>x.id===t.dataset.copyShare),old=t.textContent;try{await navigator.clipboard.writeText(shareText(l));t.textContent="Teks tersalin"}catch(_){t.textContent="Gagal menyalin"}setTimeout(()=>t.textContent=old,2500);return}
+  if(t.dataset.pdf){const l=S.listings.find(x=>x.id===t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent="Menyiapkan PDF…";
+    try{await NP_SHARE.pdf(l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent="PDF terunduh"}catch(err){t.textContent="Gagal membuat PDF, coba lagi"}
+    setTimeout(()=>{t.textContent=old;t.disabled=false},2500);return}
   if(t.dataset.copy){const v=t.dataset.copy,old=t.textContent;try{await navigator.clipboard.writeText(v);t.textContent="Tersalin"}catch(_){t.textContent="Salin manual: "+v}setTimeout(()=>t.textContent=old,2500);return}
   if(act==="logout"){await sb.auth.signOut();me=null;DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};location.hash="";render();return}
   if(act==="forgot"){
