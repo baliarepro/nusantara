@@ -44,7 +44,7 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em}
 .brand svg{flex:none}
 .brand{white-space:nowrap}
-.nav{align-items:center}
+.nav{align-items:center;flex-wrap:nowrap}
 .nav a.btn-line{border:1px solid var(--line)}
 @media (max-width:520px){.nav .nav-listing{display:none}.bar .wrap{gap:8px}.brand{font-size:17px}.nav a,.nav .btn{padding:6px 10px}}
 .nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
@@ -618,8 +618,8 @@ app.addEventListener('submit',async e=>{
     if(!o.agree)er.agree="Centang pernyataan ini untuk melanjutkan.";
     REG.data=o;REG.errors=er;
     if(!Object.keys(er).length)REG.done=regMessage(o);
-    render();window.scrollTo(0,0);
-    if(Object.keys(er).length){const f=document.querySelector('.err-text');if(f)f.scrollIntoView({block:"center"})}
+    render();
+    const f=document.querySelector(Object.keys(er).length?'.err-text':'.done');if(f)f.scrollIntoView({block:Object.keys(er).length?"center":"start"});
     return;
   }
   if(e.target.id==="lf"){
