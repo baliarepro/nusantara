@@ -294,7 +294,6 @@ function listingPage(){
         <select id="f-status" aria-label="Status"><option value="">Dijual & disewakan</option>${opt(STATUS,F.status)}</select>
         <select id="f-prov" aria-label="Provinsi"><option value="">Semua provinsi</option>${opt(PROVS,F.prov)}</select>
         <select id="f-kab" aria-label="Kota/kabupaten"><option value="">Semua kota/kabupaten</option>${opt(kabsIn(F.prov),F.kab)}</select>
-        <select id="f-agent" aria-label="Agen"><option value="">Semua agen</option>${opt(pubAgents().map(a=>[a.id,a.name]),F.agent)}</select>
         <select id="f-budget" aria-label="Budget"><option value="">Semua budget</option>${opt(BUDGETS,F.budget)}</select>
         <select id="f-bed" aria-label="Kamar tidur"><option value="">Kamar tidur</option>${opt([["1","1+ KT"],["2","2+ KT"],["3","3+ KT"],["4","4+ KT"],["5","5+ KT"]],F.bed)}</select>
         <select id="f-facing" aria-label="Hadap"><option value="">Semua arah hadap</option>${opt(FACING.map(f=>[f,"Hadap "+f]),F.facing)}</select>
