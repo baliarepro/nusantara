@@ -9,7 +9,7 @@ const STATUS=["Dijual","Disewakan"];
 const PROVS=["Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau","Jambi","Sumatera Selatan","Kepulauan Bangka Belitung","Bengkulu","Lampung","DKI Jakarta","Jawa Barat","Banten","Jawa Tengah","DI Yogyakarta","Jawa Timur","Bali","Nusa Tenggara Barat","Nusa Tenggara Timur","Kalimantan Barat","Kalimantan Tengah","Kalimantan Selatan","Kalimantan Timur","Kalimantan Utara","Sulawesi Utara","Gorontalo","Sulawesi Tengah","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tenggara","Maluku","Maluku Utara","Papua","Papua Barat","Papua Barat Daya","Papua Tengah","Papua Pegunungan","Papua Selatan"];
 const CERTS=["SHM","SHGB","Hak Pakai","Leasehold"];
 const ZONES={"Pariwisata":"--z-pariwisata","Permukiman":"--z-permukiman","Pertanian":"--z-pertanian","Perdagangan & Jasa":"--z-dagang"};
-const UNITS={total:"",are:"/ are",m2:"/ m²",tahun:"/ tahun"};
+const UNITS={total:"",are:"/ are",m2:"/ m²",tahun:"/ tahun",are_tahun:"/ are / tahun"};
 const FACING=["Utara","Timur Laut","Timur","Tenggara","Selatan","Barat Daya","Barat","Barat Laut"];
 const ROOM_TYPES=["Rumah","Villa","Apartemen","Ruko"];
 const hasBuilding=t=>t&&t!=="Tanah";
@@ -35,7 +35,7 @@ const PAGE=24,ALL_PAGE=50;
 let session=null,me=null,recovery=false;
 const F={q:"",type:"",status:"",prov:"",kab:"",agent:"",sort:"new",budget:"",bed:"",facing:""};
 const BUDGETS=[["0-500000000","Di bawah Rp500 jt"],["500000000-1000000000","Rp500 jt – 1 M"],["1000000000-2000000000","Rp1 – 2 M"],["2000000000-5000000000","Rp2 – 5 M"],["5000000000-10000000000","Rp5 – 10 M"],["10000000000-","Di atas Rp10 M"]];
-function totalPrice(l){if(l.price==null||l.price==="")return null;const v=Number(l.price);return l.unit==="are"&&l.size?v*l.size/100:l.unit==="m2"&&l.size?v*l.size:v}
+function totalPrice(l){if(l.price==null||l.price==="")return null;const v=Number(l.price);return (l.unit==="are"||l.unit==="are_tahun")&&l.size?v*l.size/100:l.unit==="m2"&&l.size?v*l.size:v}
 const REG={data:{},errors:{},done:false,busy:false,msg:null};
 const AUTH={busy:false,msg:null,email:""};
 let DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};
@@ -325,6 +325,7 @@ function detail(l){
     ["Harga",l.price==null?"Tanya agen":`${rupiah(l.price)} ${UNITS[l.unit]||""}`]];
   if(l.price&&l.unit==="total"&&l.size&&l.type==="Tanah")rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
   if(l.price&&(l.unit==="are"||l.unit==="m2")&&l.size)rows.push(["Harga total",rupiah(totalPrice(l))]);
+  if(l.price&&l.unit==="are_tahun"&&l.size)rows.push(["Sewa total per tahun",rupiah(totalPrice(l))]);
   rows.push(["Tanggal tayang",fmtD(l.created_at)]);
   if(l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY)rows.push(["Terakhir diperbarui",fmtD(l.updated_at)]);
   const mine=session&&(l.agent_id===session.user.id||(me&&me.is_admin));
@@ -556,7 +557,7 @@ function listingForm(){
     <div class="row">${hasBuilding(l.type)?`<div class="field"><label for="l-cert">Sertifikat</label><select id="l-cert" name="cert">${opt([["","—"],...CERTS],l.cert)}</select></div>`:""}
       <div class="field"><label for="l-facing">Hadap / orientasi</label><input id="l-facing" name="facing" list="facing-list" maxlength="60" value="${esc(l.facing)}" placeholder="Timur, atau Hook Timur & Selatan"><datalist id="facing-list">${FACING.map(f=>`<option value="${esc(f)}">`).join("")}</datalist><span class="hint">Tulis bebas, misalnya posisi hook dua arah.</span></div>${hasBuilding(l.type)?"":"<div></div>"}</div>
     <div class="row"><div class="field"><label for="l-price">Harga publik (Rp)</label><input id="l-price" name="price" inputmode="numeric" value="${l.price!=null&&l.price!==""?esc(dots(l.price)):""}" placeholder="Kosongkan = tanya agen"><span class="hint" id="h-price"></span></div>
-      <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["m2","Per m²"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
+      <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["m2","Per m²"],["tahun","Per tahun (sewa)"],["are_tahun","Per are per tahun (sewa tanah)"]],l.unit)}</select></div></div>
     <div class="field"><label for="l-zone">Zonasi</label><select id="l-zone" name="zone">${opt([["","—"],...Object.keys(ZONES)],l.zone)}</select></div>
     ${l.type==="Tanah"?`<div class="field"><label for="l-maps">Lokasi Google Maps</label><input id="l-maps" name="maps_url" type="url" inputmode="url" value="${esc(l.maps_url)}" placeholder="https://maps.app.goo.gl/…">
       <span class="hint">Buka lokasi tanah di aplikasi Google Maps, ketuk Bagikan, lalu salin link dan tempel di sini. Tombol Lihat lokasi akan tampil di halaman listing.</span></div>`:""}

@@ -65,7 +65,7 @@ const titleOf = (l, lang) => (lang === "en" ? L.en.I.gloss(l.title) : l.title);
 const fmtDate = (d, lang) => new Date(d).toLocaleDateString(lang === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "long", year: "numeric" });
 const hasBuilding = t => t && t !== "Tanah";
 const ROOM = ["Rumah", "Villa", "Apartemen", "Ruko"];
-const UNITS = { total: "", are: "/ are", m2: "/ m²", tahun: "/ tahun" };
+const UNITS = { total: "", are: "/ are", m2: "/ m²", tahun: "/ tahun", are_tahun: "/ are / tahun" };
 const loc = l => [l.place, l.kab, l.prov].filter(Boolean).join(", ");
 const clip = (s, n) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : s; };
 const isLive = l => l.published && !l.sold_at && (NOW - new Date(l.updated_at || l.created_at)) / 864e5 < EXPIRE_DAYS;
