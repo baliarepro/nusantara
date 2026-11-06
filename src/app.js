@@ -284,7 +284,6 @@ function listingPage(){
   const provCount=new Set(all.map(l=>l.prov).filter(Boolean)).size,kabCount=new Set(all.map(l=>l.kab).filter(Boolean)).size;
   const typeCounts=TYPES.map(t=>[t,all.filter(l=>l.type===t).length]).filter(x=>x[1]);
   return `<section class="wrap page-head" style="padding-bottom:6px"><div class="label">Listing</div><h1>Semua listing</h1>
-      <div class="stats"><span><b>${S.live}</b>listing</span><span><b>${pubAgents().length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
     </section>
     <section class="wrap tools" aria-label="Cari dan saring">
       <div class="search"><input id="f-q" type="search" placeholder="Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…" value="${esc(F.q)}" aria-label="Cari listing"></div>
