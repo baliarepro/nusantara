@@ -388,3 +388,6 @@ body{font-size:15.5px}
 .views svg{flex:none}
 .d-views{margin-top:6px}
 .d-views .views{font-size:14px}
+.share-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.share-row .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:0}
+.share-row .btn.is-done{border-color:var(--wa);color:var(--wa)}

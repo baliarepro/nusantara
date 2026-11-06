@@ -229,6 +229,23 @@ async function ensureAgent(){
 }
 
 /* ===== cards ===== */
+/* ===== bagikan link iklan ===== */
+const SHARE_IC=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>`;
+const LINK_IC=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></svg>`;
+const listingUrl=l=>`${location.origin}/#${l.id}`;
+async function copyText(txt){
+  try{await navigator.clipboard.writeText(txt);return true}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,txt.length);const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}
+}
+function flash(btn,txt){const sp=btn.querySelector('span');if(!sp)return;const old=sp.textContent;sp.textContent=T(txt);btn.classList.add('is-done');setTimeout(()=>{sp.textContent=old;btn.classList.remove('is-done')},2200)}
+async function shareListing(l,btn,copyOnly){
+  const url=listingUrl(l),title=TT(l.title),price=l.price!=null&&l.price!==""?`${rupiah(l.price)} ${UNITS[l.unit]||""}`.trim():"";
+  const text=[title,[l.place,l.kab,l.prov].filter(Boolean).join(", "),price].filter(Boolean).join("\n");
+  if(!copyOnly&&navigator.share){try{await navigator.share({title,text,url});return}catch(e){if(e&&e.name==="AbortError")return}}
+  const ok=await copyText(url);
+  flash(btn,ok?"Link tersalin":"Gagal menyalin");
+}
+
 /* ===== jumlah dilihat ===== */
 const EYE=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
 const VIEWS={},VQ=new Set();let noViews=false,vTimer=null;
@@ -379,7 +396,8 @@ function detail(l){
           <a class="who" href="#agen-${esc(a.id)}" style="text-decoration:none">${ava(a,"lg")}<span><b style="font-size:17px">${esc(a.name)}</b><br><span style="color:var(--muted)">${esc(a.agency||"")}</span></span></a>
           ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>`:""}
         </div>
-        <div class="panel"><div class="label">Brosur listing</div>
+        <div class="panel"><div class="label">Bagikan listing</div>
+          <div class="share-row"><button class="btn btn-line" data-share="${esc(l.id)}">${SHARE_IC}<span>Bagikan</span></button><button class="btn btn-line" data-copy="${esc(l.id)}">${LINK_IC}<span>Salin link</span></button></div>
           <button class="btn btn-primary" data-pdf="${esc(l.id)}">Download brosur PDF</button>
           ${mine?`<button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}" style="justify-self:start">Edit listing ini</button>`:""}</div>
         ${mine?"":`<a class="report-link" href="https://wa.me/${wa(SITE.adminPhone)}?text=${encodeURIComponent(`Halo admin ${SITE.name}, saya ingin melaporkan listing "${l.title}" (${BASE}#${l.id}). Alasan: `)}" target="_blank" rel="noopener">Laporkan listing ini</a>`}
@@ -732,6 +750,7 @@ app.addEventListener('click',async e=>{
   if(t.dataset.thumb!==undefined){const l=getL(route());const i=Number(t.dataset.thumb);
     document.getElementById('g-main').innerHTML=`<img src="${esc(l.photos[i])}" alt="${esc(l.title)}">${wmOv(l.photos[i])}`;
     document.querySelectorAll('[data-thumb]').forEach(b=>b.setAttribute('aria-current',b===t));return}
+  if(t.dataset.share||t.dataset.copy){const l=getL(t.dataset.share||t.dataset.copy);if(l)shareListing(l,t,!!t.dataset.copy);return}
   if(t.dataset.pdf){const l=getL(t.dataset.pdf),old=t.textContent;t.disabled=true;t.textContent=T("Menyiapkan PDF…");
     try{await NP_SHARE.pdf(EN()?{...l,title:TT(l.title)}:l,agentOf(l.agent_id),SITE,BASE+"#"+l.id,SH());t.textContent=T("PDF terunduh")}catch(err){t.textContent=T("Gagal membuat PDF, coba lagi")}
     setTimeout(()=>{t.textContent=old;t.disabled=false},2500);return}
