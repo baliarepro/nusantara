@@ -210,7 +210,7 @@ function resCount(n,t){return EN()?`Showing ${n} of ${t} listings`:`Menampilkan 
 function paintResults(){
   const r=document.getElementById('results'),m=document.getElementById('more');
   if(!r||!m){render();return}
-  r.innerHTML=resultsHtml();m.innerHTML=moreHtml();I.translate(r);I.translate(m);if(I.upgrade)I.upgrade(r);
+  r.innerHTML=resultsHtml();m.innerHTML=moreHtml();I.translate(r);I.translate(m);if(I.upgrade)I.upgrade(r);fillViews();
 }
 async function ensureAgent(){
   if(!session){me=null;return}
@@ -229,6 +229,31 @@ async function ensureAgent(){
 }
 
 /* ===== cards ===== */
+/* ===== jumlah dilihat ===== */
+const EYE=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const VIEWS={},VQ=new Set();let noViews=false,vTimer=null;
+function vw(l,long){const n=VIEWS[l.id];return `<span class="views" data-vid="${esc(l.id)}"${long?' data-long="1"':""}${n==null?" hidden":""}>${EYE}<span>${n==null?"":viewTxt(n,long)}</span></span>`}
+const viewTxt=(n,long)=>long?`${num(n)} kali dilihat`:num(n);
+function paintViews(){document.querySelectorAll('[data-vid]').forEach(el=>{const n=VIEWS[el.dataset.vid];if(n==null)return;el.hidden=false;el.lastElementChild.textContent=viewTxt(n,!!el.dataset.long);I.translate(el)})}
+function fillViews(){
+  if(noViews||!sb)return;
+  document.querySelectorAll('[data-vid]').forEach(el=>{if(VIEWS[el.dataset.vid]==null)VQ.add(el.dataset.vid)});
+  if(!VQ.size)return;clearTimeout(vTimer);
+  vTimer=setTimeout(async()=>{const ids=[...VQ];VQ.clear();
+    for(let i=0;i<ids.length;i+=100){const part=ids.slice(i,i+100);
+      const {data,error}=await sb.from('listing_views').select('listing_id,views').in('listing_id',part);
+      if(error){noViews=true;return}
+      part.forEach(id=>VIEWS[id]=0);(data||[]).forEach(r=>VIEWS[r.listing_id]=Number(r.views)||0)}
+    paintViews()},60);
+}
+async function countView(l){
+  if(noViews||!sb||!l||(session&&l.agent_id===session.user.id))return;
+  const k="np-seen-"+l.id;
+  try{const t=Number(localStorage.getItem(k)||0);if(Date.now()-t<12*3600*1000)return;localStorage.setItem(k,String(Date.now()))}catch(e){}
+  const {data,error}=await sb.rpc('add_listing_view',{lid:l.id});
+  if(error){if(/add_listing_view|listing_views/.test(error.message||""))noViews=true;return}
+  if(data!=null){VIEWS[l.id]=Number(data);paintViews()}
+}
 function card(l){
   const a=agentOf(l.agent_id)||{name:"Agen"};
   return `<a class="card" href="#${esc(l.id)}">
@@ -240,7 +265,7 @@ function card(l){
         ?`${l.size?`<span>LT <b>${num(l.size)}</b> m²</span>`:""}${l.building_size?`<span>LB <b>${num(l.building_size)}</b> m²</span>`:""}${l.bedrooms!=null?`<span><b>${l.bedrooms}</b> KT</span>`:""}${l.bathrooms!=null?`<span><b>${l.bathrooms}</b> KM</span>`:""}`
         :`${l.size?`<span><b>${num(l.size)}</b> m²</span><span><b>${num(Math.round(l.size)/100)}</b> are</span>`:""}`}${l.cert?`<span><b>${esc(l.cert)}</b></span>`:""}${l.facing?`<span>Hadap <b>${esc(l.facing)}</b></span>`:""}</div>
       ${zoneHtml(l.zone)}${priceHtml(l)}
-      <div class="card-date">${l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY?"Diperbarui":"Tayang"} ${fmtD(l.updated_at||l.created_at)}</div>
+      <div class="card-date"><span>${l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY?"Diperbarui":"Tayang"} ${fmtD(l.updated_at||l.created_at)}</span>${vw(l)}</div>
       <div class="card-foot"><span class="who">${ava(a)}<span>${esc(a.name)}${a.agency?` · ${esc(a.agency)}`:""}</span></span></div>
     </div></a>`;
 }
@@ -344,6 +369,7 @@ function detail(l){
         <div class="label" style="margin-top:22px">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(" · ")}</div>
         <h1 class="d-title"${mt(l.title)}>${esc(TT(l.title))}</h1>
         ${priceHtml(l,"d-price")}
+        <div class="d-views">${vw(l,true)}</div>
         <table class="facts"><tbody>${rows.map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("")}</tbody></table>
         ${l.description?`<p class="desc">${esc(l.description)}</p>`:""}
         ${l.maps_url&&/^https:\/\//.test(l.maps_url)?`<a class="btn btn-line maps-btn" href="${esc(l.maps_url)}" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Lihat lokasi di Google Maps</a>`:""}
@@ -489,7 +515,7 @@ function rowItem(l,showAgent){
   return `<div class="item">${l.photos&&l.photos[0]?`<img class="thumb" src="${esc(l.photos[0])}" alt="">`:`<span class="thumb"></span>`}
     <div><b>${esc(l.title)}</b><small>${esc([showAgent?a.name:"",l.type,[l.kab,l.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
       <small>${listingPill(l)} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small>
-      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small></div>
+      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""} ${vw(l,true)}</small></div>
     ${cs?`<span class="confirm sold-confirm">Tandai "${esc(l.title)}" sebagai ${soldWord(l).toLowerCase()}? Listing hilang dari pencarian dan dihapus permanen ${SOLD_DAYS} hari kemudian. <button class="btn btn-primary btn-sm" data-sold="${esc(l.id)}">Ya, ${soldWord(l).toLowerCase()}</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :c?`<span class="confirm">Hapus listing ini? <button class="btn btn-danger btn-sm" data-del-listing="${esc(l.id)}">Ya, hapus</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}${S.noSold?"":isSold(l)?`<button class="btn btn-line btn-sm" data-unsold="${esc(l.id)}">Batalkan ${soldWord(l).toLowerCase()}</button>`:l.published?`<button class="btn btn-sold btn-sm" data-ask-sold="${esc(l.id)}">Tandai ${soldWord(l).toLowerCase()}</button>`:""}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
@@ -624,6 +650,8 @@ function render(){
   if(I.upgrade)I.upgrade(app);
   hints();
   setTimeout(ensureRoute,0);
+  fillViews();
+  if(main&&getL(r)&&document.querySelector('.d-views'))countView(getL(r));
 }
 function setTitle(r){
   const e=EN(),l=getL(r),ag=r.startsWith("agen-")&&agentOf(r.slice(5));

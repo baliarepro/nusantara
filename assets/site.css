@@ -314,7 +314,7 @@ a.btn-ghost{text-decoration:none;display:inline-flex;align-items:center}
 .lang button{border:0;background:none;border-radius:999px;padding:4px 9px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;letter-spacing:.03em}
 .lang button[aria-pressed="true"]{background:var(--jade);color:var(--on-jade)}
 @media (max-width:520px){.nav>.btn-line,.nav>.btn-primary{display:none}}
-.card-date{font-size:12.5px;color:var(--muted)}
+.card-date{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .renew-note{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .renew-note span{flex:1 1 260px}
 .maps-btn{margin-top:18px;color:var(--jade)}
@@ -384,3 +384,7 @@ body{font-size:15.5px}
 .pick input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .pick.is-off{opacity:.45;pointer-events:none}
 .dev-note{display:grid;gap:4px;margin-bottom:14px;border-left:3px solid var(--gold)}
+.views{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.views svg{flex:none}
+.d-views{margin-top:6px}
+.d-views .views{font-size:14px}
