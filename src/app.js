@@ -563,7 +563,11 @@ function listingForm(){
     <div class="field"><label for="l-desc">Deskripsi</label><textarea id="l-desc" name="description" placeholder="Akses jalan, view, fasilitas sekitar…">${esc(l.description)}</textarea></div>
     ${(()=>{const n=(l.photos||[]).length,full=n>=MAX_PHOTOS;return `<div class="field"><label for="l-photos">Foto <span class="pill ${full?"pill-pending":"pill-approved"}">${n} / ${MAX_PHOTOS}</span></label>
       <div class="photo-limit">Maksimal ${MAX_PHOTOS} foto per listing. Foto pertama jadi foto sampul.</div>
-      <input id="l-photos" type="file" accept="image/*" multiple ${f.uploading||full?"disabled":""}>
+      <div class="pick-row">
+        <label class="btn btn-line btn-sm pick ${f.uploading||full?"is-off":""}"><input id="l-photos" type="file" accept="image/*" multiple ${f.uploading||full?"disabled":""}>Galeri / kamera HP</label>
+        <label class="btn btn-line btn-sm pick ${f.uploading||full?"is-off":""}"><input id="l-photos-file" type="file" multiple ${f.uploading||full?"disabled":""}>Google Drive / file</label>
+      </div>
+      <span class="hint">Tombol Google Drive / file membuka pemilih file; pilih Drive di menu samping (☰). Pastikan aplikasi Google Drive sudah masuk ke akun Anda.</span>
       <span class="hint">${f.uploading?"Mengunggah foto…":full?`Batas ${MAX_PHOTOS} foto sudah tercapai. Hapus salah satu foto untuk menggantinya.`:`Anda masih bisa menambah ${MAX_PHOTOS-n} foto.`}</span>`})()}
       <div class="pics">${(l.photos||[]).map((u,i)=>`<div class="pic"><img src="${esc(u)}" alt=""><button type="button" data-rmpic="${i}" aria-label="Hapus foto">×</button></div>`).join("")}</div></div>
     <div class="rules"><b>Sebelum menayangkan listing</b>
@@ -742,13 +746,15 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',async e=>{
   const id=e.target.id;
-  if(e.target.closest&&e.target.closest('#lf')&&id!=="l-photos"&&id!=="l-type")saveDraft();
+  if(e.target.closest&&e.target.closest('#lf')&&!/^l-photos/.test(id)&&id!=="l-type")saveDraft();
   if(id==="f-prov"){F.prov=e.target.value;F.kab="";render();return}
   if(id==="l-type"){snapForm();render();const el=document.getElementById('l-type');if(el)el.focus();return}
   const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort","f-budget":"budget","f-bed":"bed","f-facing":"facing"};
   if(map[id]){F[map[id]]=e.target.value;render();return}
-  if(id==="l-photos"){
-    snapForm();const room=MAX_PHOTOS-(DS.form.data.photos||[]).length,picked=[...e.target.files],files=picked.slice(0,Math.max(0,room));
+  if(id==="l-photos"||id==="l-photos-file"){
+    snapForm();const all=[...e.target.files],picked=all.filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|gif|heic|heif)$/i.test(f.name));
+    if(picked.length<all.length)DS.msg={text:`${all.length-picked.length} file bukan foto sehingga dilewati.`,err:true};
+    const room=MAX_PHOTOS-(DS.form.data.photos||[]).length,files=picked.slice(0,Math.max(0,room));
     if(picked.length>files.length)DS.msg={text:`Maksimal ${MAX_PHOTOS} foto per listing. ${picked.length-files.length} foto tidak diunggah.`,err:true};
     if(!files.length){render();return}
     DS.form.uploading=true;render();

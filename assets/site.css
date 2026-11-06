@@ -378,3 +378,8 @@ body{font-size:15.5px}
 .sold-stamp{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);border:3px solid var(--gold);border-radius:8px;padding:8px 16px;transform:rotate(-6deg);flex:none}
 
 .media .wm-ov img,.gallery .main .wm-ov img{height:1.9em;width:auto;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.45))}
+
+.pick-row{display:flex;gap:8px;flex-wrap:wrap}
+.pick{position:relative;overflow:hidden;cursor:pointer}
+.pick input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pick.is-off{opacity:.45;pointer-events:none}
