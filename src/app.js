@@ -9,7 +9,7 @@ const STATUS=["Dijual","Disewakan"];
 const PROVS=["Aceh","Sumatera Utara","Sumatera Barat","Riau","Kepulauan Riau","Jambi","Sumatera Selatan","Kepulauan Bangka Belitung","Bengkulu","Lampung","DKI Jakarta","Jawa Barat","Banten","Jawa Tengah","DI Yogyakarta","Jawa Timur","Bali","Nusa Tenggara Barat","Nusa Tenggara Timur","Kalimantan Barat","Kalimantan Tengah","Kalimantan Selatan","Kalimantan Timur","Kalimantan Utara","Sulawesi Utara","Gorontalo","Sulawesi Tengah","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tenggara","Maluku","Maluku Utara","Papua","Papua Barat","Papua Barat Daya","Papua Tengah","Papua Pegunungan","Papua Selatan"];
 const CERTS=["SHM","SHGB","Hak Pakai","Leasehold"];
 const ZONES={"Pariwisata":"--z-pariwisata","Permukiman":"--z-permukiman","Pertanian":"--z-pertanian","Perdagangan & Jasa":"--z-dagang"};
-const UNITS={total:"",are:"/ are",tahun:"/ tahun"};
+const UNITS={total:"",are:"/ are",m2:"/ m²",tahun:"/ tahun"};
 const FACING=["Utara","Timur Laut","Timur","Tenggara","Selatan","Barat Daya","Barat","Barat Laut"];
 const ROOM_TYPES=["Rumah","Villa","Apartemen","Ruko"];
 const hasBuilding=t=>t&&t!=="Tanah";
@@ -35,7 +35,7 @@ const PAGE=24,ALL_PAGE=50;
 let session=null,me=null,recovery=false;
 const F={q:"",type:"",status:"",prov:"",kab:"",agent:"",sort:"new",budget:"",bed:"",facing:""};
 const BUDGETS=[["0-500000000","Di bawah Rp500 jt"],["500000000-1000000000","Rp500 jt – 1 M"],["1000000000-2000000000","Rp1 – 2 M"],["2000000000-5000000000","Rp2 – 5 M"],["5000000000-10000000000","Rp5 – 10 M"],["10000000000-","Di atas Rp10 M"]];
-function totalPrice(l){if(l.price==null||l.price==="")return null;const v=Number(l.price);return l.unit==="are"&&l.size?v*l.size/100:v}
+function totalPrice(l){if(l.price==null||l.price==="")return null;const v=Number(l.price);return l.unit==="are"&&l.size?v*l.size/100:l.unit==="m2"&&l.size?v*l.size:v}
 const REG={data:{},errors:{},done:false,busy:false,msg:null};
 const AUTH={busy:false,msg:null,email:""};
 let DS={tab:"mine",form:null,confirm:null,busy:false,msg:null,profile:null};
@@ -147,7 +147,7 @@ async function fetchPage(reset){
   const tp=S.noTotal?'price':'total_price',from=P.items.length;
   let q=liveQ('*',{count:'exact'});
   if(F.type)q=q.eq('type',F.type);if(F.status)q=q.eq('status',F.status);if(F.prov)q=q.eq('prov',F.prov);if(F.kab)q=q.eq('kab',F.kab);
-  if(F.agent)q=q.eq('agent_id',F.agent);if(F.facing)q=q.eq('facing',F.facing);if(F.bed)q=q.gte('bedrooms',Number(F.bed));
+  if(F.agent)q=q.eq('agent_id',F.agent);if(F.facing)q=q.ilike('facing',`%${F.facing}%`);if(F.bed)q=q.gte('bedrooms',Number(F.bed));
   if(F.budget){const [mn,mx]=F.budget.split("-").map(x=>x===""?null:Number(x));q=q.gte(tp,mn);if(mx!=null)q=q.lte(tp,mx)}
   const qq=F.q.trim().replace(/[,()%*"\\]/g," ").replace(/\s+/g," ").trim();
   if(qq)q=q.or(["title","place","kab","prov","description"].map(c=>`${c}.ilike."*${qq}*"`).join(","));
@@ -324,6 +324,7 @@ function detail(l){
     ["Zonasi",l.zone?zoneHtml(l.zone):"—"],["Lokasi",esc(l.place)||"—"],["Kota/kabupaten",esc(l.kab)||"—"],["Provinsi",esc(l.prov)||"—"],
     ["Harga",l.price==null?"Tanya agen":`${rupiah(l.price)} ${UNITS[l.unit]||""}`]];
   if(l.price&&l.unit==="total"&&l.size&&l.type==="Tanah")rows.push(["Harga per are",rupiah(l.price/(l.size/100))]);
+  if(l.price&&(l.unit==="are"||l.unit==="m2")&&l.size)rows.push(["Harga total",rupiah(totalPrice(l))]);
   rows.push(["Tanggal tayang",fmtD(l.created_at)]);
   if(l.updated_at&&new Date(l.updated_at)-new Date(l.created_at)>DAY)rows.push(["Terakhir diperbarui",fmtD(l.updated_at)]);
   const mine=session&&(l.agent_id===session.user.id||(me&&me.is_admin));
@@ -553,9 +554,9 @@ function listingForm(){
     ${ROOM_TYPES.includes(l.type)?`<div class="row"><div class="field"><label for="l-bed">Kamar tidur</label><input id="l-bed" name="bedrooms" type="number" min="0" max="99" inputmode="numeric" value="${esc(l.bedrooms??"")}" placeholder="3"></div>
       <div class="field"><label for="l-bath">Kamar mandi</label><input id="l-bath" name="bathrooms" type="number" min="0" max="99" inputmode="numeric" value="${esc(l.bathrooms??"")}" placeholder="2"></div></div>`:""}
     <div class="row">${hasBuilding(l.type)?`<div class="field"><label for="l-cert">Sertifikat</label><select id="l-cert" name="cert">${opt([["","—"],...CERTS],l.cert)}</select></div>`:""}
-      <div class="field"><label for="l-facing">Hadap / orientasi</label><select id="l-facing" name="facing">${opt([["","—"],...FACING],l.facing)}</select></div>${hasBuilding(l.type)?"":"<div></div>"}</div>
-    <div class="row"><div class="field"><label for="l-price">Harga publik (Rp)</label><input id="l-price" name="price" inputmode="numeric" value="${esc(l.price??"")}" placeholder="Kosongkan = tanya agen"><span class="hint" id="h-price"></span></div>
-      <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
+      <div class="field"><label for="l-facing">Hadap / orientasi</label><input id="l-facing" name="facing" list="facing-list" maxlength="60" value="${esc(l.facing)}" placeholder="Timur, atau Hook Timur & Selatan"><datalist id="facing-list">${FACING.map(f=>`<option value="${esc(f)}">`).join("")}</datalist><span class="hint">Tulis bebas, misalnya posisi hook dua arah.</span></div>${hasBuilding(l.type)?"":"<div></div>"}</div>
+    <div class="row"><div class="field"><label for="l-price">Harga publik (Rp)</label><input id="l-price" name="price" inputmode="numeric" value="${l.price!=null&&l.price!==""?esc(dots(l.price)):""}" placeholder="Kosongkan = tanya agen"><span class="hint" id="h-price"></span></div>
+      <div class="field"><label for="l-unit">Satuan harga</label><select id="l-unit" name="unit">${opt([["total","Total"],["are","Per are"],["m2","Per m²"],["tahun","Per tahun (sewa)"]],l.unit)}</select></div></div>
     <div class="field"><label for="l-zone">Zonasi</label><select id="l-zone" name="zone">${opt([["","—"],...Object.keys(ZONES)],l.zone)}</select></div>
     ${l.type==="Tanah"?`<div class="field"><label for="l-maps">Lokasi Google Maps</label><input id="l-maps" name="maps_url" type="url" inputmode="url" value="${esc(l.maps_url)}" placeholder="https://maps.app.goo.gl/…">
       <span class="hint">Buka lokasi tanah di aplikasi Google Maps, ketuk Bagikan, lalu salin link dan tempel di sini. Tombol Lihat lokasi akan tampil di halaman listing.</span></div>`:""}
@@ -584,12 +585,13 @@ function footer(){
   <span class="swatches" aria-label="Warna zonasi">${Object.entries(ZONES).map(([z,v])=>`<span class="zone"><i style="background:var(${v})"></i>${z}</span>`).join("")}</span></div></footer>`;
 }
 function render(){
+  if(DS.form&&document.getElementById('lf')){snapForm();writeDraft()}
   if(location.hash==="#"&&history.replaceState)history.replaceState(null,"",location.pathname+location.search);
   const r=route();let main;
   if(recovery)main=resetPage();
   else if(r==="daftar")main=session?dashboard():registerPage();
   else if(r==="masuk")main=session?dashboard():loginPage();
-  else if(r==="dasbor")main=dashboard();
+  else if(r==="dasbor"){restoreDraft();main=dashboard()}
   else{
     const l=getL(r);const a=r.startsWith("agen-")&&agentOf(r.slice(5));
     const pendingId=!l&&/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(r)&&!S.missing[r];
@@ -626,8 +628,18 @@ function hints(){
   [["l-size","h-size",v=>`= ${num(v/100)} are`],["l-price","h-price",rupiah]].forEach(([i,h,f])=>{
     const a=document.getElementById(i),b=document.getElementById(h);if(a&&b){const v=Number(String(a.value).replace(/\D/g,""));b.textContent=v?f(v):""}});
 }
+const dots=v=>{const d=String(v??"").replace(/\D/g,"");return d?d.replace(/\B(?=(\d{3})+(?!\d))/g,"."):""};
 const digits=v=>{const d=String(v||"").replace(/\D/g,"");return d?Number(d):null};
 function readForm(form){const o={};new FormData(form).forEach((v,k)=>{if(k in o){o[k]=[].concat(o[k],String(v))}else o[k]=String(v).trim()});return o}
+const DRAFT_KEY="np-listing-draft";
+function saveDraft(){snapForm();writeDraft()}
+function writeDraft(){try{if(DS.form&&me)localStorage.setItem(DRAFT_KEY,JSON.stringify({uid:me.id,ts:Date.now(),data:DS.form.data,own:!!DS.form.own}))}catch(e){}}
+function clearDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
+function restoreDraft(){
+  if(DS.form||!me)return;
+  try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null");
+    if(d&&d.uid===me.id&&Date.now()-d.ts<3*DAY){DS.form={data:d.data,own:d.own};DS.msg={text:"Isian listing yang belum tersimpan sudah dipulihkan. Lanjutkan lalu simpan."}}}catch(e){}
+}
 function snapForm(){const f=document.getElementById('lf');if(f&&DS.form){const o=readForm(f);
   ["title","type","status","prov","kab","place","size","price","unit","cert","zone","description","maps_url","building_size","bedrooms","bathrooms","facing"].forEach(k=>DS.form.data[k]=o[k]??DS.form.data[k]);
   DS.form.data.published=!!o.published;DS.form.own=!!o.own;}}
@@ -693,7 +705,7 @@ app.addEventListener('click',async e=>{
     AUTH.busy=false;AUTH.msg=error?{text:errMsg(error),err:true}:{text:`Tautan untuk mengatur ulang password sudah dikirim ke ${AUTH.email}.`};render();return}
   if(t.dataset.dtab){DS.tab=t.dataset.dtab;DS.msg=null;DS.confirm=null;DS.profile=null;render();return}
   if(act==="new-listing"){DS.form={data:blankListing()};DS.msg=null;render();window.scrollTo(0,0);return}
-  if(act==="close-form"){e.preventDefault();DS.form=null;render();return}
+  if(act==="close-form"){e.preventDefault();DS.form=null;clearDraft();render();return}
   if(act==="cancel"){DS.confirm=null;DS.confirmSold=null;render();return}
   if(t.dataset.askSold){DS.confirmSold=t.dataset.askSold;DS.confirm=null;render();return}
   if(t.dataset.sold||t.dataset.unsold){
@@ -723,10 +735,14 @@ app.addEventListener('click',async e=>{
 app.addEventListener('input',e=>{
   const id=e.target.id;
   if(id==="f-q"){F.q=e.target.value;clearTimeout(window.__npq);window.__npq=setTimeout(()=>{if(S.page.key!==fkey())fetchPage(true)},350);return}
+  if(id==="l-price"){const el=e.target,pos=el.selectionStart,before=el.value.slice(0,pos).replace(/\D/g,"").length;
+    el.value=dots(el.value);let i=0,n=0;while(i<el.value.length&&n<before){if(/\d/.test(el.value[i]))n++;i++}try{el.setSelectionRange(i,i)}catch(_){}}
   if(/^(l-size|l-price)$/.test(id))hints();
+  if(e.target.closest&&e.target.closest('#lf'))saveDraft();
 });
 app.addEventListener('change',async e=>{
   const id=e.target.id;
+  if(e.target.closest&&e.target.closest('#lf')&&id!=="l-photos"&&id!=="l-type")saveDraft();
   if(id==="f-prov"){F.prov=e.target.value;F.kab="";render();return}
   if(id==="l-type"){snapForm();render();const el=document.getElementById('l-type');if(el)el.focus();return}
   const map={"f-status":"status","f-kab":"kab","f-agent":"agent","f-sort":"sort","f-budget":"budget","f-bed":"bed","f-facing":"facing"};
@@ -808,7 +824,7 @@ app.addEventListener('submit',async e=>{
     DS.busy=false;
     if(error&&/maps_url|facing|building_size|bedrooms|bathrooms/.test(error.message||"")){DS.msg={text:"Kolom baru belum ada di database. Admin perlu menjalankan SQL tambahan di Supabase.",err:true};render();return}
     if(error){DS.msg={text:errMsg(error),err:true};render();return}
-    DS.form=null;DS.msg={text:row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf."};await load();window.scrollTo(0,0);return;
+    DS.form=null;clearDraft();DS.msg={text:row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf."};await load();window.scrollTo(0,0);return;
   }
 });
 window.addEventListener('hashchange',()=>{MENU=false;if(route()!=="dasbor")DS.form=null;REG.done=REG.done&&route()==="daftar";render();window.scrollTo(0,0)});
@@ -817,8 +833,11 @@ window.addEventListener('hashchange',()=>{MENU=false;if(route()!=="dasbor")DS.fo
 render();
 if(sb){
   sb.auth.onAuthStateChange((ev,s)=>{
+    const same=session&&s&&session.user.id===s.user.id;
     session=s;
     if(ev==="PASSWORD_RECOVERY")recovery=true;
+    // Token diperbarui / tab kembali aktif: jangan muat ulang halaman supaya isian form tidak hilang
+    if(same&&(ev==="TOKEN_REFRESHED"||ev==="SIGNED_IN"||ev==="USER_UPDATED"))return;
     setTimeout(async()=>{await ensureAgent();await load();
       if(FROM_LINK&&ev==="SIGNED_IN"&&s&&!recovery&&route()!=="dasbor")location.hash="dasbor"},0);
   });

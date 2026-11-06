@@ -218,3 +218,18 @@ revoke all on function public.purge_sold_listings() from public, anon, authentic
 -- d. Jalankan otomatis setiap jam (pg_cron)
 create extension if not exists pg_cron;
 select cron.schedule('hapus-listing-terjual', '23 * * * *', 'select public.purge_sold_listings()');
+
+
+-- 13. SATUAN HARGA PER m² (untuk filter budget & urutan harga)
+drop index if exists public.listings_total_price_idx;
+alter table public.listings drop column if exists total_price;
+alter table public.listings add column total_price numeric
+  generated always as (
+    case
+      when unit = 'are' and size is not null then price * size / 100
+      when unit = 'm2' and size is not null then price * size
+      else price
+    end
+  ) stored;
+create index if not exists listings_total_price_idx on public.listings (total_price);
+-- selesai
