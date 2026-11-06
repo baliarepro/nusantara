@@ -270,7 +270,6 @@ function home(){
       <p>${esc(SITE.tagline)}</p>
       <form class="search home-search" id="hs" role="search"><input id="h-q" type="search" placeholder="Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…" aria-label="Cari listing"><button class="btn btn-primary">Cari</button></form>
       <div class="chips" style="margin-top:12px">${typeCounts.map(([t,n])=>`<button class="chip" data-go-type="${t}">${t}<span class="n">${n}</span></button>`).join("")}</div>
-      <div class="stats"><span><b>${S.live}</b>listing</span><span><b>${pubAgents().length}</b>agen</span><span><b>${provCount}</b>provinsi</span><span><b>${kabCount}</b>kota/kabupaten</span></div>
     </section>
     <section class="wrap"><div class="section-head"><div><div class="label">Baru tayang</div><h2>Listing terbaru</h2></div><a class="btn btn-line btn-sm" href="#listing">Lihat semua listing</a></div>
       <div class="grid">${!S.loaded?`<div class="empty">Memuat listing…</div>`:S.error?`<div class="empty">${esc(S.error)}</div>`:latest.length?latest.map(card).join(""):`<div class="empty">Belum ada listing yang tayang.</div>`}</div></section>
