@@ -383,3 +383,4 @@ body{font-size:15.5px}
 .pick{position:relative;overflow:hidden;cursor:pointer}
 .pick input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .pick.is-off{opacity:.45;pointer-events:none}
+.dev-note{display:grid;gap:4px;margin-bottom:14px;border-left:3px solid var(--gold)}

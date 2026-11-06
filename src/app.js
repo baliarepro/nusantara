@@ -456,9 +456,16 @@ function dashboard(){
     ${!DS.form&&DS.tab!=="mine"&&S.mine.some(l=>needsRenew(l))?`<div class="note err renew-note"><span>Ada listing Anda yang sudah atau akan segera diturunkan.</span><button class="btn btn-line btn-sm" data-dtab="mine">Lihat listing saya</button></div>`:""}
     ${me.status==="rejected"?`<div class="note err">Pendaftaran Anda belum disetujui. Hubungi admin lewat WhatsApp untuk informasi lebih lanjut.</div> <a class="btn btn-wa btn-sm" style="justify-self:start" href="https://wa.me/${wa(SITE.adminPhone)}" target="_blank" rel="noopener">WhatsApp admin</a>`:""}
     ${DS.form?"":`<div class="tabs dash-tabs" role="tablist">${tabs.map(([k,t])=>`<button role="tab" aria-selected="${DS.tab===k}" data-dtab="${k}">${t}</button>`).join("")}</div>`}
+    ${devNotice()}
     ${capacityNote()}
     ${note(DS.msg)}
     ${body}</div>`;
+}
+// Pemberitahuan pengembangan website: tampil di semua dasbor sampai tanggal berikut, lalu hilang otomatis
+const DEV_NOTICE_UNTIL=new Date("2026-11-13T12:30:00+08:00");
+function devNotice(){
+  if(Date.now()>DEV_NOTICE_UNTIL.getTime())return "";
+  return `<div class="note dev-note"><b>Pemberitahuan</b><span>Tim developer sedang melakukan pengembangan website secara berkala. Selama proses ini, sistem tetap berjalan normal dan Anda bisa memasang, mengubah, serta mengelola listing seperti biasa.</span></div>`;
 }
 function listingPill(l){
   if(isSold(l)){const d=soldLeft(l);return `<span class="pill pill-sold">${soldWord(l)} · ${fmtD(l.sold_at)}</span> <span class="pill pill-rejected">${d<=1?"Dihapus permanen hari ini":`Dihapus permanen dalam ${d} hari`}</span>`}
