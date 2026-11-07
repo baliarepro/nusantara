@@ -22,5 +22,17 @@
   "event": "published",
   "listing": "0fe69ad5-3719-4be0-a27d-ce02bc38c10b",
   "permalink": "https://www.instagram.com/p/DfcLGYqm-l4/"
+ },
+ {
+  "at": "2026-11-07T12:24:41+00:00",
+  "event": "prepared",
+  "listing": "83704f2d-927b-40e1-8195-f45ccb75cdf8",
+  "images": 5
+ },
+ {
+  "at": "2026-11-07T12:24:52+00:00",
+  "event": "prepared",
+  "listing": "cda0c817-3851-4e71-b45e-a6441a8dc474",
+  "images": 5
  }
 ]
