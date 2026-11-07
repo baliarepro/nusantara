@@ -7,6 +7,7 @@ Dijalankan oleh GitHub Actions (.github/workflows/ig-post.yml) dalam dua tahap:
 
 Uji lokal tanpa internet:  MOCK=1 python3 scripts/ig_post.py prepare
 Token Instagram dibaca dari secret IG_TOKEN (tidak pernah ditulis ke file atau log).
+Maksimal IG_MAX_PER_RUN listing per putaran (bawaan 2) supaya feed tidak dibanjiri.
 """
 import io, json, os, re, sys, time, textwrap, urllib.parse, urllib.request
 from datetime import datetime, timezone, timedelta
