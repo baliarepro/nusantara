@@ -34,5 +34,17 @@
   "event": "prepared",
   "listing": "cda0c817-3851-4e71-b45e-a6441a8dc474",
   "images": 5
+ },
+ {
+  "at": "2026-11-07T12:30:40+00:00",
+  "event": "published",
+  "listing": "83704f2d-927b-40e1-8195-f45ccb75cdf8",
+  "permalink": "https://www.instagram.com/p/DfcL40IjRdd/"
+ },
+ {
+  "at": "2026-11-07T12:31:35+00:00",
+  "event": "published",
+  "listing": "cda0c817-3851-4e71-b45e-a6441a8dc474",
+  "permalink": "https://www.instagram.com/p/DfcL-s-E0i5/"
  }
 ]
