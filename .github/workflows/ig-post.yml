@@ -1,0 +1,51 @@
+name: Posting otomatis ke Instagram
+
+on:
+  schedule:
+    - cron: "47 */3 * * *"   # setiap 3 jam
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "scripts/ig_post.py"
+      - ".github/workflows/ig-post.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ig-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow==11.0.0
+      - name: Siapkan gambar listing baru
+        run: python3 scripts/ig_post.py prepare
+      - name: Unggah gambar ke website
+        run: |
+          git config user.name "nusantara-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A ig data
+          if ! git diff --cached --quiet; then
+            git commit -m "Siapkan gambar Instagram [otomatis]"
+            for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+          fi
+      - name: Posting ke Instagram
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python3 scripts/ig_post.py publish
+      - name: Simpan catatan posting
+        if: always()
+        run: |
+          git add -A ig data
+          if ! git diff --cached --quiet; then
+            git commit -m "Catatan posting Instagram [otomatis]"
+            for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+          fi
