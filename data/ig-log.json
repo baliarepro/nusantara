@@ -52,5 +52,11 @@
   "event": "prepared",
   "listing": "8a00cda0-f635-4c1e-b072-9621c411a7fe",
   "images": 5
+ },
+ {
+  "at": "2026-11-07T13:38:31+00:00",
+  "event": "published",
+  "listing": "8a00cda0-f635-4c1e-b072-9621c411a7fe",
+  "permalink": "https://www.instagram.com/p/DfcTp38lx-z/"
  }
 ]
