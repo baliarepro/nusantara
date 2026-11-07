@@ -3,7 +3,7 @@
 > Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
 > English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
 
-Diperbarui / updated: 2026-11-07. Jumlah listing tayang / live listings: 4.
+Diperbarui / updated: 2026-11-07. Jumlah listing tayang / live listings: 5.
 
 ## Halaman utama / Key pages
 - [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
@@ -19,12 +19,14 @@ Diperbarui / updated: 2026-11-07. Jumlah listing tayang / live listings: 4.
 - [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
 
 ## Listing
+- [Tanah 2450m² dekat Hillstone Ungasan](https://nusantara.properties/listing/tanah-2450m-dekat-hillstone-ungasan-8a00cd/): Tanah · Dijual · Ungasan, Badung, Bali · 2.450 m² · SHM · Rp 650 jt / are
 - [Tanah 4,3are di Ungasan dekat Pantai Melasti](https://nusantara.properties/listing/tanah-4-3are-di-ungasan-dekat-pantai-melasti-cda0c8/): Tanah · Dijual · Ungasan, Badung, Bali · 430 m² · SHM · Rp 7,5 jt / m²
 - [Tanah 3are di Ungasan Lingkungan Villa Mewah](https://nusantara.properties/listing/tanah-3are-di-ungasan-lingkungan-villa-mewah-83704f/): Tanah · Dijual · Ungasan, Badung, Bali · 300 m² · SHM · Rp 650 jt / are
 - [Dijual gudang siap pakai lokasi lawang malang](https://nusantara.properties/listing/dijual-gudang-siap-pakai-lokasi-lawang-malang-0fe69a/): Gudang · Dijual · Kecamatan Lawang, Kabupaten Malang, Jawa Timur · 12.035 m² · SHGB · Rp 20 M
 - [Villa di Dewi Sri Kuta Bali](https://nusantara.properties/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · Dijual · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 M
 
 ## Listings (English)
+- [Land 2450m² near Hillstone Ungasan](https://nusantara.properties/en/listing/tanah-2450m-dekat-hillstone-ungasan-8a00cd/): Land · For sale · Ungasan, Badung, Bali · 2,450 m² · SHM · Rp 650 M / are
 - [Land 4,3are in Ungasan near Melasti Beach](https://nusantara.properties/en/listing/tanah-4-3are-di-ungasan-dekat-pantai-melasti-cda0c8/): Land · For sale · Ungasan, Badung, Bali · 430 m² · SHM · Rp 7.5 M / m²
 - [Land 3are in Ungasan Neighbourhood Villa Luxury](https://nusantara.properties/en/listing/tanah-3are-di-ungasan-lingkungan-villa-mewah-83704f/): Land · For sale · Ungasan, Badung, Bali · 300 m² · SHM · Rp 650 M / are
 - [For sale warehouse siap pakai lokasi lawang malang](https://nusantara.properties/en/listing/dijual-gudang-siap-pakai-lokasi-lawang-malang-0fe69a/): Warehouse · For sale · Kecamatan Lawang, Kabupaten Malang, Jawa Timur · 12,035 m² · SHGB · Rp 20 B
