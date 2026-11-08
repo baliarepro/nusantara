@@ -58,5 +58,17 @@
   "event": "published",
   "listing": "8a00cda0-f635-4c1e-b072-9621c411a7fe",
   "permalink": "https://www.instagram.com/p/DfcTp38lx-z/"
+ },
+ {
+  "at": "2026-11-08T13:36:05+00:00",
+  "event": "prepared",
+  "listing": "3ba14907-b4c8-4baa-9fab-3381a4650988",
+  "images": 5
+ },
+ {
+  "at": "2026-11-08T13:36:13+00:00",
+  "event": "prepared",
+  "listing": "d8227721-2962-4c9e-8b9f-363c380cf99d",
+  "images": 5
  }
 ]
