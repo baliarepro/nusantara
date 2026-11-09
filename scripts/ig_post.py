@@ -28,6 +28,8 @@ W, H = 1080, 1350  # rasio 4:5, ukuran feed Instagram
 POSTED_F = os.path.join(ROOT, "data", "ig-posted.json")
 QUEUE_F = os.path.join(ROOT, "ig", "queue.json")
 LOG_F = os.path.join(ROOT, "data", "ig-log.json")
+ALERTS_F = os.path.join(ROOT, "data", "ig-alerts.json")
+MISSING_DAYS = 7  # listing hilang dari data publik selama ini (dihapus/diturunkan) baru dianggap tidak tersedia
 FONT_F = os.path.join(ROOT, "assets", "fonts", "PlusJakartaSans.ttf")
 LOGO_F = os.path.join(ROOT, "assets", "np-mark-light.png")
 
@@ -510,12 +512,86 @@ def publish():
     save_json(QUEUE_F, left)
 
 
+# ---------- tahap 3: sinkron postingan lama ----------
+def sync():
+    """Listing terjual/tersewa atau sudah tidak tersedia: hapus postingan IG; bila API tidak mengizinkan,
+    tambahkan komentar pemberitahuan dan catat di data/ig-alerts.json supaya admin mengarsipkannya manual."""
+    posted = load_json(POSTED_F, {})
+    live_posts = {k: v for k, v in posted.items() if v.get("media_id") and not v.get("closed")}
+    if not live_posts:
+        print("Tidak ada postingan untuk disinkronkan.")
+        return
+    data = get_data()
+    if not data["listings"]:
+        print("Data listing kosong; sinkron dilewati demi keamanan.")
+        return
+    by_id = {l["id"]: l for l in data["listings"]}
+    todo = []
+    for lid, st in live_posts.items():
+        l = by_id.get(lid)
+        if l and l.get("sold_at"):
+            word = "TERSEWA" if l.get("status") == "Disewakan" else "TERJUAL"
+            todo.append((lid, st, f"✅ Update: properti ini sudah {word}. Terima kasih atas minatnya. Lihat listing lain yang masih tersedia di nusantara.properties", word.lower()))
+            continue
+        if l:
+            st.pop("missing_since", None)
+            continue
+        first = st.setdefault("missing_since", now().isoformat(timespec="seconds"))
+        if now() - datetime.fromisoformat(first) >= timedelta(days=MISSING_DAYS):
+            todo.append((lid, st, "ℹ️ Update: listing ini sudah tidak tersedia. Lihat listing lain yang masih tersedia di nusantara.properties", "tidak tersedia"))
+    save_json(POSTED_F, posted)
+    if not todo:
+        print("Semua postingan masih sesuai.")
+        return
+    token = os.environ.get("IG_TOKEN", "").strip()
+    if not token:
+        log("no_token", note="Secret IG_TOKEN belum diisi di GitHub")
+        return
+    ig = IG(token)
+    alerts = load_json(ALERTS_F, [])
+    for lid, st, msg, why in todo:
+        action = None
+        try:
+            req = urllib.request.Request(f"{ig.base}/{st['media_id']}?access_token={urllib.parse.quote(ig.token)}", method="DELETE")
+            try:
+                with urllib.request.urlopen(req, timeout=60) as r:
+                    ok = r.status == 200 and b"true" in r.read()
+            except urllib.error.HTTPError:
+                ok = False
+            if ok:
+                action = "deleted"
+        except Exception:
+            action = None
+        if not action:
+            try:
+                ig.call(f"{st['media_id']}/comments", {"message": msg}, post=True)
+                action = "commented"
+            except Exception as e:
+                action = "failed"
+                st["sync_error"] = str(e)[:300]
+                st["sync_fails"] = st.get("sync_fails", 0) + 1
+        if action == "failed" and st.get("sync_fails", 0) < 3:
+            log("sync_retry", listing=lid, error=st.get("sync_error"))
+            continue
+        st["closed"] = True
+        st["closed_reason"] = why
+        st["closed_action"] = action
+        st["closed_at"] = now().isoformat(timespec="seconds")
+        log("synced", listing=lid, reason=why, action=action)
+        if action != "deleted":
+            alerts.append({"at": now().isoformat(timespec="seconds"), "title": st.get("title"), "permalink": st.get("permalink"), "reason": why, "action": action, "emailed": False})
+    save_json(POSTED_F, posted)
+    save_json(ALERTS_F, alerts[-100:])
+
+
 if __name__ == "__main__":
     step = sys.argv[1] if len(sys.argv) > 1 else ""
     if step == "prepare":
         prepare()
     elif step == "publish":
         publish()
+    elif step == "sync":
+        sync()
     else:
         print(__doc__)
         sys.exit(1)

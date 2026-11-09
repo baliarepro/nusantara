@@ -41,6 +41,11 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: python3 scripts/ig_post.py publish
+      - name: Sinkron postingan lama (terjual / tidak tersedia)
+        if: always()
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python3 scripts/ig_post.py sync
       - name: Simpan catatan posting
         if: always()
         run: |
