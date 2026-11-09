@@ -1,0 +1,38 @@
+name: Cadangan data mingguan
+
+on:
+  schedule:
+    - cron: "41 18 * * 0"   # setiap Senin 02.41 WITA
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Ambil data dari Supabase
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BACKUP_PASSWORD: ${{ secrets.BACKUP_PASSWORD }}
+        run: python3 scripts/backup.py
+      - name: Enkripsi
+        env:
+          BACKUP_PASSWORD: ${{ secrets.BACKUP_PASSWORD }}
+        run: |
+          if [ -f backup/nusantara-backup.json.gz ]; then
+            openssl enc -aes-256-cbc -pbkdf2 -salt -in backup/nusantara-backup.json.gz -out backup/nusantara-backup.json.gz.enc -pass env:BACKUP_PASSWORD
+            rm backup/nusantara-backup.json.gz
+          fi
+      - name: Simpan sebagai artifact (90 hari)
+        uses: actions/upload-artifact@v4
+        with:
+          name: nusantara-backup-${{ github.run_number }}
+          path: backup/nusantara-backup.json.gz.enc
+          retention-days: 90
+          if-no-files-found: ignore
