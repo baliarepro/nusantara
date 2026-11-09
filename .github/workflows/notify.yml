@@ -1,0 +1,37 @@
+name: Email otomatis (pengingat listing & agen baru)
+
+on:
+  schedule:
+    - cron: "5 */4 * * *"   # setiap 4 jam
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ig-post            # sama dengan posting Instagram supaya tidak bentrok saat menyimpan catatan
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Kirim email
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: python3 scripts/notify.py
+      - name: Simpan status pengiriman
+        if: always()
+        run: |
+          git config user.name "nusantara-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A data
+          if ! git diff --cached --quiet; then
+            git commit -m "Status email otomatis [otomatis]"
+            for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+          fi
