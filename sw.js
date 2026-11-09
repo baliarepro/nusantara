@@ -1,6 +1,6 @@
 // Nusantara Property: selalu ambil versi terbaru dari jaringan; salinan tersimpan hanya dipakai saat offline.
 // Data Supabase (domain lain) tidak pernah disimpan.
-const CACHE = "np-v3";
+const CACHE = "np-v4";
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
