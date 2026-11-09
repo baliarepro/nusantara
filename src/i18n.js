@@ -95,8 +95,6 @@ const P=[
  [/^(\d+) file bukan foto sehingga dilewati\.$/,m=>m[1]+" file(s) were not photos and were skipped."],
  [/^([\d.,]+) klik WhatsApp$/,m=>m[1].replace(/\./g,",")+(m[1]==="1"?" WhatsApp tap":" WhatsApp taps")],
  [/^([\d.,]+) kali dilihat$/,m=>m[1].replace(/\./g,",")+(m[1]==="1"?" view":" views")],
- [/^(\d+) listing terlihat mirip satu sama lain .+$/,m=>m[1]+" listings look very similar (same type, city, size and price). Check whether the same property was posted by more than one agent."],
- [/^(Listing tersimpan dan tayang\.|Listing tersimpan sebagai draf\.) Perhatian: ada (\d+) listing dari agen lain .+$/,m=>(m[1].includes("tayang")?"Listing saved and live.":"Listing saved as a draft.")+` Note: ${m[2]} listing(s) from other agents have almost the same type, city and size. Make sure this is not the same property.`],
  [/^(\d+) tayang$/,m=>m[1]+" live"],[/^(\d+) terjual\/tersewa$/,m=>m[1]+" sold/rented"],
  [/^Tandai "(.+)" sebagai (terjual|tersewa)\? Listing hilang dari pencarian dan dihapus permanen (\d+) hari kemudian\.$/,m=>`Mark "${m[1]}" as ${m[2]==="terjual"?"sold":"rented"}? It will be removed from search and permanently deleted ${m[3]} days later.`],
  [/^Dihapus permanen dalam (\d+) hari$/,m=>`Permanently deleted in ${m[1]} days`],

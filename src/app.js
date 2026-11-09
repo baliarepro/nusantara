@@ -544,7 +544,6 @@ function rowItem(l,showAgent){
   const a=agentOf(l.agent_id)||{};const c=DS.confirm===l.id,cs=DS.confirmSold===l.id;
   return `<div class="item">${l.photos&&l.photos[0]?`<img class="thumb" src="${esc(l.photos[0])}" alt="">`:`<span class="thumb"></span>`}
     <div><b>${esc(l.title)}</b><small>${esc([showAgent?a.name:"",l.type,[l.kab,l.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
-      ${showAgent&&DUPS[l.id]?`<small class="dup-flag">Mirip dengan: ${DUPS[l.id].map(x=>`<a href="#${esc(x.id)}">${esc(x.title)}</a> (${esc((agentOf(x.agent_id)||{}).name||"agen")})`).join(", ")}</small>`:""}
       <small>${listingPill(l)} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small>
       <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small><small class="stat-line">${vw(l,true)} ${waw(l)}</small></div>
     ${cs?`<span class="confirm sold-confirm">Tandai "${esc(l.title)}" sebagai ${soldWord(l).toLowerCase()}? Listing hilang dari pencarian dan dihapus permanen ${SOLD_DAYS} hari kemudian. <button class="btn btn-primary btn-sm" data-sold="${esc(l.id)}">Ya, ${soldWord(l).toLowerCase()}</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
@@ -559,23 +558,10 @@ function myListings(){
     <p class="hint" style="margin:0">Listing otomatis diturunkan bila tidak diperbarui selama ${EXPIRE_DAYS} hari. Menyimpan perubahan atau mengetuk Tayangkan ulang akan memulai hitungan dari awal.</p>
     <div class="list">${mine.length?mine.map(l=>rowItem(l,false)).join(""):`<div class="empty">Belum ada listing. ${me.status==="approved"?"Ketuk Tambah listing untuk memasang yang pertama.":"Anda bisa memasang listing setelah akun disetujui."}</div>`}</div>`;
 }
-let DUPS={};
-function findDups(items){
-  const out={},near=(a,b,t)=>a&&b&&Math.abs(a-b)/Math.max(a,b)<=t;
-  for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
-    const a=items[i],b=items[j];
-    if(a.type!==b.type||(a.kab||"").toLowerCase()!==(b.kab||"").toLowerCase())continue;
-    const sameMap=a.maps_url&&b.maps_url&&a.maps_url===b.maps_url;
-    if(sameMap||(near(Number(a.size),Number(b.size),.03)&&(near(totalPrice(a),totalPrice(b),.15)||(a.place&&b.place&&a.place.toLowerCase()===b.place.toLowerCase())))){
-      (out[a.id]||=[]).push(b);(out[b.id]||=[]).push(a);}
-  }
-  return out;
-}
 function adminListings(){
-  const A=S.all;DUPS=findDups(A.items);const nd=Object.keys(DUPS).length;
+  const A=S.all;
   if(!A.started||(A.loading&&!A.items.length))return `<div class="empty">Memuat listing…</div>`;
   return `<div class="dash-bar"><span class="label">${A.total} listing dari semua agen</span></div>
-    ${nd?`<div class="note err">${nd} listing terlihat mirip satu sama lain (jenis, kota, luas, dan harga hampir sama). Periksa apakah properti yang sama dipasang lebih dari satu agen.</div>`:""}
     ${renewBanner(A.items,false)}
     <div class="list">${A.items.length?A.items.map(l=>rowItem(l,true)).join(""):`<div class="empty">Belum ada listing.</div>`}</div>
     ${A.done?"":`<button class="btn btn-line" data-act="more-all" ${A.loading?"disabled":""}>${A.loading?"Memuat…":"Muat lebih banyak"}</button>`}`;
@@ -917,11 +903,7 @@ app.addEventListener('submit',async e=>{
     DS.busy=false;
     if(error&&/maps_url|facing|building_size|bedrooms|bathrooms/.test(error.message||"")){DS.msg={text:"Kolom baru belum ada di database. Admin perlu menjalankan SQL tambahan di Supabase.",err:true};render();return}
     if(error){DS.msg={text:errMsg(error),err:true};render();return}
-    let simNote="";
-    if(!d.id&&row.size){try{const lo=row.size*.97,hi=row.size*1.03;
-      const r=await liveQ('id,title,agent_id,size').eq('type',row.type).ilike('kab',row.kab).gte('size',lo).lte('size',hi).neq('agent_id',me.id).limit(3);
-      if(r.data&&r.data.length)simNote=` Perhatian: ada ${r.data.length} listing dari agen lain dengan jenis, kota, dan luas yang hampir sama. Pastikan ini bukan properti yang sama.`}catch(e){}}
-    DS.form=null;clearDraft();DS.msg={text:(row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf.")+simNote,err:!!simNote};await load();window.scrollTo(0,0);return;
+    DS.form=null;clearDraft();DS.msg={text:row.published?"Listing tersimpan dan tayang.":"Listing tersimpan sebagai draf."};await load();window.scrollTo(0,0);return;
   }
 });
 window.addEventListener('hashchange',()=>{MENU=false;if(route()!=="dasbor")DS.form=null;REG.done=REG.done&&route()==="daftar";render();window.scrollTo(0,0)});

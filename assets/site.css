@@ -397,8 +397,6 @@ body{font-size:15.5px}
 .foot a{color:inherit;text-decoration:underline}
 .stat-line{display:flex;gap:14px;flex-wrap:wrap}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-.dup-flag{color:var(--danger)}
-.dup-flag a{color:inherit;text-decoration:underline}
 .orig{margin-top:8px;font-size:13.5px;color:var(--muted)}
 .orig summary{cursor:pointer}
 .orig .desc{margin-top:8px}
