@@ -2,6 +2,12 @@
    Berita: tambahkan item baru di PALING ATAS array NEWS. */
 window.NP_PAGES=(function(){
 const NEWS_ID=[
+  {date:"2026-11-06",tag:"Harga rumah",title:"Survei BI: harga rumah primer naik 0,58% di kuartal III 2026, penjualan turun 8,43%",
+   summary:"Survei Harga Properti Residensial Bank Indonesia mencatat Indeks Harga Properti Residensial di pasar primer tumbuh 0,58% (yoy) pada kuartal III 2026, melambat dari 0,69% di kuartal II. Penjualan rumah primer terkontraksi 8,43% (yoy) dan turun di semua tipe. Hanya rumah tipe kecil yang harganya tumbuh lebih cepat, yaitu 0,55% dari 0,49%. KPR masih menjadi skema pembelian utama dengan porsi 70,68%, sementara pengembang mengandalkan dana internal untuk 73,94% kebutuhan pembiayaan.",
+   source:"ANTARA",url:"https://www.antaranews.com/berita/5836051/survei-bi-harga-properti-residensial-kuartal-iii-2026-tumbuh-terbatas"},
+  {date:"2026-11-06",tag:"Jakarta",title:"REI: hanya sekitar 116 unit apartemen Jakarta terserap di kuartal III 2026",
+   summary:"Wakil Ketua Umum DPP REI Bambang Ekajaya menyebut, menurut survei terakhir, hanya sekitar 116 unit apartemen di Jakarta terserap pasar selama kuartal III 2026. Ia memperkirakan stok apartemen belum terjual di DKI Jakarta mencapai 20.000 hingga 25.000 unit, dengan segmen atas dan premium paling lesu. REI mengusulkan insentif seperti PPN DTP, pembebasan BPHTB, dan keringanan IPL. Ini masih berupa usulan asosiasi, bukan kebijakan pemerintah.",
+   source:"Kontan",url:"https://industri.kontan.co.id/news/penjualan-apartemen-jakarta-lesu-hanya-116-unit-terserap-pada-kuartal-iii-2026"},
   {date:"2026-11-05",tag:"Ekonomi",title:"BPS: ekonomi Indonesia tumbuh 5,47% di kuartal III 2026",
    summary:"Badan Pusat Statistik mencatat ekonomi Indonesia tumbuh 5,47% (yoy) pada kuartal III 2026 dan 1,59% dibanding kuartal sebelumnya, dengan pertumbuhan kumulatif 5,45%. Deputi Bidang Neraca dan Analisis Statistik BPS M Edy Mahmud menyebut belanja modal pemerintah untuk konstruksi naik 63,65% (yoy), sementara realisasi investasi PMDN dan PMA tumbuh 7,59%.",
    source:"Kontan",url:"https://nasional.kontan.co.id/news/ekonomi-ri-tumbuh-547-di-kuartal-iii-2026-bps-ungkap-pendorong-utamanya"},
@@ -106,30 +112,36 @@ const FAQ_ID=[
 ];
 
 const NEWS_EN=[
+  {date:"2026-11-06",tag:"House prices",title:"BI survey: primary house prices up 0.58% in Q3 2026, sales down 8.43%",
+   summary:"Bank Indonesia's Residential Property Price Survey recorded 0.58% (yoy) growth in the primary-market residential price index in Q3 2026, slowing from 0.69% in Q2. Primary home sales contracted 8.43% (yoy) and fell across all house types. Only small houses saw faster price growth, at 0.55% from 0.49%. Mortgages remained the main purchase scheme with a 70.68% share, while developers relied on internal funds for 73.94% of their financing needs.",
+   source:"ANTARA",url:NEWS_ID[0].url},
+  {date:"2026-11-06",tag:"Jakarta",title:"REI: only about 116 Jakarta apartment units sold in Q3 2026",
+   summary:"Bambang Ekajaya, Deputy Chairman of the Indonesian Real Estate Association (REI), said that according to the latest survey only about 116 apartment units in Jakarta were absorbed by the market in Q3 2026. He estimated unsold apartment stock in Jakarta at 20,000 to 25,000 units, with the upper and premium segments the weakest. REI has proposed incentives such as government-borne VAT, a BPHTB exemption and relief on service charges (IPL). These are still association proposals, not government policy.",
+   source:"Kontan",url:NEWS_ID[1].url},
   {date:"2026-11-05",tag:"Economy",title:"Statistics Indonesia: the economy grew 5.47% in Q3 2026",
    summary:"Statistics Indonesia (BPS) recorded 5.47% (yoy) economic growth in Q3 2026 and 1.59% on the previous quarter, with cumulative growth of 5.45%. BPS Deputy for Balance Sheets and Statistical Analysis M Edy Mahmud said government capital spending on construction rose 63.65% (yoy), while domestic and foreign investment realisation grew 7.59%.",
-   source:"Kontan",url:NEWS_ID[0].url},
+   source:"Kontan",url:NEWS_ID[2].url},
   {date:"2026-11-03",tag:"Subsidised housing",title:"FLPP subsidised mortgages reach 197,048 units in 2026, mass signings planned for December",
    summary:"BP Tapera recorded 194,360 FLPP mortgages worth Rp24.22 trillion as of 31 October 2026, nearly 54% of this year's 360,000-unit target. By 2 November the figure had risen to 197,048 units worth Rp24.55 trillion. Bank BTN disbursed the most (85,341 units), and West Java recorded the highest total of any province. Mass signings of 71,000 units on 17 December and 30,000 units on 21 December are being prepared.",
-   source:"CNBC Indonesia",url:NEWS_ID[1].url},
+   source:"CNBC Indonesia",url:NEWS_ID[3].url},
   {date:"2026-11-02",tag:"Subsidised housing",title:"Housing ministry plans to target FLPP mortgages for 40,000 subsidised apartments",
    summary:"Sri Haryati, Director General of Urban Housing at the Ministry of Housing and Settlement Areas (PKP), said the target is FLPP mortgage disbursement for 40,000 apartment units. This is still a plan and a target. She said subsidised apartment output over the past five years was under 200 units. Projects named include apartments at Meikarta, TOD housing at Manggarai, and the 609-unit Alonia Kemayoran apartments, with construction targeted to start in early January 2027.",
-   source:"ANTARA",url:NEWS_ID[2].url},
+   source:"ANTARA",url:NEWS_ID[4].url},
   {date:"2026-10-28",tag:"Credit",title:"Property lending grew 16.4% in September 2026, mortgages edged up",
    summary:"According to Bank Indonesia's money supply data, property lending grew 16.4% (yoy) to Rp1,703.7 trillion in September 2026, slowing from 18.3% the month before. House and apartment mortgages rose slightly to 4.3% (yoy) at Rp863.1 trillion, against the trend of weaker consumer lending. Construction lending still grew 42.3%.",
-   source:"Kontan",url:NEWS_ID[3].url},
+   source:"Kontan",url:NEWS_ID[5].url},
   {date:"2026-10-27",tag:"Land titles",title:"ATR/BPN has issued nearly 10 million electronic land certificates",
    summary:"The Ministry of Agrarian Affairs and Spatial Planning (ATR/BPN) recorded 9,774,933 electronic certificates issued from the service launch on 4 December 2023 to October 2026, including analog certificates converted to electronic form. From January to October 2026, 3,077,397 were issued. Analog and electronic certificates have the same legal force, and conversion requirements and fees can be checked in the Sentuh Tanahku app.",
-   source:"ANTARA",url:NEWS_ID[4].url},
+   source:"ANTARA",url:NEWS_ID[6].url},
   {date:"2026-10-21",tag:"Interest rates",title:"Bank Indonesia holds the BI Rate at 5.75% in October 2026",
    summary:"Bank Indonesia kept its benchmark rate at 5.75%. Over 2026 the BI Rate has risen 100 basis points from 4.75% since mid-May to keep the rupiah stable. For buyers on floating-rate mortgages, instalments are unlikely to fall soon, so a longer fixed-rate period is worth considering.",
-   source:"Bisnis.com",url:NEWS_ID[5].url},
+   source:"Bisnis.com",url:NEWS_ID[7].url},
   {date:"2026-08-07",tag:"House prices",title:"Primary house prices up 0.69% in Q2 2026 as sales start to recover",
    summary:"Bank Indonesia's Residential Property Price Survey recorded a 0.69% (yoy) rise in its residential price index in Q2 2026. Primary-market sales were still down 2.36% (yoy), a big improvement on the 25.67% contraction in Q1, and up 9.39% on the previous quarter.",
-   source:"Industry.co.id",url:NEWS_ID[6].url},
+   source:"Industry.co.id",url:NEWS_ID[8].url},
   {date:"2026-01-05",tag:"Tax",title:"Government covers 100% of VAT on homes throughout 2026",
    summary:"Under Finance Minister Regulation No. 90 of 2025, the government covers 100% of VAT on the portion of the price up to Rp2 billion for landed houses or apartment units priced up to Rp5 billion. The incentive applies to handovers from January to December 2026, and only to purchases from developers that charge VAT.",
-   source:"Suara Surabaya",url:NEWS_ID[7].url}
+   source:"Suara Surabaya",url:NEWS_ID[9].url}
 ];
 const GUIDE_EN=[
  {id:"sertifikat",title:"Know the types of land title",html:`
