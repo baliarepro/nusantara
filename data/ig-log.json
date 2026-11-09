@@ -106,5 +106,11 @@
   "event": "published",
   "listing": "554d1d6d-9eef-4f8a-9a74-0a136a3a1b4e",
   "permalink": "https://www.instagram.com/p/Dfhfwmsj-qt/"
+ },
+ {
+  "at": "2026-11-09T22:29:35+00:00",
+  "event": "prepared",
+  "listing": "9b26fc03-4f27-45f1-8597-05deb33607fd",
+  "images": 3
  }
 ]
