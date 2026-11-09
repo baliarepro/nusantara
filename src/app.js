@@ -399,7 +399,7 @@ function detail(l){
         ${priceHtml(l,"d-price")}
         <div class="d-views">${vw(l,true)}</div>
         <table class="facts"><tbody>${rows.map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("")}</tbody></table>
-        ${l.description?`<p class="desc">${esc(l.description)}</p>`:""}
+        ${l.description?(EN()?`<p class="desc" data-mtl="${esc(l.description)}" data-noi18n>${esc(l.description)}</p><details class="orig" data-noi18n><summary>Machine-translated · show original (Bahasa Indonesia)</summary><p class="desc">${esc(l.description)}</p></details>`:`<p class="desc">${esc(l.description)}</p>`):""}
         ${l.maps_url&&/^https:\/\//.test(l.maps_url)?`<a class="btn btn-line maps-btn" href="${esc(l.maps_url)}" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Lihat lokasi di Google Maps</a>`:""}
       </div>
       <aside class="side">

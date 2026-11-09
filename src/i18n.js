@@ -181,8 +181,27 @@ function machine(text){
   pending.set(text,pr);return pr;
 }
 function title(text){return LANG==="en"?(cached(text)||gloss(text)):text}
+// Terjemahan teks panjang (deskripsi): per baris, baris panjang dipecah per kalimat (batas layanan ±450 karakter)
+function chunks(line){
+  if(line.length<=450)return [line];
+  const out=[];let cur="";
+  for(const sent of line.split(/(?<=[.!?])\s+/)){
+    if((cur+" "+sent).trim().length>450&&cur){out.push(cur);cur=sent}else cur=(cur+" "+sent).trim();
+  }
+  if(cur)out.push(cur);
+  return out.flatMap(c=>c.length>450?c.match(/.{1,450}(\s|$)/g):[c]);
+}
+function long(text){
+  const lines=String(text||"").split("\n");
+  return Promise.all(lines.map(ln=>!ln.trim()?Promise.resolve(ln):Promise.all(chunks(ln).map(c=>machine(c).then(v=>v||gloss(c)))).then(p=>p.join(" "))))
+    .then(p=>p.join("\n"));
+}
 function upgrade(root){
   if(LANG!=="en"||!root)return;
+  root.querySelectorAll("[data-mtl]").forEach(el=>{
+    const src=el.getAttribute("data-mtl");if(!src||el.dataset.done)return;el.dataset.done="1";
+    long(src).then(v=>{if(v&&LANG==="en"&&el.isConnected&&el.getAttribute("data-mtl")===src)el.textContent=v});
+  });
   root.querySelectorAll("[data-mt]").forEach(el=>{
     const src=el.getAttribute("data-mt");if(!src||cached(src))return;
     machine(src).then(v=>{if(v&&LANG==="en"&&el.isConnected&&el.getAttribute("data-mt")===src)el.textContent=v});
