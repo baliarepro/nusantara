@@ -248,20 +248,31 @@ async function shareListing(l,btn,copyOnly){
 
 /* ===== jumlah dilihat ===== */
 const EYE=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
-const VIEWS={},VQ=new Set();let noViews=false,vTimer=null;
+const VIEWS={},WAS={},VQ=new Set();let noViews=false,noWa=false,vTimer=null;
+const WA_IC=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20l1.3-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>`;
+function waw(l){const n=WAS[l.id];return `<span class="views" data-wid="${esc(l.id)}"${n==null?" hidden":""}>${WA_IC}<span>${n==null?"":`${num(n)} klik WhatsApp`}</span></span>`}
 function vw(l,long){const n=VIEWS[l.id];return `<span class="views" data-vid="${esc(l.id)}"${long?' data-long="1"':""}${n==null?" hidden":""}>${EYE}<span>${n==null?"":viewTxt(n,long)}</span></span>`}
 const viewTxt=(n,long)=>long?`${num(n)} kali dilihat`:num(n);
-function paintViews(){document.querySelectorAll('[data-vid]').forEach(el=>{const n=VIEWS[el.dataset.vid];if(n==null)return;el.hidden=false;el.lastElementChild.textContent=viewTxt(n,!!el.dataset.long);I.translate(el)})}
+function paintViews(){document.querySelectorAll('[data-vid]').forEach(el=>{const n=VIEWS[el.dataset.vid];if(n==null)return;el.hidden=false;el.lastElementChild.textContent=viewTxt(n,!!el.dataset.long);I.translate(el)});
+  document.querySelectorAll('[data-wid]').forEach(el=>{const n=WAS[el.dataset.wid];if(n==null)return;el.hidden=false;el.lastElementChild.textContent=`${num(n)} klik WhatsApp`;I.translate(el)})}
 function fillViews(){
   if(noViews||!sb)return;
   document.querySelectorAll('[data-vid]').forEach(el=>{if(VIEWS[el.dataset.vid]==null)VQ.add(el.dataset.vid)});
   if(!VQ.size)return;clearTimeout(vTimer);
   vTimer=setTimeout(async()=>{const ids=[...VQ];VQ.clear();
     for(let i=0;i<ids.length;i+=100){const part=ids.slice(i,i+100);
-      const {data,error}=await sb.from('listing_views').select('listing_id,views').in('listing_id',part);
+      let res=noWa?null:await sb.from('listing_views').select('listing_id,views,wa_clicks').in('listing_id',part);
+      if(!res||res.error){if(res)noWa=true;res=await sb.from('listing_views').select('listing_id,views').in('listing_id',part)}
+      const {data,error}=res;
       if(error){noViews=true;return}
-      part.forEach(id=>VIEWS[id]=0);(data||[]).forEach(r=>VIEWS[r.listing_id]=Number(r.views)||0)}
+      part.forEach(id=>{VIEWS[id]=0;if(!noWa)WAS[id]=0});(data||[]).forEach(r=>{VIEWS[r.listing_id]=Number(r.views)||0;if(!noWa)WAS[r.listing_id]=Number(r.wa_clicks)||0})}
     paintViews()},60);
+}
+async function countWa(id){
+  const l=getL(id);if(!sb||!l||noWa||(session&&l.agent_id===session.user.id))return;
+  const k="np-wa-"+id;
+  try{const t=Number(localStorage.getItem(k)||0);if(Date.now()-t<12*3600*1000)return;localStorage.setItem(k,String(Date.now()))}catch(e){}
+  try{const {error}=await sb.rpc('add_listing_wa',{lid:id});if(error&&/add_listing_wa|wa_clicks/.test(error.message||""))noWa=true}catch(e){}
 }
 async function countView(l){
   if(noViews||!sb||!l||(session&&l.agent_id===session.user.id))return;
@@ -394,7 +405,7 @@ function detail(l){
       <aside class="side">
         <div class="panel"><div class="label">Agen listing ini</div>
           <a class="who" href="#agen-${esc(a.id)}" style="text-decoration:none">${ava(a,"lg")}<span><b style="font-size:17px">${esc(a.name)}</b><br><span style="color:var(--muted)">${esc(a.agency||"")}</span></span></a>
-          ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>`:""}
+          ${a.phone?`<a class="btn btn-wa" href="${waLink(a,l)}" data-wa-lid="${esc(l.id)}" target="_blank" rel="noopener">Tanya via WhatsApp</a>`:""}
         </div>
         <div class="panel"><div class="label">Bagikan listing</div>
           <div class="share-row"><button class="btn btn-line" data-share="${esc(l.id)}">${SHARE_IC}<span>Bagikan</span></button><button class="btn btn-line" data-copy="${esc(l.id)}">${LINK_IC}<span>Salin link</span></button></div>
@@ -533,7 +544,7 @@ function rowItem(l,showAgent){
   return `<div class="item">${l.photos&&l.photos[0]?`<img class="thumb" src="${esc(l.photos[0])}" alt="">`:`<span class="thumb"></span>`}
     <div><b>${esc(l.title)}</b><small>${esc([showAgent?a.name:"",l.type,[l.kab,l.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
       <small>${listingPill(l)} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small>
-      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""} ${vw(l,true)}</small></div>
+      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small><small class="stat-line">${vw(l,true)} ${waw(l)}</small></div>
     ${cs?`<span class="confirm sold-confirm">Tandai "${esc(l.title)}" sebagai ${soldWord(l).toLowerCase()}? Listing hilang dari pencarian dan dihapus permanen ${SOLD_DAYS} hari kemudian. <button class="btn btn-primary btn-sm" data-sold="${esc(l.id)}">Ya, ${soldWord(l).toLowerCase()}</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :c?`<span class="confirm">Hapus listing ini? <button class="btn btn-danger btn-sm" data-del-listing="${esc(l.id)}">Ya, hapus</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}${S.noSold?"":isSold(l)?`<button class="btn btn-line btn-sm" data-unsold="${esc(l.id)}">Batalkan ${soldWord(l).toLowerCase()}</button>`:l.published?`<button class="btn btn-sold btn-sm" data-ask-sold="${esc(l.id)}">Tandai ${soldWord(l).toLowerCase()}</button>`:""}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
@@ -738,6 +749,7 @@ async function uploadPhoto(file,prefix,max,wm){
 }
 
 /* ===== events ===== */
+app.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[data-wa-lid]');if(a)countWa(a.dataset.waLid)});
 app.addEventListener('click',async e=>{
   const t=e.target.closest('button,a[data-act],a[data-goto]');if(!t)return;
   const act=t.dataset.act;

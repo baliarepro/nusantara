@@ -93,6 +93,7 @@ const P=[
  [/^Ya, (terjual|tersewa)$/,m=>"Yes, "+(m[1]==="terjual"?"sold":"rented")],
  [/^(Terjual|Tersewa) · (.+)$/,m=>(m[1]==="Terjual"?"Sold":"Rented")+" · "+m[2]],
  [/^(\d+) file bukan foto sehingga dilewati\.$/,m=>m[1]+" file(s) were not photos and were skipped."],
+ [/^([\d.,]+) klik WhatsApp$/,m=>m[1].replace(/\./g,",")+(m[1]==="1"?" WhatsApp tap":" WhatsApp taps")],
  [/^([\d.,]+) kali dilihat$/,m=>m[1].replace(/\./g,",")+(m[1]==="1"?" view":" views")],
  [/^(\d+) tayang$/,m=>m[1]+" live"],[/^(\d+) terjual\/tersewa$/,m=>m[1]+" sold/rented"],
  [/^Tandai "(.+)" sebagai (terjual|tersewa)\? Listing hilang dari pencarian dan dihapus permanen (\d+) hari kemudian\.$/,m=>`Mark "${m[1]}" as ${m[2]==="terjual"?"sold":"rented"}? It will be removed from search and permanently deleted ${m[3]} days later.`],
