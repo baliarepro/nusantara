@@ -304,6 +304,25 @@ function homeBlock(list, lang) {
   <section class="wrap"><nav class="static-links" style="padding-block:20px">${NAV[lang].map(([h, t]) => `<a href="${h}">${t}</a>`).join(" · ")}</nav></section>`;
 }
 
+function sharePage(l) {
+  const title = `${l.title} – ${[l.kab, l.prov].filter(Boolean).join(", ")}`;
+  const price = priceText(l, "id");
+  const desc = [price, [l.type, l.status].filter(Boolean).join(" · "), l.size ? `${num(l.size, "id")} m²` : "", l.cert || ""].filter(Boolean).join(" · ") + " — Nusantara Property";
+  const img = (l.photos || [])[0] || SITE_URL + "/assets/og-image.png?v=2";
+  const app = `/#${l.id}`;
+  return `<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} | Nusantara Property</title>
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="${SITE_URL}${listingPath(l, "id")}">
+<meta name="description" content="${esc(desc)}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Nusantara Property">
+<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${SITE_URL}/l/${l.id}/"><meta property="og:image" content="${esc(img)}">
+<meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0A2845">
+<script>location.replace(${JSON.stringify(app)})</script>
+</head><body style="font-family:system-ui,sans-serif;padding:24px"><p>Membuka iklan… <a href="${app}">Ketuk di sini bila tidak terbuka otomatis</a>.</p></body></html>`;
+}
+
 /* ---------- main ---------- */
 const { agents, listings } = await getData();
 const agentOf = id => agents.find(a => a.id === id);
@@ -315,6 +334,14 @@ const files = [];
 const write = (p, html) => { const f = path.join(ROOT, p, "index.html"); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, html); files.push(p); };
 
 for (const l of live) for (const lang of ["id", "en"]) write(listingPath(l, lang), listingPage(l, agentOf(l.agent_id), live, lang));
+
+// Link bagikan /l/<id>/: pratinjau foto & harga di WhatsApp/Facebook, lalu langsung membuka iklan di aplikasi.
+// Tidak dimasukkan ke sitemap (noindex). Bila halaman belum dibangun, 404.html mengarahkan ke /#<id>.
+for (const l of live) {
+  const f = path.join(ROOT, "l", l.id, "index.html");
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, sharePage(l));
+}
 
 const groups = {};
 live.forEach(l => (groups[catKey(l)] ||= []).push(l));
