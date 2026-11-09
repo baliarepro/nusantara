@@ -396,3 +396,6 @@ body{font-size:15.5px}
 .legal ul{padding-left:20px;display:grid;gap:6px}
 .foot a{color:inherit;text-decoration:underline}
 .stat-line{display:flex;gap:14px;flex-wrap:wrap}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.dup-flag{color:var(--danger)}
+.dup-flag a{color:inherit;text-decoration:underline}
