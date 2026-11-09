@@ -439,7 +439,7 @@ function registerPage(){
         <div class="checks">${SPEC.map(s=>`<label><input type="checkbox" name="spec" value="${s}" ${(d.spec||[]).includes(s)?"checked":""}>${s}</label>`).join("")}</div></div>
       <div class="field"><label for="r-arebi">No. anggota AREBI (opsional)</label><input id="r-arebi" name="arebi" value="${v("arebi")}"></div>
       <div class="field"><label for="r-bio">Profil singkat</label><textarea id="r-bio" name="bio" placeholder="Pengalaman, keahlian, bahasa yang dikuasai…">${v("bio")}</textarea></div>
-      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data diri ini benar. Setiap listing yang saya pasang saya terima langsung dari pemilik properti dan dapat saya pertanggungjawabkan. Saya memahami listing yang tidak sesuai dapat diturunkan oleh admin.</span></label>${E("agree")}
+      <label class="agree"><input type="checkbox" id="r-agree" name="agree" ${d.agree?"checked":""}><span>Saya menyatakan data diri ini benar. Setiap listing yang saya pasang saya terima langsung dari pemilik properti dan dapat saya pertanggungjawabkan. Saya memahami listing yang tidak sesuai dapat diturunkan oleh admin. <a href="#syarat" target="_blank">Syarat & ketentuan</a> · <a href="#privasi" target="_blank">Kebijakan privasi</a></span></label>${E("agree")}
       <button class="btn btn-primary" style="justify-self:start" ${REG.busy?"disabled":""}>${REG.busy?"Membuat akun…":"Buat akun"}</button>
       <span class="hint">Sudah punya akun? <a href="#masuk">Masuk di sini</a>.</span>
     </form>`;
@@ -637,7 +637,7 @@ function listingForm(){
 /* ===== render ===== */
 function route(){const h=decodeURIComponent((location.hash||"").slice(1));return /access_token|error_description|type=/.test(h)?"":h}
 function footer(){
-  return `<footer class="foot"><div class="wrap"><span>© ${new Date().getFullYear()} ${esc(SITE.name)} · Informasi listing dari masing-masing agen.</span>
+  return `<footer class="foot"><div class="wrap"><span>© ${new Date().getFullYear()} ${esc(SITE.name)} · Informasi listing dari masing-masing agen. <a href="#privasi">Kebijakan privasi</a> · <a href="#syarat">Syarat & ketentuan</a></span>
   <span class="swatches" aria-label="Warna zonasi">${Object.entries(ZONES).map(([z,v])=>`<span class="zone"><i style="background:var(${v})"></i>${z}</span>`).join("")}</span></div></footer>`;
 }
 function render(){
@@ -659,6 +659,8 @@ function render(){
     else if(r==="berita"&&window.NP_PAGES)main=NP_PAGES.news();
     else if(r==="panduan"&&window.NP_PAGES)main=NP_PAGES.guide();
     else if(r==="faq"&&window.NP_PAGES)main=NP_PAGES.faq(SITE);
+    else if(r==="privasi"&&window.NP_PAGES&&NP_PAGES.privacy)main=NP_PAGES.privacy(SITE);
+    else if(r==="syarat"&&window.NP_PAGES&&NP_PAGES.terms)main=NP_PAGES.terms(SITE);
     else if(r==="tentang"&&window.NP_PAGES){main=NP_PAGES.about(SITE,{listings:S.live,agents:pubAgents().length,provs:new Set(S.facets.map(l=>l.prov).filter(Boolean)).size})}
     else main=home();
   }
@@ -675,7 +677,7 @@ function setTitle(r){
   const e=EN(),l=getL(r),ag=r.startsWith("agen-")&&agentOf(r.slice(5));
   const base=e?"Nusantara Property – Land, Houses & Villas in Bali and Across Indonesia":"Nusantara Property – Jual Beli Tanah, Rumah & Villa di Bali dan Seluruh Indonesia";
   const map={listing:e?"All property listings":"Semua listing properti",berita:e?"Indonesian property news":"Berita properti Indonesia",panduan:e?"Guide to buying property in Indonesia":"Panduan membeli properti di Indonesia",
-    tentang:e?"About us":"Tentang kami",faq:"FAQ",daftar:e?"Join as an agent":"Daftar sebagai agen",masuk:e?"Agent sign in":"Masuk agen",dasbor:e?"Agent dashboard":"Dasbor agen",agen:e?"Our agents":"Agen kami"};
+    tentang:e?"About us":"Tentang kami",faq:"FAQ",privasi:e?"Privacy policy":"Kebijakan privasi",syarat:e?"Terms of use":"Syarat & ketentuan",daftar:e?"Join as an agent":"Daftar sebagai agen",masuk:e?"Agent sign in":"Masuk agen",dasbor:e?"Agent dashboard":"Dasbor agen",agen:e?"Our agents":"Agen kami"};
   let t=base;
   if(l)t=`${TT(l.title)} – ${[l.kab,l.prov].filter(Boolean).join(", ")} | Nusantara Property`;
   else if(ag)t=`${ag.name} – ${e?"Property agent":"Agen properti"} | Nusantara Property`;
