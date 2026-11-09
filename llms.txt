@@ -3,7 +3,7 @@
 > Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
 > English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
 
-Diperbarui / updated: 2026-11-09. Jumlah listing tayang / live listings: 7.
+Diperbarui / updated: 2026-11-09. Jumlah listing tayang / live listings: 8.
 
 ## Halaman utama / Key pages
 - [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
@@ -14,11 +14,12 @@ Diperbarui / updated: 2026-11-09. Jumlah listing tayang / live listings: 7.
 - [Berita properti](https://nusantara.properties/berita/) · [Property news](https://nusantara.properties/en/news/)
 
 ## Kategori / Categories
+- [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
 - [Tanah Dijual di Bali](https://nusantara.properties/properti/tanah-dijual-bali/) · [Land for Sale in Bali](https://nusantara.properties/en/property/land-for-sale-bali/)
 - [Gudang Dijual di Jawa Timur](https://nusantara.properties/properti/gudang-dijual-jawa-timur/) · [Warehouse for Sale in Jawa Timur](https://nusantara.properties/en/property/warehouse-for-sale-jawa-timur/)
-- [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
 
 ## Listing
+- [Villa di Ungasan ada 3 Unit Ready dekat Pantai Melasti](https://nusantara.properties/listing/villa-di-ungasan-ada-3-unit-ready-dekat-pantai-melasti-ae7c24/): Villa · Dijual · Ungasan, Badung, Bali · 165 m² · SHM · Rp 3,5 M
 - [Tanah 3,5are di Kayu Tulang Utara Canggu](https://nusantara.properties/listing/tanah-3-5are-di-kayu-tulang-utara-canggu-d82277/): Tanah · Dijual · Canggu, Badung, Bali · 350 m² · SHM · Rp 2,1 M / are
 - [Tanah 30are Ocean View di Area Pantai Pandawa](https://nusantara.properties/listing/tanah-30are-ocean-view-di-area-pantai-pandawa-3ba149/): Tanah · Dijual · Kutuh, Badung, Bali · 3.000 m² · SHM · Rp 650 jt / are
 - [Tanah 2450m² dekat Hillstone Ungasan](https://nusantara.properties/listing/tanah-2450m-dekat-hillstone-ungasan-8a00cd/): Tanah · Dijual · Ungasan, Badung, Bali · 2.450 m² · SHM · Rp 650 jt / are
@@ -28,6 +29,7 @@ Diperbarui / updated: 2026-11-09. Jumlah listing tayang / live listings: 7.
 - [Villa di Dewi Sri Kuta Bali](https://nusantara.properties/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · Dijual · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 M
 
 ## Listings (English)
+- [Villa in Ungasan ada 3 Unit Ready near Melasti Beach](https://nusantara.properties/en/listing/villa-di-ungasan-ada-3-unit-ready-dekat-pantai-melasti-ae7c24/): Villa · For sale · Ungasan, Badung, Bali · 165 m² · SHM · Rp 3.5 B
 - [Land 3,5are in Kayu Tulang Utara Canggu](https://nusantara.properties/en/listing/tanah-3-5are-di-kayu-tulang-utara-canggu-d82277/): Land · For sale · Canggu, Badung, Bali · 350 m² · SHM · Rp 2.1 B / are
 - [Land 30are Ocean View in Area Pandawa Beach](https://nusantara.properties/en/listing/tanah-30are-ocean-view-di-area-pantai-pandawa-3ba149/): Land · For sale · Kutuh, Badung, Bali · 3,000 m² · SHM · Rp 650 M / are
 - [Land 2450m² near Hillstone Ungasan](https://nusantara.properties/en/listing/tanah-2450m-dekat-hillstone-ungasan-8a00cd/): Land · For sale · Ungasan, Badung, Bali · 2,450 m² · SHM · Rp 650 M / are
