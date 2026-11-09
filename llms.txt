@@ -12,6 +12,7 @@ Diperbarui / updated: 2026-11-09. Jumlah listing tayang / live listings: 9.
 - [FAQ](https://nusantara.properties/faq/) · [FAQ (English)](https://nusantara.properties/en/faq/)
 - [Tentang kami](https://nusantara.properties/tentang/) · [About us](https://nusantara.properties/en/about/)
 - [Berita properti](https://nusantara.properties/berita/) · [Property news](https://nusantara.properties/en/news/)
+- [Kebijakan privasi](https://nusantara.properties/privasi/) · [Privacy policy](https://nusantara.properties/en/privacy/) · [Syarat & ketentuan](https://nusantara.properties/syarat/) · [Terms of use](https://nusantara.properties/en/terms/)
 
 ## Kategori / Categories
 - [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
