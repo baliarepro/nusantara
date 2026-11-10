@@ -118,5 +118,11 @@
   "event": "published",
   "listing": "9b26fc03-4f27-45f1-8597-05deb33607fd",
   "permalink": "https://www.instagram.com/p/DfiaKosjfMK/"
+ },
+ {
+  "at": "2026-11-10T07:56:56+00:00",
+  "event": "prepared",
+  "listing": "a06bb87c-5acd-4958-9eb6-8fc2e2bdc1b8",
+  "images": 5
  }
 ]
