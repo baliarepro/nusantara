@@ -51,7 +51,7 @@ const DAY=86400000;
 const fmtD=d=>d?new Date(d).toLocaleDateString(I.locale,{day:"numeric",month:"short",year:"numeric"}):"";
 const daysLeft=l=>EXPIRE_DAYS-Math.floor((Date.now()-new Date(l.updated_at||l.created_at).getTime())/DAY);
 const isSold=l=>!!(l&&l.sold_at);
-const FEAT_DAYS=30;
+const FEAT_DAYS=30,FEAT_MAX=4;
 const isFeat=l=>!!(l&&l.featured_until&&new Date(l.featured_until).getTime()>Date.now()&&!l.sold_at);
 const STAR=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
 const isLive=l=>l.published&&!isSold(l)&&daysLeft(l)>0;
@@ -334,7 +334,7 @@ function home(){
       <div class="chips" style="margin-top:12px">${typeCounts.map(([t,n])=>`<button class="chip" data-go-type="${t}">${t}<span class="n">${n}</span></button>`).join("")}</div>
     </section>
     ${(S.feat||[]).length?`<section class="wrap feat-section"><div class="section-head"><div><div class="label label-feat">${STAR}Unggulan</div><h2>Properti pilihan</h2></div></div>
-      <div class="grid">${S.feat.slice(0,6).map(card).join("")}</div></section>`:""}
+      <div class="grid">${S.feat.slice(0,FEAT_MAX).map(card).join("")}</div></section>`:""}
     <section class="wrap"><div class="section-head"><div><div class="label">Baru tayang</div><h2>Listing terbaru</h2></div><a class="btn btn-line btn-sm" href="#listing">Lihat semua listing</a></div>
       <div class="grid">${!S.loaded?`<div class="empty">Memuat listing…</div>`:S.error?`<div class="empty">${esc(S.error)}</div>`:latest.length?latest.map(card).join(""):`<div class="empty">Belum ada listing yang tayang.</div>`}</div></section>
     ${P?`<section class="wrap"><div class="section-head"><div><div class="label">Berita</div><h2>Kabar properti terbaru</h2></div><a class="btn btn-line btn-sm" href="#berita">Semua berita</a></div>
@@ -366,7 +366,7 @@ function listingPage(){
         ${(F.type||F.status||F.prov||F.kab||F.agent||F.budget||F.bed||F.facing||F.q)?`<button class="btn-ghost btn-sm" data-act="reset-filter">Hapus filter</button>`:""}
       </div>
     </section>
-    ${(()=>{const fl=(S.feat||[]).filter(l=>(!F.type||l.type===F.type)&&(!F.status||l.status===F.status)&&(!F.prov||l.prov===F.prov)&&(!F.kab||l.kab===F.kab)).slice(0,3);
+    ${(()=>{const fl=(S.feat||[]).filter(l=>(!F.type||l.type===F.type)&&(!F.status||l.status===F.status)&&(!F.prov||l.prov===F.prov)&&(!F.kab||l.kab===F.kab)).slice(0,FEAT_MAX);
       return fl.length?`<section class="wrap feat-strip"><div class="label label-feat">${STAR}Unggulan</div><div class="grid">${fl.map(card).join("")}</div></section>`:""})()}
     <section class="wrap grid" id="results">${resultsHtml()}</section>
     <section class="wrap more" id="more">${moreHtml()}</section>`;
@@ -557,7 +557,11 @@ function renewBanner(list,own){
 }
 function featBtn(l){
   if(isSold(l)||!l.published||!isLive(l))return "";
-  if(me&&me.is_admin)return isFeat(l)?`<button class="btn btn-line btn-sm" data-unfeat="${esc(l.id)}">Hentikan sorotan</button>`:`<button class="btn btn-feat btn-sm" data-feat="${esc(l.id)}">${STAR}Sorot ${FEAT_DAYS} hari</button>`;
+  if(me&&me.is_admin){
+    if(isFeat(l))return `<button class="btn btn-line btn-sm" data-unfeat="${esc(l.id)}">Hentikan sorotan</button>`;
+    const full=(S.feat||[]).length>=FEAT_MAX;
+    return `<button class="btn btn-feat btn-sm" data-feat="${esc(l.id)}" ${full?`disabled title="Sudah ${FEAT_MAX} listing unggulan"`:""}>${STAR}Sorot ${FEAT_DAYS} hari</button>`;
+  }
   if(isFeat(l))return "";
   return `<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(SITE.adminPhone)}?text=${encodeURIComponent(`Halo admin ${SITE.name}, saya ingin listing "${l.title}" (${listingUrl(l)}) disorot sebagai Unggulan selama ${FEAT_DAYS} hari.`)}">Minta sorotan</a>`;
 }
@@ -580,9 +584,9 @@ function myListings(){
     <div class="list">${mine.length?mine.map(l=>rowItem(l,false)).join(""):`<div class="empty">Belum ada listing. ${me.status==="approved"?"Ketuk Tambah listing untuk memasang yang pertama.":"Anda bisa memasang listing setelah akun disetujui."}</div>`}</div>`;
 }
 function adminListings(){
-  const A=S.all;
+  const A=S.all;const nf=(S.feat||[]).length;
   if(!A.started||(A.loading&&!A.items.length))return `<div class="empty">Memuat listing…</div>`;
-  return `<div class="dash-bar"><span class="label">${A.total} listing dari semua agen</span></div>
+  return `<div class="dash-bar"><span class="label">${A.total} listing dari semua agen</span><span class="pill pill-feat">${STAR}Unggulan ${nf} / ${FEAT_MAX}</span></div>
     ${renewBanner(A.items,false)}
     <div class="list">${A.items.length?A.items.map(l=>rowItem(l,true)).join(""):`<div class="empty">Belum ada listing.</div>`}</div>
     ${A.done?"":`<button class="btn btn-line" data-act="more-all" ${A.loading?"disabled":""}>${A.loading?"Memuat…":"Muat lebih banyak"}</button>`}`;
@@ -805,10 +809,12 @@ app.addEventListener('click',async e=>{
   if(act==="cancel"){DS.confirm=null;DS.confirmSold=null;render();return}
   if(t.dataset.askSold){DS.confirmSold=t.dataset.askSold;DS.confirm=null;render();return}
   if(t.dataset.feat||t.dataset.unfeat){
-    const id=t.dataset.feat||t.dataset.unfeat,on=!!t.dataset.feat;t.disabled=true;
+    const id=t.dataset.feat||t.dataset.unfeat,on=!!t.dataset.feat;
+    if(on&&(S.feat||[]).length>=FEAT_MAX){DS.msg={text:`Maksimal ${FEAT_MAX} listing unggulan sekaligus. Hentikan sorotan salah satu listing dulu, lalu sorot yang baru.`,err:true};render();return}
+    t.disabled=true;
     const until=on?new Date(Date.now()+FEAT_DAYS*DAY).toISOString():null;
     const {error}=await sb.from('listings').update({featured_until:until}).eq('id',id);
-    DS.msg=error?{text:/featured_until/.test(error.message||"")?"Fitur Unggulan belum aktif di database. Admin perlu menjalankan SQL tambahan di Supabase.":errMsg(error),err:true}
+    DS.msg=error?{text:/FEATURED_FULL/.test(error.message||"")?`Maksimal ${FEAT_MAX} listing unggulan sekaligus. Hentikan sorotan salah satu listing dulu, lalu sorot yang baru.`:/featured_until/.test(error.message||"")?"Fitur Unggulan belum aktif di database. Admin perlu menjalankan SQL tambahan di Supabase.":errMsg(error),err:true}
       :{text:on?`Listing disorot sebagai Unggulan sampai ${fmtD(until)}.`:"Sorotan listing dihentikan."};
     await load();return}
   if(t.dataset.sold||t.dataset.unsold){

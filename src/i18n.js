@@ -95,6 +95,7 @@ const P=[
  [/^(\d+) file bukan foto sehingga dilewati\.$/,m=>m[1]+" file(s) were not photos and were skipped."],
  [/^([\d.,]+) klik WhatsApp$/,m=>m[1].replace(/\./g,",")+(m[1]==="1"?" WhatsApp tap":" WhatsApp taps")],
  [/^([\d.,]+) kali dilihat$/,m=>m[1].replace(/\./g,",")+(m[1]==="1"?" view":" views")],
+ [/^Unggulan (\d+) \/ (\d+)$/,m=>`Featured ${m[1]} / ${m[2]}`],[/^Maksimal (\d+) listing unggulan sekaligus\..*$/,m=>`A maximum of ${m[1]} featured listings at a time. Stop featuring one listing first, then feature the new one.`],
  [/^Disorot sampai (.+)$/,m=>"Featured until "+m[1]],[/^Sorot (\d+) hari$/,m=>`Feature for ${m[1]} days`],[/^Listing disorot sebagai Unggulan sampai (.+)\.$/,m=>`Listing featured until ${m[1]}.`],
  [/^(\d+) tayang$/,m=>m[1]+" live"],[/^(\d+) terjual\/tersewa$/,m=>m[1]+" sold/rented"],
  [/^Tandai "(.+)" sebagai (terjual|tersewa)\? Listing hilang dari pencarian dan dihapus permanen (\d+) hari kemudian\.$/,m=>`Mark "${m[1]}" as ${m[2]==="terjual"?"sold":"rented"}? It will be removed from search and permanently deleted ${m[3]} days later.`],

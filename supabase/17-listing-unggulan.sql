@@ -3,7 +3,7 @@
 alter table public.listings add column if not exists featured_until timestamptz;
 create index if not exists listings_featured_idx on public.listings (featured_until);
 
--- Hanya admin yang boleh menyorot atau menghentikan sorotan
+-- Hanya admin yang boleh menyorot, dan maksimal 4 listing unggulan sekaligus
 create or replace function public.protect_listing_featured() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
@@ -12,6 +12,13 @@ begin
       new.featured_until := null;
     else
       new.featured_until := old.featured_until;
+    end if;
+  end if;
+  if new.featured_until is not null and new.featured_until > now()
+     and (tg_op = 'INSERT' or old.featured_until is null or old.featured_until <= now()) then
+    if (select count(*) from public.listings
+        where featured_until > now() and sold_at is null and id <> new.id) >= 4 then
+      raise exception 'FEATURED_FULL: maksimal 4 listing unggulan sekaligus';
     end if;
   end if;
   return new;
