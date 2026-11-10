@@ -3,7 +3,7 @@
 > Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
 > English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
 
-Diperbarui / updated: 2026-11-10. Jumlah listing tayang / live listings: 11.
+Diperbarui / updated: 2026-11-10. Jumlah listing tayang / live listings: 12.
 
 ## Halaman utama / Key pages
 - [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
@@ -16,12 +16,14 @@ Diperbarui / updated: 2026-11-10. Jumlah listing tayang / live listings: 11.
 - [Kebijakan privasi](https://nusantara.properties/privasi/) · [Privacy policy](https://nusantara.properties/en/privacy/) · [Syarat & ketentuan](https://nusantara.properties/syarat/) · [Terms of use](https://nusantara.properties/en/terms/)
 
 ## Kategori / Categories
+- [Ruko Dijual di Jawa Timur](https://nusantara.properties/properti/ruko-dijual-jawa-timur/) · [Shophouse for Sale in Jawa Timur](https://nusantara.properties/en/property/shophouse-for-sale-jawa-timur/)
 - [Tanah Dijual di Bali](https://nusantara.properties/properti/tanah-dijual-bali/) · [Land for Sale in Bali](https://nusantara.properties/en/property/land-for-sale-bali/)
 - [Rumah Dijual di Jawa Timur](https://nusantara.properties/properti/rumah-dijual-jawa-timur/) · [House for Sale in Jawa Timur](https://nusantara.properties/en/property/house-for-sale-jawa-timur/)
 - [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
 - [Gudang Dijual di Jawa Timur](https://nusantara.properties/properti/gudang-dijual-jawa-timur/) · [Warehouse for Sale in Jawa Timur](https://nusantara.properties/en/property/warehouse-for-sale-jawa-timur/)
 
 ## Listing
+- [Ruko strategis sigura gura dekat unibraw da uin](https://nusantara.properties/listing/ruko-strategis-sigura-gura-dekat-unibraw-da-uin-d7572f/): Ruko · Dijual · Sigura gura, Kota Malang, Jawa Timur · 84 m² · SHM · Rp 1,65 M
 - [Tanah 70are di Toyaning Ungasan Kuta Selatan](https://nusantara.properties/listing/tanah-70are-di-toyaning-ungasan-kuta-selatan-a06bb8/): Tanah · Dijual · Ungasan, Badung, Bali · 7.000 m² · SHM · Rp 5,8 jt / m²
 - [Rumah dijual area jaksa agung suprapto Malang](https://nusantara.properties/listing/rumah-dijual-area-jaksa-agung-suprapto-malang-9b26fc/): Rumah · Dijual · Klojen, Kota Malang, Jawa Timur · 1.587 m² · SHM · Rp 13 M
 - [Rice field view villa Blahkiuh Near Ubud](https://nusantara.properties/listing/rice-field-view-villa-blahkiuh-near-ubud-554d1d/): Villa · Dijual · Abiansemal, Badung, Bali · 248 m² · SHM · Rp 5,99 M
@@ -35,6 +37,7 @@ Diperbarui / updated: 2026-11-10. Jumlah listing tayang / live listings: 11.
 - [Villa di Dewi Sri Kuta Bali](https://nusantara.properties/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · Dijual · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 M
 
 ## Listings (English)
+- [Shophouse strategic sigura gura near unibraw da uin](https://nusantara.properties/en/listing/ruko-strategis-sigura-gura-dekat-unibraw-da-uin-d7572f/): Shophouse · For sale · Sigura gura, Kota Malang, Jawa Timur · 84 m² · SHM · Rp 1.65 B
 - [Land 70are in Toyaning Ungasan Kuta Selatan](https://nusantara.properties/en/listing/tanah-70are-di-toyaning-ungasan-kuta-selatan-a06bb8/): Land · For sale · Ungasan, Badung, Bali · 7,000 m² · SHM · Rp 5.8 M / m²
 - [House for sale area jaksa agung suprapto Malang](https://nusantara.properties/en/listing/rumah-dijual-area-jaksa-agung-suprapto-malang-9b26fc/): House · For sale · Klojen, Kota Malang, Jawa Timur · 1,587 m² · SHM · Rp 13 B
 - [Rice field view villa Blahkiuh Near Ubud](https://nusantara.properties/en/listing/rice-field-view-villa-blahkiuh-near-ubud-554d1d/): Villa · For sale · Abiansemal, Badung, Bali · 248 m² · SHM · Rp 5.99 B
