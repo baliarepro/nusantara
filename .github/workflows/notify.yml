@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "5 */4 * * *"   # setiap 4 jam
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "scripts/notify.py"
+      - ".github/workflows/notify.yml"
 
 permissions:
   contents: write
