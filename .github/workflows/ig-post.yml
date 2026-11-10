@@ -1,14 +1,11 @@
 name: Posting otomatis ke Instagram
 
+# DIJEDA SEMENTARA (10 Nov 2026): portofolio bisnis Meta sedang dibatasi, menunggu hasil tinjauan.
+# Untuk mengaktifkan lagi, kembalikan blok "schedule" di bawah.
 on:
-  schedule:
-    - cron: "47 */3 * * *"   # setiap 3 jam
+  # schedule:
+  #   - cron: "47 */3 * * *"   # setiap 3 jam
   workflow_dispatch: {}
-  push:
-    branches: [main]
-    paths:
-      - "scripts/ig_post.py"
-      - ".github/workflows/ig-post.yml"
 
 permissions:
   contents: write
