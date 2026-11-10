@@ -124,5 +124,11 @@
   "event": "prepared",
   "listing": "a06bb87c-5acd-4958-9eb6-8fc2e2bdc1b8",
   "images": 5
+ },
+ {
+  "at": "2026-11-10T07:58:15+00:00",
+  "event": "published",
+  "listing": "a06bb87c-5acd-4958-9eb6-8fc2e2bdc1b8",
+  "permalink": "https://www.instagram.com/p/DfjbFjSF6NQ/"
  }
 ]
