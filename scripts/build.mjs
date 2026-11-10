@@ -129,7 +129,7 @@ ${jsonld.map(j => `<script type="application/ld+json">${JSON.stringify(j).replac
 </div></header>
 <main>${body}</main>
 <footer class="foot"><div class="wrap"><span>© ${NOW.getFullYear()} Nusantara Property · ${lang === "en" ? "Listing information is provided by each agent." : "Informasi listing dari masing-masing agen."}</span>
-<span class="static-links">${NAV[lang].map(([h, t]) => `<a href="${h}">${t}</a>`).join(" · ")} · ${lang === "en" ? `<a href="/en/privacy/">Privacy</a> · <a href="/en/terms/">Terms</a>` : `<a href="/privasi/">Kebijakan privasi</a> · <a href="/syarat/">Syarat & ketentuan</a>`}</span></div></footer>
+<span class="static-links">${NAV[lang].map(([h, t]) => `<a href="${h}">${t}</a>`).join(" · ")} · ${lang === "en" ? `<a href="/en/agent-guide/">Agent guide</a> · <a href="/en/privacy/">Privacy</a> · <a href="/en/terms/">Terms</a>` : `<a href="/panduan-agen/">Panduan agen</a> · <a href="/privasi/">Kebijakan privasi</a> · <a href="/syarat/">Syarat & ketentuan</a>`}</span></div></footer>
 </body>
 </html>`;
 }
@@ -256,8 +256,8 @@ function catalogPage(list, lang, { title, h1, intro, pathId, pathEn, crumbs }) {
 
 /* ---------- content pages from pages.js ---------- */
 function fixLinks(html) {
-  return html.replace(/href="#panduan" data-goto="([^"]+)"/g, 'href="#g-$1"')
-    .replace(/href="#(listing|daftar|masuk|dasbor|agen|berita|panduan|tentang|faq|privasi|syarat)?"/g, (m, r) => `href="/#${r || ""}"`);
+  return html.replace(/href="#panduan(?:-agen)?" data-goto="([^"]+)"/g, 'href="#g-$1"')
+    .replace(/href="#(listing|daftar|masuk|dasbor|agen|berita|panduan|tentang|faq|privasi|syarat|panduan-agen)?"/g, (m, r) => `href="/#${r || ""}"`);
 }
 function contentPages(stats) {
   const out = [];
@@ -268,6 +268,8 @@ function contentPages(stats) {
       en: ["FAQ – Frequently asked questions | Nusantara Property", "Answers for buyers and agents: contacting agents, zoning colours, joining as an agent, the 60-day rule and listing photo limits."] }],
     ["about", "/tentang/", "/en/about/", { id: ["Tentang Nusantara Property – Platform properti dari pengalaman lapangan", "Nusantara Property adalah platform listing properti multi-agen untuk seluruh Indonesia, dibangun dari pengalaman lapangan sejak 2009 di Bali."],
       en: ["About Nusantara Property – A property platform built from field experience", "Nusantara Property is a multi-agent property listing platform for all of Indonesia, built from field experience in Bali since 2009."] }],
+    ["agentguide", "/panduan-agen/", "/en/agent-guide/", { id: ["Panduan agen – Cara bergabung dan memasang listing | Nusantara Property", "Panduan untuk agen properti: cara mendaftar di Nusantara Property, aturan Direct Owner, cara memasang listing yang menarik, dan mengelolanya."],
+      en: ["Agent guide – How to join and post listings | Nusantara Property", "Guide for property agents: registering on Nusantara Property, the Direct Owner rule, posting attractive listings and managing them."] }],
     ["privacy", "/privasi/", "/en/privacy/", { id: ["Kebijakan privasi | Nusantara Property", "Data apa yang dikumpulkan Nusantara Property dari agen dan pengunjung, untuk apa digunakan, berapa lama disimpan, dan hak Anda sesuai UU PDP."],
       en: ["Privacy policy | Nusantara Property", "What data Nusantara Property collects from agents and visitors, how it is used, how long it is kept, and your rights."] }],
     ["terms", "/syarat/", "/en/terms/", { id: ["Syarat & ketentuan | Nusantara Property", "Aturan penggunaan Nusantara Property bagi agen, pembeli, dan pengunjung: kewajiban agen Direct Owner, penurunan listing, dan batas tanggung jawab."],
@@ -279,7 +281,7 @@ function contentPages(stats) {
     for (const lang of ["id", "en"]) {
       const { P } = L[lang];
       const site = { name: "Nusantara Property", adminPhone: "0812868080" };
-      let html = kind === "guide" ? P.guide() : kind === "faq" ? P.faq(site) : kind === "about" ? P.about(site, stats) : kind === "privacy" ? P.privacy(site) : kind === "terms" ? P.terms(site) : P.news();
+      let html = kind === "guide" ? P.guide() : kind === "faq" ? P.faq(site) : kind === "about" ? P.about(site, stats) : kind === "agentguide" ? P.agentGuide(site) : kind === "privacy" ? P.privacy(site) : kind === "terms" ? P.terms(site) : P.news();
       html = fixLinks(html);
       const jsonld = [breadcrumbs(lang, [[meta[lang][0].split(" | ")[0].split(" – ")[0], lang === "en" ? pen : pid]])];
       if (kind === "faq") {
@@ -329,7 +331,7 @@ const agentOf = id => agents.find(a => a.id === id);
 const live = listings.filter(l => isLive(l) && agentOf(l.agent_id));
 console.log(`agen: ${agents.length}, listing tayang: ${live.length}`);
 
-for (const d of ["listing", "en", "properti", "panduan", "faq", "tentang", "berita", "privasi", "syarat", "l"]) fs.rmSync(path.join(ROOT, d), { recursive: true, force: true });
+for (const d of ["listing", "en", "properti", "panduan", "faq", "tentang", "berita", "privasi", "syarat", "panduan-agen", "l"]) fs.rmSync(path.join(ROOT, d), { recursive: true, force: true });
 const files = [];
 const write = (p, html) => { const f = path.join(ROOT, p, "index.html"); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, html); files.push(p); };
 
@@ -401,6 +403,7 @@ Diperbarui / updated: ${lastmod}. Jumlah listing tayang / live listings: ${live.
 - [FAQ](${SITE_URL}/faq/) · [FAQ (English)](${SITE_URL}/en/faq/)
 - [Tentang kami](${SITE_URL}/tentang/) · [About us](${SITE_URL}/en/about/)
 - [Berita properti](${SITE_URL}/berita/) · [Property news](${SITE_URL}/en/news/)
+- [Panduan agen](${SITE_URL}/panduan-agen/) · [Agent guide](${SITE_URL}/en/agent-guide/)
 - [Kebijakan privasi](${SITE_URL}/privasi/) · [Privacy policy](${SITE_URL}/en/privacy/) · [Syarat & ketentuan](${SITE_URL}/syarat/) · [Terms of use](${SITE_URL}/en/terms/)
 
 ## Kategori / Categories

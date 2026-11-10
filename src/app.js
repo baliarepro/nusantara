@@ -465,6 +465,7 @@ function registerPage(){
           <li><div><b>Konfirmasi email</b><span>Klik tautan yang kami kirim ke email Anda.</span></div></li>
           <li><div><b>Persetujuan admin</b><span>Setelah disetujui, profil Anda tayang dan Anda bisa memasang listing.</span></div></li>
         </ol>
+        <p><a href="#panduan-agen">Baca panduan agen lengkap →</a></p>
       </div>${right}</div></div>`;
 }
 
@@ -555,7 +556,7 @@ function myListings(){
   return `<div class="dash-bar"><span class="label">${mine.length} listing</span>${sold?`<span class="dash-stats"><span class="pill pill-approved">${liveN} tayang</span> <span class="pill pill-sold">${sold} terjual/tersewa</span></span>`:""}
       <button class="btn btn-primary btn-sm" data-act="new-listing" ${me.status==="approved"?"":"disabled title=\"Menunggu persetujuan admin\""}>Tambah listing</button></div>
     ${renewBanner(mine,true)}
-    <p class="hint" style="margin:0">Listing otomatis diturunkan bila tidak diperbarui selama ${EXPIRE_DAYS} hari. Menyimpan perubahan atau mengetuk Tayangkan ulang akan memulai hitungan dari awal.</p>
+    <p class="hint" style="margin:0">Listing otomatis diturunkan bila tidak diperbarui selama ${EXPIRE_DAYS} hari. Menyimpan perubahan atau mengetuk Tayangkan ulang akan memulai hitungan dari awal. <a href="#panduan-agen">Panduan agen</a></p>
     <div class="list">${mine.length?mine.map(l=>rowItem(l,false)).join(""):`<div class="empty">Belum ada listing. ${me.status==="approved"?"Ketuk Tambah listing untuk memasang yang pertama.":"Anda bisa memasang listing setelah akun disetujui."}</div>`}</div>`;
 }
 function adminListings(){
@@ -649,7 +650,7 @@ function listingForm(){
 /* ===== render ===== */
 function route(){const h=decodeURIComponent((location.hash||"").slice(1));return /access_token|error_description|type=/.test(h)?"":h}
 function footer(){
-  return `<footer class="foot"><div class="wrap"><span>© ${new Date().getFullYear()} ${esc(SITE.name)} · Informasi listing dari masing-masing agen. <a href="#privasi">Kebijakan privasi</a> · <a href="#syarat">Syarat & ketentuan</a></span>
+  return `<footer class="foot"><div class="wrap"><span>© ${new Date().getFullYear()} ${esc(SITE.name)} · Informasi listing dari masing-masing agen. <a href="#panduan-agen">Panduan agen</a> · <a href="#privasi">Kebijakan privasi</a> · <a href="#syarat">Syarat & ketentuan</a></span>
   <span class="swatches" aria-label="Warna zonasi">${Object.entries(ZONES).map(([z,v])=>`<span class="zone"><i style="background:var(${v})"></i>${z}</span>`).join("")}</span></div></footer>`;
 }
 function render(){
@@ -672,6 +673,7 @@ function render(){
     else if(r==="panduan"&&window.NP_PAGES)main=NP_PAGES.guide();
     else if(r==="faq"&&window.NP_PAGES)main=NP_PAGES.faq(SITE);
     else if(r==="privasi"&&window.NP_PAGES&&NP_PAGES.privacy)main=NP_PAGES.privacy(SITE);
+    else if(r==="panduan-agen"&&window.NP_PAGES&&NP_PAGES.agentGuide)main=NP_PAGES.agentGuide(SITE);
     else if(r==="syarat"&&window.NP_PAGES&&NP_PAGES.terms)main=NP_PAGES.terms(SITE);
     else if(r==="tentang"&&window.NP_PAGES){main=NP_PAGES.about(SITE,{listings:S.live,agents:pubAgents().length,provs:new Set(S.facets.map(l=>l.prov).filter(Boolean)).size})}
     else main=home();
@@ -689,7 +691,7 @@ function setTitle(r){
   const e=EN(),l=getL(r),ag=r.startsWith("agen-")&&agentOf(r.slice(5));
   const base=e?"Nusantara Property – Land, Houses & Villas in Bali and Across Indonesia":"Nusantara Property – Jual Beli Tanah, Rumah & Villa di Bali dan Seluruh Indonesia";
   const map={listing:e?"All property listings":"Semua listing properti",berita:e?"Indonesian property news":"Berita properti Indonesia",panduan:e?"Guide to buying property in Indonesia":"Panduan membeli properti di Indonesia",
-    tentang:e?"About us":"Tentang kami",faq:"FAQ",privasi:e?"Privacy policy":"Kebijakan privasi",syarat:e?"Terms of use":"Syarat & ketentuan",daftar:e?"Join as an agent":"Daftar sebagai agen",masuk:e?"Agent sign in":"Masuk agen",dasbor:e?"Agent dashboard":"Dasbor agen",agen:e?"Our agents":"Agen kami"};
+    tentang:e?"About us":"Tentang kami",faq:"FAQ",privasi:e?"Privacy policy":"Kebijakan privasi","panduan-agen":e?"Agent guide":"Panduan agen",syarat:e?"Terms of use":"Syarat & ketentuan",daftar:e?"Join as an agent":"Daftar sebagai agen",masuk:e?"Agent sign in":"Masuk agen",dasbor:e?"Agent dashboard":"Dasbor agen",agen:e?"Our agents":"Agen kami"};
   let t=base;
   if(l)t=`${TT(l.title)} – ${[l.kab,l.prov].filter(Boolean).join(", ")} | Nusantara Property`;
   else if(ag)t=`${ag.name} – ${e?"Property agent":"Agen properti"} | Nusantara Property`;
