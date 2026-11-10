@@ -400,3 +400,10 @@ body{font-size:15.5px}
 .orig{margin-top:8px;font-size:13.5px;color:var(--muted)}
 .orig summary{cursor:pointer}
 .orig .desc{margin-top:8px}
+.tag-feat{background:var(--gold-grad);color:#0A2845;display:inline-flex;align-items:center;gap:4px;font-weight:700}
+.card.feat{box-shadow:0 0 0 2px var(--gold),0 10px 28px -14px rgba(212,128,42,.55)}
+.label-feat{color:var(--gold-ink);display:inline-flex;align-items:center;gap:6px}
+.pill-feat{background:var(--gold-soft);color:var(--gold-ink);display:inline-flex;align-items:center;gap:4px}
+.btn-feat{background:var(--gold-grad);color:#0A2845;border:0;display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.feat-strip{padding-block:6px 4px}
+.feat-strip .label{margin-bottom:10px}

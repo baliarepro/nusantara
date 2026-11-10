@@ -51,6 +51,9 @@ const DAY=86400000;
 const fmtD=d=>d?new Date(d).toLocaleDateString(I.locale,{day:"numeric",month:"short",year:"numeric"}):"";
 const daysLeft=l=>EXPIRE_DAYS-Math.floor((Date.now()-new Date(l.updated_at||l.created_at).getTime())/DAY);
 const isSold=l=>!!(l&&l.sold_at);
+const FEAT_DAYS=30;
+const isFeat=l=>!!(l&&l.featured_until&&new Date(l.featured_until).getTime()>Date.now()&&!l.sold_at);
+const STAR=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>`;
 const isLive=l=>l.published&&!isSold(l)&&daysLeft(l)>0;
 const needsRenew=l=>l.published&&!isSold(l)&&daysLeft(l)<=WARN_DAYS;
 const soldLeft=l=>Math.max(0,SOLD_DAYS-Math.floor((Date.now()-new Date(l.sold_at).getTime())/DAY));
@@ -136,6 +139,12 @@ async function load(){
   S.facets=(f&&f.data)||[];S.live=(c&&c.count)??S.facets.length;S.home=merge(h&&h.data);S.mine=m?merge(m.data):[];S.totalAll=t?t.count:null;
   S.loaded=true;S.page.key=null;S.all={items:[],total:0,loading:false,done:false,started:false};S.byAgent={};S.missing={};
   render();
+  loadFeatured();
+}
+async function loadFeatured(){
+  try{const r=await liveQ('*').gt('featured_until',new Date().toISOString()).order('featured_until',{ascending:true}).limit(12);
+    S.feat=r.error?[]:merge(r.data).filter(isFeat);}catch(e){S.feat=[]}
+  if(S.feat.length&&(route()===""||route()==="listing"))render();
 }
 function fkey(){return JSON.stringify([F.q.trim(),F.type,F.status,F.prov,F.kab,F.agent,F.sort,F.budget,F.bed,F.facing])}
 async function fetchPage(reset){
@@ -284,8 +293,8 @@ async function countView(l){
 }
 function card(l){
   const a=agentOf(l.agent_id)||{name:"Agen"};
-  return `<a class="card" href="#${esc(l.id)}">
-    <div class="media">${mediaHtml(l)}<div class="tags"><span class="tag">${esc(l.type)}</span>${l.status==="Disewakan"?`<span class="tag sewa">Disewakan</span>`:""}</div></div>
+  return `<a class="card${isFeat(l)?" feat":""}" href="#${esc(l.id)}">
+    <div class="media">${mediaHtml(l)}<div class="tags">${isFeat(l)?`<span class="tag tag-feat">${STAR}Unggulan</span>`:""}<span class="tag">${esc(l.type)}</span>${l.status==="Disewakan"?`<span class="tag sewa">Disewakan</span>`:""}</div></div>
     <div class="card-body">
       <h3${mt(l.title)}>${esc(TT(l.title))}</h3>
       <div class="loc">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(", ")}</div>
@@ -324,6 +333,8 @@ function home(){
       <form class="search home-search" id="hs" role="search"><input id="h-q" type="search" placeholder="Cari kota atau lokasi, mis. Jakarta Selatan, Sleman, Canggu…" aria-label="Cari listing"><button class="btn btn-primary">Cari</button></form>
       <div class="chips" style="margin-top:12px">${typeCounts.map(([t,n])=>`<button class="chip" data-go-type="${t}">${t}<span class="n">${n}</span></button>`).join("")}</div>
     </section>
+    ${(S.feat||[]).length?`<section class="wrap feat-section"><div class="section-head"><div><div class="label label-feat">${STAR}Unggulan</div><h2>Properti pilihan</h2></div></div>
+      <div class="grid">${S.feat.slice(0,6).map(card).join("")}</div></section>`:""}
     <section class="wrap"><div class="section-head"><div><div class="label">Baru tayang</div><h2>Listing terbaru</h2></div><a class="btn btn-line btn-sm" href="#listing">Lihat semua listing</a></div>
       <div class="grid">${!S.loaded?`<div class="empty">Memuat listing…</div>`:S.error?`<div class="empty">${esc(S.error)}</div>`:latest.length?latest.map(card).join(""):`<div class="empty">Belum ada listing yang tayang.</div>`}</div></section>
     ${P?`<section class="wrap"><div class="section-head"><div><div class="label">Berita</div><h2>Kabar properti terbaru</h2></div><a class="btn btn-line btn-sm" href="#berita">Semua berita</a></div>
@@ -355,6 +366,8 @@ function listingPage(){
         ${(F.type||F.status||F.prov||F.kab||F.agent||F.budget||F.bed||F.facing||F.q)?`<button class="btn-ghost btn-sm" data-act="reset-filter">Hapus filter</button>`:""}
       </div>
     </section>
+    ${(()=>{const fl=(S.feat||[]).filter(l=>(!F.type||l.type===F.type)&&(!F.status||l.status===F.status)&&(!F.prov||l.prov===F.prov)&&(!F.kab||l.kab===F.kab)).slice(0,3);
+      return fl.length?`<section class="wrap feat-strip"><div class="label label-feat">${STAR}Unggulan</div><div class="grid">${fl.map(card).join("")}</div></section>`:""})()}
     <section class="wrap grid" id="results">${resultsHtml()}</section>
     <section class="wrap more" id="more">${moreHtml()}</section>`;
 }
@@ -394,7 +407,8 @@ function detail(l){
     <div class="detail"><div>
         <div class="gallery"><div class="main" id="g-main">${pics.length?`<img src="${esc(pics[0])}" alt="${esc(l.title)}">${wmOv(pics[0])}`:mediaHtml(l)}</div>
           ${pics.length>1?`<div class="thumbs">${pics.map((p,i)=>`<button data-thumb="${i}" aria-current="${i===0}" aria-label="Foto ${i+1}"><img src="${esc(p)}" alt=""></button>`).join("")}</div>`:""}</div>
-        <div class="label" style="margin-top:22px">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(" · ")}</div>
+        ${isFeat(l)?`<div style="margin-top:18px"><span class="tag tag-feat">${STAR}Unggulan</span></div>`:""}
+        <div class="label" style="margin-top:${isFeat(l)?"10px":"22px"}">${[l.place,l.kab,l.prov].filter(Boolean).map(esc).join(" · ")}</div>
         <h1 class="d-title"${mt(l.title)}>${esc(TT(l.title))}</h1>
         ${priceHtml(l,"d-price")}
         <div class="d-views">${vw(l,true)}</div>
@@ -541,15 +555,21 @@ function renewBanner(list,own){
   return `<div class="note ${exp.length?"err":""} renew-note"><span>${exp.length?`<b>${exp.length} listing${own?" Anda":""} sudah diturunkan</b> karena tidak diperbarui selama ${EXPIRE_DAYS} hari. `:""}${soon.length?`<b>${soon.length} listing</b> akan diturunkan dalam ${WARN_DAYS} hari. `:""}${own?"Jika properti masih tersedia, tayangkan ulang agar tetap terlihat pembeli.":"Agen pemilik perlu menayangkan ulang listingnya."}</span>
     ${own?`<button class="btn btn-primary btn-sm" data-renew="${ids}">Tayangkan ulang semua</button>`:""}</div>`;
 }
+function featBtn(l){
+  if(isSold(l)||!l.published||!isLive(l))return "";
+  if(me&&me.is_admin)return isFeat(l)?`<button class="btn btn-line btn-sm" data-unfeat="${esc(l.id)}">Hentikan sorotan</button>`:`<button class="btn btn-feat btn-sm" data-feat="${esc(l.id)}">${STAR}Sorot ${FEAT_DAYS} hari</button>`;
+  if(isFeat(l))return "";
+  return `<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(SITE.adminPhone)}?text=${encodeURIComponent(`Halo admin ${SITE.name}, saya ingin listing "${l.title}" (${listingUrl(l)}) disorot sebagai Unggulan selama ${FEAT_DAYS} hari.`)}">Minta sorotan</a>`;
+}
 function rowItem(l,showAgent){
   const a=agentOf(l.agent_id)||{};const c=DS.confirm===l.id,cs=DS.confirmSold===l.id;
   return `<div class="item">${l.photos&&l.photos[0]?`<img class="thumb" src="${esc(l.photos[0])}" alt="">`:`<span class="thumb"></span>`}
     <div><b>${esc(l.title)}</b><small>${esc([showAgent?a.name:"",l.type,[l.kab,l.prov].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>
       <small>${listingPill(l)} ${l.price!=null?rupiah(l.price):"Harga: tanya agen"}</small>
-      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small><small class="stat-line">${vw(l,true)} ${waw(l)}</small></div>
+      <small>Tayang ${fmtD(l.created_at)}${l.updated_at?` · diperbarui ${fmtD(l.updated_at)}`:""}</small>${isFeat(l)?`<small><span class="pill pill-feat">${STAR}Disorot sampai ${fmtD(l.featured_until)}</span></small>`:""}<small class="stat-line">${vw(l,true)} ${waw(l)}</small></div>
     ${cs?`<span class="confirm sold-confirm">Tandai "${esc(l.title)}" sebagai ${soldWord(l).toLowerCase()}? Listing hilang dari pencarian dan dihapus permanen ${SOLD_DAYS} hari kemudian. <button class="btn btn-primary btn-sm" data-sold="${esc(l.id)}">Ya, ${soldWord(l).toLowerCase()}</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
       :c?`<span class="confirm">Hapus listing ini? <button class="btn btn-danger btn-sm" data-del-listing="${esc(l.id)}">Ya, hapus</button><button class="btn btn-line btn-sm" data-act="cancel">Batal</button></span>`
-      :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}${S.noSold?"":isSold(l)?`<button class="btn btn-line btn-sm" data-unsold="${esc(l.id)}">Batalkan ${soldWord(l).toLowerCase()}</button>`:l.published?`<button class="btn btn-sold btn-sm" data-ask-sold="${esc(l.id)}">Tandai ${soldWord(l).toLowerCase()}</button>`:""}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
+      :`<span class="item-acts">${needsRenew(l)?`<button class="btn btn-primary btn-sm" data-renew="${esc(l.id)}">Tayangkan ulang</button>${showAgent&&l.agent_id!==me.id&&a.phone?`<a class="btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${wa(a.phone)}?text=${encodeURIComponent(`Halo ${a.name}, listing Anda "${l.title}" di ${SITE.name} ${daysLeft(l)<=0?"sudah diturunkan":"akan diturunkan dalam "+daysLeft(l)+" hari"} karena belum diperbarui ${EXPIRE_DAYS} hari. Silakan masuk ke dasbor dan ketuk Tayangkan ulang bila properti masih tersedia. Terima kasih.`)}">Ingatkan via WA</a>`:""}`:""}${S.noSold?"":isSold(l)?`<button class="btn btn-line btn-sm" data-unsold="${esc(l.id)}">Batalkan ${soldWord(l).toLowerCase()}</button>`:l.published?`<button class="btn btn-sold btn-sm" data-ask-sold="${esc(l.id)}">Tandai ${soldWord(l).toLowerCase()}</button>`:""}${featBtn(l)}<a class="btn-ghost btn-sm" href="#${esc(l.id)}">Lihat</a><button class="btn btn-line btn-sm" data-edit-listing="${esc(l.id)}">Edit</button><button class="btn-ghost btn-sm" data-ask="${esc(l.id)}">Hapus</button></span>`}</div>`;
 }
 function myListings(){
   const mine=S.mine;const sold=mine.filter(isSold).length,liveN=mine.filter(isLive).length;
@@ -784,6 +804,13 @@ app.addEventListener('click',async e=>{
   if(act==="close-form"){e.preventDefault();DS.form=null;clearDraft();render();return}
   if(act==="cancel"){DS.confirm=null;DS.confirmSold=null;render();return}
   if(t.dataset.askSold){DS.confirmSold=t.dataset.askSold;DS.confirm=null;render();return}
+  if(t.dataset.feat||t.dataset.unfeat){
+    const id=t.dataset.feat||t.dataset.unfeat,on=!!t.dataset.feat;t.disabled=true;
+    const until=on?new Date(Date.now()+FEAT_DAYS*DAY).toISOString():null;
+    const {error}=await sb.from('listings').update({featured_until:until}).eq('id',id);
+    DS.msg=error?{text:/featured_until/.test(error.message||"")?"Fitur Unggulan belum aktif di database. Admin perlu menjalankan SQL tambahan di Supabase.":errMsg(error),err:true}
+      :{text:on?`Listing disorot sebagai Unggulan sampai ${fmtD(until)}.`:"Sorotan listing dihentikan."};
+    await load();return}
   if(t.dataset.sold||t.dataset.unsold){
     const id=t.dataset.sold||t.dataset.unsold,l=getL(id),on=!!t.dataset.sold;t.disabled=true;
     const {error}=await sb.from('listings').update({sold_at:on?new Date().toISOString():null}).eq('id',id);
