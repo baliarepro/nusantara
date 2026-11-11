@@ -3,7 +3,7 @@
 > Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
 > English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
 
-Diperbarui / updated: 2026-11-11. Jumlah listing tayang / live listings: 12.
+Diperbarui / updated: 2026-11-11. Jumlah listing tayang / live listings: 15.
 
 ## Halaman utama / Key pages
 - [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
@@ -16,13 +16,16 @@ Diperbarui / updated: 2026-11-11. Jumlah listing tayang / live listings: 12.
 - [Kebijakan privasi](https://nusantara.properties/privasi/) · [Privacy policy](https://nusantara.properties/en/privacy/) · [Syarat & ketentuan](https://nusantara.properties/syarat/) · [Terms of use](https://nusantara.properties/en/terms/)
 
 ## Kategori / Categories
-- [Tanah Dijual di Jawa Timur](https://nusantara.properties/properti/tanah-dijual-jawa-timur/) · [Land for Sale in Jawa Timur](https://nusantara.properties/en/property/land-for-sale-jawa-timur/)
 - [Tanah Dijual di Bali](https://nusantara.properties/properti/tanah-dijual-bali/) · [Land for Sale in Bali](https://nusantara.properties/en/property/land-for-sale-bali/)
+- [Tanah Dijual di Jawa Timur](https://nusantara.properties/properti/tanah-dijual-jawa-timur/) · [Land for Sale in Jawa Timur](https://nusantara.properties/en/property/land-for-sale-jawa-timur/)
 - [Rumah Dijual di Jawa Timur](https://nusantara.properties/properti/rumah-dijual-jawa-timur/) · [House for Sale in Jawa Timur](https://nusantara.properties/en/property/house-for-sale-jawa-timur/)
 - [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
 - [Gudang Dijual di Jawa Timur](https://nusantara.properties/properti/gudang-dijual-jawa-timur/) · [Warehouse for Sale in Jawa Timur](https://nusantara.properties/en/property/warehouse-for-sale-jawa-timur/)
 
 ## Listing
+- [Ocean view pandawa](https://nusantara.properties/listing/ocean-view-pandawa-f44dfb/): Tanah · Dijual · Kuta Selatan, Badung, Bali · 1.100 m² · SHM · Rp 850 jt / are
+- [Kavling Pandawa Nusa Dua](https://nusantara.properties/listing/kavling-pandawa-nusa-dua-6616ed/): Tanah · Dijual · Kuta Selatan, Badung, Bali · 250 m² · SHM · Harga: tanya agen
+- [Ocean View Jimbaran](https://nusantara.properties/listing/ocean-view-jimbaran-885e19/): Tanah · Dijual · Kuta Selatan, Badung, Bali · 17.300 m² · SHM · Rp 112,45 M
 - [Kantor dan Gudang di Mastrip Hitung Tanah](https://nusantara.properties/listing/kantor-dan-gudang-di-mastrip-hitung-tanah-da046b/): Tanah · Dijual · Kedurus, Surabaya, Jawa Timur · 2.638 m² · SHM · Rp 11 jt / m²
 - [Tanah 70are di Toyaning Ungasan Kuta Selatan](https://nusantara.properties/listing/tanah-70are-di-toyaning-ungasan-kuta-selatan-a06bb8/): Tanah · Dijual · Ungasan, Badung, Bali · 7.000 m² · SHM · Rp 5,8 jt / m²
 - [Rumah dijual area jaksa agung suprapto Malang](https://nusantara.properties/listing/rumah-dijual-area-jaksa-agung-suprapto-malang-9b26fc/): Rumah · Dijual · Klojen, Kota Malang, Jawa Timur · 1.587 m² · SHM · Rp 13 M
@@ -37,6 +40,9 @@ Diperbarui / updated: 2026-11-11. Jumlah listing tayang / live listings: 12.
 - [Villa di Dewi Sri Kuta Bali](https://nusantara.properties/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · Dijual · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 M
 
 ## Listings (English)
+- [Ocean view pandawa](https://nusantara.properties/en/listing/ocean-view-pandawa-f44dfb/): Land · For sale · Kuta Selatan, Badung, Bali · 1,100 m² · SHM · Rp 850 M / are
+- [Plot Pandawa Nusa Dua](https://nusantara.properties/en/listing/kavling-pandawa-nusa-dua-6616ed/): Land · For sale · Kuta Selatan, Badung, Bali · 250 m² · SHM · Price on request
+- [Ocean View Jimbaran](https://nusantara.properties/en/listing/ocean-view-jimbaran-885e19/): Land · For sale · Kuta Selatan, Badung, Bali · 17,300 m² · SHM · Rp 112.45 B
 - [Kantor and Warehouse in Mastrip Hitung Land](https://nusantara.properties/en/listing/kantor-dan-gudang-di-mastrip-hitung-tanah-da046b/): Land · For sale · Kedurus, Surabaya, Jawa Timur · 2,638 m² · SHM · Rp 11 M / m²
 - [Land 70are in Toyaning Ungasan Kuta Selatan](https://nusantara.properties/en/listing/tanah-70are-di-toyaning-ungasan-kuta-selatan-a06bb8/): Land · For sale · Ungasan, Badung, Bali · 7,000 m² · SHM · Rp 5.8 M / m²
 - [House for sale area jaksa agung suprapto Malang](https://nusantara.properties/en/listing/rumah-dijual-area-jaksa-agung-suprapto-malang-9b26fc/): House · For sale · Klojen, Kota Malang, Jawa Timur · 1,587 m² · SHM · Rp 13 B
