@@ -3,7 +3,7 @@
 > Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
 > English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
 
-Diperbarui / updated: 2026-11-12. Jumlah listing tayang / live listings: 16.
+Diperbarui / updated: 2026-11-12. Jumlah listing tayang / live listings: 19.
 
 ## Halaman utama / Key pages
 - [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
@@ -16,14 +16,17 @@ Diperbarui / updated: 2026-11-12. Jumlah listing tayang / live listings: 16.
 - [Kebijakan privasi](https://nusantara.properties/privasi/) · [Privacy policy](https://nusantara.properties/en/privacy/) · [Syarat & ketentuan](https://nusantara.properties/syarat/) · [Terms of use](https://nusantara.properties/en/terms/)
 
 ## Kategori / Categories
-- [Komersial Dijual di Jawa Timur](https://nusantara.properties/properti/komersial-dijual-jawa-timur/) · [Commercial for Sale in Jawa Timur](https://nusantara.properties/en/property/commercial-for-sale-jawa-timur/)
 - [Tanah Dijual di Bali](https://nusantara.properties/properti/tanah-dijual-bali/) · [Land for Sale in Bali](https://nusantara.properties/en/property/land-for-sale-bali/)
+- [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
+- [Komersial Dijual di Jawa Timur](https://nusantara.properties/properti/komersial-dijual-jawa-timur/) · [Commercial for Sale in Jawa Timur](https://nusantara.properties/en/property/commercial-for-sale-jawa-timur/)
 - [Tanah Dijual di Jawa Timur](https://nusantara.properties/properti/tanah-dijual-jawa-timur/) · [Land for Sale in Jawa Timur](https://nusantara.properties/en/property/land-for-sale-jawa-timur/)
 - [Rumah Dijual di Jawa Timur](https://nusantara.properties/properti/rumah-dijual-jawa-timur/) · [House for Sale in Jawa Timur](https://nusantara.properties/en/property/house-for-sale-jawa-timur/)
-- [Villa Dijual di Bali](https://nusantara.properties/properti/villa-dijual-bali/) · [Villa for Sale in Bali](https://nusantara.properties/en/property/villa-for-sale-bali/)
 - [Gudang Dijual di Jawa Timur](https://nusantara.properties/properti/gudang-dijual-jawa-timur/) · [Warehouse for Sale in Jawa Timur](https://nusantara.properties/en/property/warehouse-for-sale-jawa-timur/)
 
 ## Listing
+- [Ocean view kuta selatan pecatu](https://nusantara.properties/listing/ocean-view-kuta-selatan-pecatu-e68593/): Tanah · Dijual · Kuta selatan, Badung, Bali · 775 m² · SHM · Rp 900 jt / are
+- [Ocean view kuta selatan ungasan](https://nusantara.properties/listing/ocean-view-kuta-selatan-ungasan-d50276/): Tanah · Dijual · Kuta Selata, Badung, Bali · 805 m² · SHM · Rp 8,5 M
+- [Villa Canggu Brawe](https://nusantara.properties/listing/villa-canggu-brawe-e23264/): Villa · Dijual · Kuta Utara, Badung, Bali · 528 m² · SHM · Rp 17,8 M
 - [Rumah kost area merjosari dinoyo  malang](https://nusantara.properties/listing/rumah-kost-area-merjosari-dinoyo-malang-4861f4/): Komersial · Dijual · Merjosari dinoyo, Kota Malang, Jawa Timur · 170 m² · SHM · Rp 1,5 M
 - [Ocean view pandawa](https://nusantara.properties/listing/ocean-view-pandawa-f44dfb/): Tanah · Dijual · Kuta Selatan, Badung, Bali · 1.100 m² · SHM · Rp 850 jt / are
 - [Kavling Pandawa Nusa Dua](https://nusantara.properties/listing/kavling-pandawa-nusa-dua-6616ed/): Tanah · Dijual · Kuta Selatan, Badung, Bali · 250 m² · SHM · Harga: tanya agen
@@ -42,6 +45,9 @@ Diperbarui / updated: 2026-11-12. Jumlah listing tayang / live listings: 16.
 - [Villa di Dewi Sri Kuta Bali](https://nusantara.properties/listing/villa-di-dewi-sri-kuta-bali-edeedd/): Villa · Dijual · Kuta, Badung, Bali · 100 m² · SHM · Rp 5 M
 
 ## Listings (English)
+- [Ocean view kuta selatan pecatu](https://nusantara.properties/en/listing/ocean-view-kuta-selatan-pecatu-e68593/): Land · For sale · Kuta selatan, Badung, Bali · 775 m² · SHM · Rp 900 M / are
+- [Ocean view kuta selatan ungasan](https://nusantara.properties/en/listing/ocean-view-kuta-selatan-ungasan-d50276/): Land · For sale · Kuta Selata, Badung, Bali · 805 m² · SHM · Rp 8.5 B
+- [Villa Canggu Brawe](https://nusantara.properties/en/listing/villa-canggu-brawe-e23264/): Villa · For sale · Kuta Utara, Badung, Bali · 528 m² · SHM · Rp 17.8 B
 - [House boarding house area merjosari dinoyo  malang](https://nusantara.properties/en/listing/rumah-kost-area-merjosari-dinoyo-malang-4861f4/): Commercial · For sale · Merjosari dinoyo, Kota Malang, Jawa Timur · 170 m² · SHM · Rp 1.5 B
 - [Ocean view pandawa](https://nusantara.properties/en/listing/ocean-view-pandawa-f44dfb/): Land · For sale · Kuta Selatan, Badung, Bali · 1,100 m² · SHM · Rp 850 M / are
 - [Plot Pandawa Nusa Dua](https://nusantara.properties/en/listing/kavling-pandawa-nusa-dua-6616ed/): Land · For sale · Kuta Selatan, Badung, Bali · 250 m² · SHM · Price on request
