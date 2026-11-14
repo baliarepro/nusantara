@@ -3,7 +3,7 @@
 > Nusantara Property (https://nusantara.properties) adalah platform listing properti multi-agen untuk seluruh Indonesia: tanah, rumah, villa, apartemen, ruko, gudang, dan properti komersial, dijual maupun disewakan. Setiap agen diverifikasi admin, setiap listing mencantumkan sertifikat, zonasi, luas (m² dan are), dan kontak WhatsApp agen. Listing yang tidak diperbarui 60 hari otomatis diturunkan.
 > English: a multi-agent property listing platform for Indonesia (land, houses, villas, commercial), with verified agents, land title and zoning on every listing, and listings removed automatically after 60 days without an update.
 
-Diperbarui / updated: 2026-11-13. Jumlah listing tayang / live listings: 21.
+Diperbarui / updated: 2026-11-14. Jumlah listing tayang / live listings: 21.
 
 ## Halaman utama / Key pages
 - [Semua listing](https://nusantara.properties/listing/) · [All listings (English)](https://nusantara.properties/en/listings/)
