@@ -2,6 +2,15 @@
    Berita: tambahkan item baru di PALING ATAS array NEWS. */
 window.NP_PAGES=(function(){
 const NEWS_ID=[
+  {date:"2026-11-15",tag:"Pertanahan",title:"ATR/BPN: 35.294 kasus pertanahan selesai, 100 dari 120 target operasi mafia tanah 2026 dituntaskan",
+   summary:"Kementerian ATR/BPN mencatat lebih dari 58.000 kasus pertanahan dalam hampir 12 tahun terakhir, dan 35.294 di antaranya telah diselesaikan hingga 3 November 2026. Beban kasus 2026 terdiri dari 21.000 kasus sisa tahun-tahun sebelumnya dan 3.392 kasus baru, dengan 1.164 kasus terselesaikan. Dari 120 target operasi mafia tanah di 2026, 100 sudah diselesaikan, dan aset yang diselamatkan sekitar Rp5,286 triliun. Angka ini dipaparkan pada rapat koordinasi penanganan tindak pidana pertanahan di Jakarta, 12 November 2026.",
+   source:"ANTARA",url:"https://jogja.antaranews.com/berita/868107/kementerian-atrbpn-tuntaskan-35294-kasus-pertanahan-hingga-2026"},
+  {date:"2026-11-15",tag:"IKN",title:"Pembangunan kawasan legislatif dan yudikatif IKN capai 25–32 persen",
+   summary:"Otorita IKN mencatat rata-rata progres fisik kawasan legislatif 25,40% dan kawasan yudikatif 32,83%. Pembangunan jalan di kedua kawasan bergerak lebih cepat, yaitu 41,49% dan 46,69%. Investor asal China, PT Star Bright International Investment, mulai membangun di KIPP 1B sejak Juli 2026 dengan nilai investasi Rp1,25 triliun. Pembangunan mengacu pada Perpres Nomor 79 Tahun 2025 tentang tahap II pembangunan IKN 2025–2029.",
+   source:"ANTARA",url:"https://www.antaranews.com/berita/5855847/pembangunan-kawasan-legislatif-dan-yudikatif-ikn-capai-25-32-persen"},
+  {date:"2026-11-11",tag:"Kredit",title:"Pemerintah siapkan alokasi Kredit Perumahan Rp30 triliun untuk 2027",
+   summary:"Menko Perekonomian Airlangga Hartarto menyebut pemerintah menyiapkan alokasi Kredit Perumahan sebesar Rp30 triliun pada 2027, yang masih berpeluang ditingkatkan pada semester II-2027. Angka ini bagian dari target penyaluran kredit program 2027 sebesar Rp386,9 triliun, termasuk KUR Rp325 triliun yang naik dari Rp295 triliun di 2026. Target disampaikan usai rapat koordinasi komite kebijakan KUR di Jakarta, 11 November 2026.",
+   source:"Katadata",url:"https://katadata.co.id/finansial/keuangan/6af4240084155/pemerintah-tetapkan-target-penyaluran-kredit-program-2027-rp-386-9-triliun"},
   {date:"2026-11-06",tag:"Harga rumah",title:"Survei BI: harga rumah primer naik 0,58% di kuartal III 2026, penjualan turun 8,43%",
    summary:"Survei Harga Properti Residensial Bank Indonesia mencatat Indeks Harga Properti Residensial di pasar primer tumbuh 0,58% (yoy) pada kuartal III 2026, melambat dari 0,69% di kuartal II. Penjualan rumah primer terkontraksi 8,43% (yoy) dan turun di semua tipe. Hanya rumah tipe kecil yang harganya tumbuh lebih cepat, yaitu 0,55% dari 0,49%. KPR masih menjadi skema pembelian utama dengan porsi 70,68%, sementara pengembang mengandalkan dana internal untuk 73,94% kebutuhan pembiayaan.",
    source:"ANTARA",url:"https://www.antaranews.com/berita/5836051/survei-bi-harga-properti-residensial-kuartal-iii-2026-tumbuh-terbatas"},
@@ -28,10 +37,7 @@ const NEWS_ID=[
    source:"Bisnis.com",url:"https://finansial.bisnis.com/read/20261021/11/2014506/bi-rate-ditahan-575-pada-oktober-intip-historis-lengkapnya-sepanjang-2026"},
   {date:"2026-08-07",tag:"Harga rumah",title:"Harga rumah primer naik 0,69% di kuartal II 2026, penjualan mulai pulih",
    summary:"Survei Harga Properti Residensial Bank Indonesia mencatat Indeks Harga Properti Residensial naik 0,69% (yoy) pada kuartal II 2026. Penjualan rumah di pasar primer masih turun 2,36% (yoy), jauh membaik dibanding kontraksi 25,67% di kuartal I, dan naik 9,39% dibanding kuartal sebelumnya.",
-   source:"Industry.co.id",url:"https://www.industry.co.id/read/154227/harga-rumah-di-pasar-primer-naik-terbatas-pada-kuartal-ii-2026-penjualan-mulai-pulih"},
-  {date:"2026-01-05",tag:"Pajak",title:"PPN rumah ditanggung pemerintah 100% sepanjang 2026",
-   summary:"Lewat PMK Nomor 90 Tahun 2025, pemerintah menanggung 100% PPN untuk bagian harga sampai Rp2 miliar atas pembelian rumah tapak atau satuan rumah susun dengan harga jual paling banyak Rp5 miliar. Insentif berlaku untuk penyerahan Januari sampai Desember 2026, dan hanya untuk pembelian dari pengembang yang dikenai PPN.",
-   source:"Suara Surabaya",url:"https://www.suarasurabaya.net/ekonomibisnis/2026/pemerintah-beri-ppn-dtp-100-persen-untuk-pembelian-rumah-sepanjang-2026/"}
+   source:"Industry.co.id",url:"https://www.industry.co.id/read/154227/harga-rumah-di-pasar-primer-naik-terbatas-pada-kuartal-ii-2026-penjualan-mulai-pulih"}
 ];
 
 const GUIDE_ID=[
@@ -112,36 +118,42 @@ const FAQ_ID=[
 ];
 
 const NEWS_EN=[
+  {date:"2026-11-15",tag:"Land",title:"ATR/BPN: 35,294 land cases resolved, 100 of 120 land-mafia target operations in 2026 completed",
+   summary:"The Ministry of Agrarian Affairs and Spatial Planning (ATR/BPN) recorded more than 58,000 land cases over almost the past 12 years, of which 35,294 had been resolved as of 3 November 2026. The 2026 caseload consists of 21,000 cases carried over from previous years and 3,392 new cases, with 1,164 resolved. Of 120 land-mafia target operations in 2026, 100 have been completed, and assets worth about Rp5.286 trillion were saved. The figures were presented at a coordination meeting on land crime handling in Jakarta on 12 November 2026.",
+   source:"ANTARA",url:NEWS_ID[0].url},
+  {date:"2026-11-15",tag:"IKN",title:"Construction of IKN's legislative and judicial areas reaches 25–32 percent",
+   summary:"The IKN Authority recorded average physical progress of 25.40% in the legislative area and 32.83% in the judicial area. Road construction in the two areas is moving faster, at 41.49% and 46.69%. Chinese investor PT Star Bright International Investment began building at KIPP 1B in July 2026, with an investment value of Rp1.25 trillion. Construction follows Presidential Regulation No. 79 of 2025 on Phase II of IKN development for 2025–2029.",
+   source:"ANTARA",url:NEWS_ID[1].url},
+  {date:"2026-11-11",tag:"Credit",title:"Government sets aside Rp30 trillion in housing credit for 2027",
+   summary:"Coordinating Minister for Economic Affairs Airlangga Hartarto said the government is preparing a housing credit allocation of Rp30 trillion for 2027, which could still be raised in the second half of 2027. The figure is part of a 2027 program credit disbursement target of Rp386.9 trillion, including KUR of Rp325 trillion, up from Rp295 trillion in 2026. The targets were announced after a KUR policy committee coordination meeting in Jakarta on 11 November 2026.",
+   source:"Katadata",url:NEWS_ID[2].url},
   {date:"2026-11-06",tag:"House prices",title:"BI survey: primary house prices up 0.58% in Q3 2026, sales down 8.43%",
    summary:"Bank Indonesia's Residential Property Price Survey recorded 0.58% (yoy) growth in the primary-market residential price index in Q3 2026, slowing from 0.69% in Q2. Primary home sales contracted 8.43% (yoy) and fell across all house types. Only small houses saw faster price growth, at 0.55% from 0.49%. Mortgages remained the main purchase scheme with a 70.68% share, while developers relied on internal funds for 73.94% of their financing needs.",
-   source:"ANTARA",url:NEWS_ID[0].url},
+   source:"ANTARA",url:NEWS_ID[3].url},
   {date:"2026-11-06",tag:"Jakarta",title:"REI: only about 116 Jakarta apartment units sold in Q3 2026",
    summary:"Bambang Ekajaya, Deputy Chairman of the Indonesian Real Estate Association (REI), said that according to the latest survey only about 116 apartment units in Jakarta were absorbed by the market in Q3 2026. He estimated unsold apartment stock in Jakarta at 20,000 to 25,000 units, with the upper and premium segments the weakest. REI has proposed incentives such as government-borne VAT, a BPHTB exemption and relief on service charges (IPL). These are still association proposals, not government policy.",
-   source:"Kontan",url:NEWS_ID[1].url},
+   source:"Kontan",url:NEWS_ID[4].url},
   {date:"2026-11-05",tag:"Economy",title:"Statistics Indonesia: the economy grew 5.47% in Q3 2026",
    summary:"Statistics Indonesia (BPS) recorded 5.47% (yoy) economic growth in Q3 2026 and 1.59% on the previous quarter, with cumulative growth of 5.45%. BPS Deputy for Balance Sheets and Statistical Analysis M Edy Mahmud said government capital spending on construction rose 63.65% (yoy), while domestic and foreign investment realisation grew 7.59%.",
-   source:"Kontan",url:NEWS_ID[2].url},
+   source:"Kontan",url:NEWS_ID[5].url},
   {date:"2026-11-03",tag:"Subsidised housing",title:"FLPP subsidised mortgages reach 197,048 units in 2026, mass signings planned for December",
    summary:"BP Tapera recorded 194,360 FLPP mortgages worth Rp24.22 trillion as of 31 October 2026, nearly 54% of this year's 360,000-unit target. By 2 November the figure had risen to 197,048 units worth Rp24.55 trillion. Bank BTN disbursed the most (85,341 units), and West Java recorded the highest total of any province. Mass signings of 71,000 units on 17 December and 30,000 units on 21 December are being prepared.",
-   source:"CNBC Indonesia",url:NEWS_ID[3].url},
+   source:"CNBC Indonesia",url:NEWS_ID[6].url},
   {date:"2026-11-02",tag:"Subsidised housing",title:"Housing ministry plans to target FLPP mortgages for 40,000 subsidised apartments",
    summary:"Sri Haryati, Director General of Urban Housing at the Ministry of Housing and Settlement Areas (PKP), said the target is FLPP mortgage disbursement for 40,000 apartment units. This is still a plan and a target. She said subsidised apartment output over the past five years was under 200 units. Projects named include apartments at Meikarta, TOD housing at Manggarai, and the 609-unit Alonia Kemayoran apartments, with construction targeted to start in early January 2027.",
-   source:"ANTARA",url:NEWS_ID[4].url},
+   source:"ANTARA",url:NEWS_ID[7].url},
   {date:"2026-10-28",tag:"Credit",title:"Property lending grew 16.4% in September 2026, mortgages edged up",
    summary:"According to Bank Indonesia's money supply data, property lending grew 16.4% (yoy) to Rp1,703.7 trillion in September 2026, slowing from 18.3% the month before. House and apartment mortgages rose slightly to 4.3% (yoy) at Rp863.1 trillion, against the trend of weaker consumer lending. Construction lending still grew 42.3%.",
-   source:"Kontan",url:NEWS_ID[5].url},
+   source:"Kontan",url:NEWS_ID[8].url},
   {date:"2026-10-27",tag:"Land titles",title:"ATR/BPN has issued nearly 10 million electronic land certificates",
    summary:"The Ministry of Agrarian Affairs and Spatial Planning (ATR/BPN) recorded 9,774,933 electronic certificates issued from the service launch on 4 December 2023 to October 2026, including analog certificates converted to electronic form. From January to October 2026, 3,077,397 were issued. Analog and electronic certificates have the same legal force, and conversion requirements and fees can be checked in the Sentuh Tanahku app.",
-   source:"ANTARA",url:NEWS_ID[6].url},
+   source:"ANTARA",url:NEWS_ID[9].url},
   {date:"2026-10-21",tag:"Interest rates",title:"Bank Indonesia holds the BI Rate at 5.75% in October 2026",
    summary:"Bank Indonesia kept its benchmark rate at 5.75%. Over 2026 the BI Rate has risen 100 basis points from 4.75% since mid-May to keep the rupiah stable. For buyers on floating-rate mortgages, instalments are unlikely to fall soon, so a longer fixed-rate period is worth considering.",
-   source:"Bisnis.com",url:NEWS_ID[7].url},
+   source:"Bisnis.com",url:NEWS_ID[10].url},
   {date:"2026-08-07",tag:"House prices",title:"Primary house prices up 0.69% in Q2 2026 as sales start to recover",
    summary:"Bank Indonesia's Residential Property Price Survey recorded a 0.69% (yoy) rise in its residential price index in Q2 2026. Primary-market sales were still down 2.36% (yoy), a big improvement on the 25.67% contraction in Q1, and up 9.39% on the previous quarter.",
-   source:"Industry.co.id",url:NEWS_ID[8].url},
-  {date:"2026-01-05",tag:"Tax",title:"Government covers 100% of VAT on homes throughout 2026",
-   summary:"Under Finance Minister Regulation No. 90 of 2025, the government covers 100% of VAT on the portion of the price up to Rp2 billion for landed houses or apartment units priced up to Rp5 billion. The incentive applies to handovers from January to December 2026, and only to purchases from developers that charge VAT.",
-   source:"Suara Surabaya",url:NEWS_ID[9].url}
+   source:"Industry.co.id",url:NEWS_ID[11].url}
 ];
 const GUIDE_EN=[
  {id:"sertifikat",title:"Know the types of land title",html:`
